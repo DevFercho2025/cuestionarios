@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 08-04-2025 a las 16:10:15
--- Versión del servidor: 9.1.0
--- Versión de PHP: 8.3.14
+-- Host: localhost:8889
+-- Generation Time: Apr 08, 2025 at 07:35 PM
+-- Server version: 8.0.40
+-- PHP Version: 7.4.33
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,111 +18,96 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `bd_formulario`
+-- Database: `psicometria`
 --
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `aplicaciones`
+-- Table structure for table `aplicaciones`
 --
 
-DROP TABLE IF EXISTS `aplicaciones`;
-CREATE TABLE IF NOT EXISTS `aplicaciones` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+CREATE TABLE `aplicaciones` (
+  `id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
   `cargo_aplicado` varchar(255) DEFAULT NULL,
   `fecha_nacimiento` date DEFAULT NULL,
   `genero` varchar(50) DEFAULT NULL,
-  `codigo_postal` varchar(10) DEFAULT NULL,
-  `celular` varchar(20) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `codigo_postal` int DEFAULT NULL,
+  `celular` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `aplicaciones`
+-- Dumping data for table `aplicaciones`
 --
 
 INSERT INTO `aplicaciones` (`id`, `user_id`, `cargo_aplicado`, `fecha_nacimiento`, `genero`, `codigo_postal`, `celular`, `created_at`) VALUES
-(1, 1, 'Vacante de Prueba', '2025-04-01', 'masculino', '000000', NULL, '2025-04-07 17:32:25'),
-(2, 2, 'Vacante de Prueba2', '2025-04-01', 'masculino', '000000', NULL, '2025-04-07 17:36:26'),
-(3, 3, 'Vacante de Prueba2', '2025-04-01', 'masculino', '000000', NULL, '2025-04-07 17:38:16'),
-(4, 4, 'Vacante de Prueba', '2025-04-01', 'masculino', '000000', NULL, '2025-04-07 17:40:30'),
-(5, 5, 'Vacante de Prueba', '2025-04-01', 'masculino', '000000', NULL, '2025-04-07 17:42:14'),
-(6, 6, 'Vacante de Prueba', '2025-04-01', 'masculino', '000000', NULL, '2025-04-07 17:43:25'),
-(7, 7, 'Vacante de Prueba', '2025-04-01', 'masculino', '000000', NULL, '2025-04-07 17:44:36'),
-(8, 8, 'Vacante de Prueba', '2025-04-01', 'masculino', '000000', NULL, '2025-04-08 14:06:42'),
-(9, 9, 'Vacante de Prueba', '2025-03-31', 'masculino', '000000', NULL, '2025-04-08 14:29:59'),
-(10, 10, 'Vacante de Prueba', '2025-04-01', 'masculino', '000000', NULL, '2025-04-08 14:58:32'),
-(11, 11, 'Vacante de Prueba', '2025-04-01', 'masculino', '000000', NULL, '2025-04-08 15:27:26'),
-(12, 12, 'Vacante de prueba 12', '2025-04-01', 'masculino', '000000', NULL, '2025-04-08 15:50:02');
+(24, 3, 'Doctor', '2025-04-01', 'masculino', 0, NULL, '2025-04-08 17:11:32'),
+(32, 11, 'Doctor', '2025-04-23', 'masculino', 54040, NULL, '2025-04-08 17:59:42'),
+(33, 12, 'Fernando', '2025-04-30', 'masculino', 54040, '59690793', '2025-04-08 18:16:01'),
+(34, 14, 'Fernando', '1993-10-20', 'masculino', 54040, '5559690793', '2025-04-08 19:09:39'),
+(35, 15, 'Fernando', '1993-10-17', 'masculino', 54040, '5559690793', '2025-04-08 19:13:00'),
+(36, 16, 'Fernando', '1993-10-17', 'masculino', 54040, '5559690793', '2025-04-08 19:14:36'),
+(37, 17, 'Fernando', '1993-04-14', 'masculino', 54040, '5638084595', '2025-04-08 19:17:02'),
+(38, 18, 'Fernando', '1993-10-17', 'masculino', 54040, '5559690793', '2025-04-08 19:21:26'),
+(39, 19, 'Demo', '2000-03-16', 'masculino', 54040, '5638084595', '2025-04-08 19:53:09');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `imagenes_usuario`
+-- Table structure for table `imagenes_usuario`
 --
 
-DROP TABLE IF EXISTS `imagenes_usuario`;
-CREATE TABLE IF NOT EXISTS `imagenes_usuario` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
+CREATE TABLE `imagenes_usuario` (
+  `id` bigint NOT NULL,
   `id_usuario` bigint UNSIGNED NOT NULL,
   `file_name` varchar(255) NOT NULL,
   `file_path` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL,
-  `token_id` bigint UNSIGNED DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `id_usuario` (`id_usuario`),
-  KEY `token_id` (`token_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `token_id` bigint UNSIGNED DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `imagenes_usuario`
+-- Dumping data for table `imagenes_usuario`
 --
 
 INSERT INTO `imagenes_usuario` (`id`, `id_usuario`, `file_name`, `file_path`, `created_at`, `token_id`) VALUES
-(15, 11, '67f5406b47bdd.png', 'private/uploads/67f5406b47bdd.png', '2025-04-08 20:27:39', NULL),
-(16, 11, '67f5407447e04.png', 'private/uploads/67f5407447e04.png', '2025-04-08 20:27:48', NULL),
-(17, 11, '67f5407d4774f.png', 'private/uploads/67f5407d4774f.png', '2025-04-08 20:27:57', NULL),
-(18, 12, '67f545b7021f9.png', 'private/uploads/67f545b7021f9.png', '2025-04-08 20:50:15', NULL),
-(19, 12, '67f545c003b31.png', 'private/uploads/67f545c003b31.png', '2025-04-08 20:50:24', NULL),
-(20, 12, '67f545c9026fd.png', 'private/uploads/67f545c9026fd.png', '2025-04-08 20:50:33', NULL);
+(9, 12, '67f567f850e06.png', 'private/uploads/67f567f850e06.png', '2025-04-09 00:16:24', 2),
+(10, 12, '67f568014c1e7.png', 'private/uploads/67f568014c1e7.png', '2025-04-09 00:16:33', 2),
+(11, 12, '67f5680bbe7f5.png', 'private/uploads/67f5680bbe7f5.png', '2025-04-09 00:16:43', 2),
+(12, 18, '67f57744dbad9.png', 'private/uploads/67f57744dbad9.png', '2025-04-09 01:21:40', NULL),
+(13, 18, '67f5774dd24f2.png', 'private/uploads/67f5774dd24f2.png', '2025-04-09 01:21:49', NULL),
+(14, 18, '67f57756d8f45.png', 'private/uploads/67f57756d8f45.png', '2025-04-09 01:21:58', NULL);
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `migrations`
+-- Table structure for table `migrations`
 --
 
-DROP TABLE IF EXISTS `migrations`;
-CREATE TABLE IF NOT EXISTS `migrations` (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+CREATE TABLE `migrations` (
+  `id` int UNSIGNED NOT NULL,
   `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `batch` int NOT NULL,
-  PRIMARY KEY (`id`)
+  `batch` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `preguntas`
+-- Table structure for table `preguntas`
 --
 
-DROP TABLE IF EXISTS `preguntas`;
-CREATE TABLE IF NOT EXISTS `preguntas` (
+CREATE TABLE `preguntas` (
   `pregunta_id` int NOT NULL,
   `pregunta` varchar(200) NOT NULL,
   `cuestionario` varchar(200) NOT NULL,
   `required` tinyint(1) NOT NULL DEFAULT '0',
-  `seccion_id` int NOT NULL,
-  PRIMARY KEY (`pregunta_id`),
-  KEY `seccion_id` (`seccion_id`) USING BTREE
+  `seccion_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `preguntas`
+-- Dumping data for table `preguntas`
 --
 
 INSERT INTO `preguntas` (`pregunta_id`, `pregunta`, `cuestionario`, `required`, `seccion_id`) VALUES
@@ -395,21 +380,17 @@ INSERT INTO `preguntas` (`pregunta_id`, `pregunta`, `cuestionario`, `required`, 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `pregunta_y_respuesta_correcta`
+-- Table structure for table `pregunta_y_respuesta_correcta`
 --
 
-DROP TABLE IF EXISTS `pregunta_y_respuesta_correcta`;
-CREATE TABLE IF NOT EXISTS `pregunta_y_respuesta_correcta` (
-  `id` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `pregunta_y_respuesta_correcta` (
+  `id` int NOT NULL,
   `pregunta_id` int NOT NULL,
-  `respuesta_id` int NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `pregunta_id` (`pregunta_id`),
-  KEY `respuesta_id` (`respuesta_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `respuesta_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `pregunta_y_respuesta_correcta`
+-- Dumping data for table `pregunta_y_respuesta_correcta`
 --
 
 INSERT INTO `pregunta_y_respuesta_correcta` (`id`, `pregunta_id`, `respuesta_id`) VALUES
@@ -452,21 +433,18 @@ INSERT INTO `pregunta_y_respuesta_correcta` (`id`, `pregunta_id`, `respuesta_id`
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `respuestas`
+-- Table structure for table `respuestas`
 --
 
-DROP TABLE IF EXISTS `respuestas`;
-CREATE TABLE IF NOT EXISTS `respuestas` (
+CREATE TABLE `respuestas` (
   `respuesta_id` int NOT NULL,
   `respuesta` varchar(200) NOT NULL,
   `opcion` char(1) NOT NULL,
-  `pregunta_id` int NOT NULL,
-  PRIMARY KEY (`respuesta_id`),
-  KEY `pregunta_id` (`pregunta_id`)
+  `pregunta_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `respuestas`
+-- Dumping data for table `respuestas`
 --
 
 INSERT INTO `respuestas` (`respuesta_id`, `respuesta`, `opcion`, `pregunta_id`) VALUES
@@ -1041,81 +1019,140 @@ INSERT INTO `respuestas` (`respuesta_id`, `respuesta`, `opcion`, `pregunta_id`) 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `respuestas_usuario`
+-- Table structure for table `respuestas_usuario`
 --
 
-DROP TABLE IF EXISTS `respuestas_usuario`;
-CREATE TABLE IF NOT EXISTS `respuestas_usuario` (
+CREATE TABLE `respuestas_usuario` (
   `user_id` bigint UNSIGNED NOT NULL,
   `pregunta_id` int NOT NULL,
   `respuesta_id` int NOT NULL,
   `ip_usuario` varchar(40) NOT NULL,
-  `token_id` bigint UNSIGNED DEFAULT NULL,
-  KEY `pregunta_id` (`pregunta_id`),
-  KEY `respuesta_id` (`respuesta_id`),
-  KEY `user_id` (`user_id`),
-  KEY `token_id` (`token_id`) USING BTREE
+  `token_id` bigint UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `respuestas_usuario`
+-- Dumping data for table `respuestas_usuario`
 --
 
 INSERT INTO `respuestas_usuario` (`user_id`, `pregunta_id`, `respuesta_id`, `ip_usuario`, `token_id`) VALUES
-(11, 18, 40, '::1', 14),
-(11, 14, 31, '::1', 14),
-(11, 20, 44, '::1', 14),
-(11, 24, 52, '::1', 14),
-(11, 21, 46, '::1', 14),
-(11, 29, 62, '::1', 14),
-(11, 32, 68, '::1', 14),
-(11, 26, 56, '::1', 14),
-(11, 11, 25, '::1', 14),
-(11, 13, 30, '::1', 14),
-(11, 4, 8, '::1', 14),
-(11, 34, 72, '::1', 14),
-(11, 5, 11, '::1', 14),
-(11, 19, 42, '::1', 14),
-(11, 1, 1, '::1', 14),
-(11, 35, 75, '::1', 14),
-(12, 9, 20, '::1', 16),
-(12, 26, 56, '::1', 16),
-(12, 6, 13, '::1', 16),
-(12, 29, 62, '::1', 16),
-(12, 35, 74, '::1', 16),
-(12, 20, 44, '::1', 16),
-(12, 15, 34, '::1', 16),
-(12, 23, 50, '::1', 16),
-(12, 24, 52, '::1', 16),
-(12, 14, 31, '::1', 16),
-(12, 25, 54, '::1', 16),
-(12, 7, 16, '::1', 16),
-(12, 5, 11, '::1', 16),
-(12, 27, 58, '::1', 16),
-(12, 34, 72, '::1', 16),
-(12, 17, 38, '::1', 16),
-(12, 19, 42, '::1', 16);
+(12, 32, 68, '::1', 2),
+(12, 6, 14, '::1', 2),
+(12, 11, 25, '::1', 2),
+(12, 10, 22, '::1', 2),
+(12, 19, 42, '::1', 2),
+(12, 35, 74, '::1', 2),
+(12, 17, 38, '::1', 2),
+(12, 16, 37, '::1', 2),
+(12, 8, 18, '::1', 2),
+(12, 18, 41, '::1', 2),
+(12, 1, 2, '::1', 2),
+(12, 29, 62, '::1', 2),
+(12, 14, 31, '::1', 2),
+(12, 33, 71, '::1', 2),
+(12, 26, 56, '::1', 2),
+(12, 23, 51, '::1', 2),
+(12, 25, 55, '::1', 2),
+(12, 27, 59, '::1', 2),
+(12, 4, 10, '::1', 2),
+(12, 21, 46, '::1', 2),
+(12, 13, 30, '::1', 2),
+(12, 20, 44, '::1', 2),
+(12, 59, 122, '::1', 2),
+(12, 99, 203, '::1', 2),
+(12, 130, 264, '::1', 2),
+(12, 113, 230, '::1', 2),
+(12, 154, 312, '::1', 2),
+(12, 148, 301, '::1', 2),
+(12, 183, 372, '::1', 2),
+(17, 12, 27, '::1', NULL),
+(17, 7, 16, '::1', NULL),
+(17, 17, 38, '::1', NULL),
+(17, 32, 68, '::1', NULL),
+(17, 25, 54, '::1', NULL),
+(17, 2, 4, '::1', NULL),
+(17, 31, 66, '::1', NULL),
+(17, 33, 70, '::1', NULL),
+(17, 14, 31, '::1', NULL),
+(17, 30, 64, '::1', NULL),
+(17, 21, 46, '::1', NULL),
+(17, 18, 40, '::1', NULL),
+(17, 35, 74, '::1', NULL),
+(17, 1, 1, '::1', NULL),
+(17, 10, 22, '::1', NULL),
+(17, 27, 58, '::1', NULL),
+(17, 4, 8, '::1', NULL),
+(17, 8, 18, '::1', NULL),
+(17, 24, 52, '::1', NULL),
+(17, 22, 48, '::1', NULL),
+(17, 15, 34, '::1', NULL),
+(17, 29, 62, '::1', NULL),
+(17, 3, 6, '::1', NULL),
+(17, 23, 50, '::1', NULL),
+(17, 9, 20, '::1', NULL),
+(17, 5, 11, '::1', NULL),
+(17, 26, 56, '::1', NULL),
+(17, 20, 44, '::1', NULL),
+(17, 13, 29, '::1', NULL),
+(17, 28, 60, '::1', NULL),
+(17, 34, 72, '::1', NULL),
+(17, 6, 13, '::1', NULL),
+(17, 16, 36, '::1', NULL),
+(17, 11, 25, '::1', NULL),
+(17, 19, 42, '::1', NULL),
+(17, 12, 27, '::1', NULL),
+(17, 7, 16, '::1', NULL),
+(17, 17, 38, '::1', NULL),
+(17, 32, 68, '::1', NULL),
+(17, 25, 54, '::1', NULL),
+(17, 2, 4, '::1', NULL),
+(17, 31, 66, '::1', NULL),
+(17, 33, 70, '::1', NULL),
+(17, 14, 31, '::1', NULL),
+(17, 30, 64, '::1', NULL),
+(17, 21, 46, '::1', NULL),
+(17, 18, 40, '::1', NULL),
+(17, 35, 74, '::1', NULL),
+(17, 1, 1, '::1', NULL),
+(17, 10, 22, '::1', NULL),
+(17, 27, 58, '::1', NULL),
+(17, 4, 8, '::1', NULL),
+(17, 8, 18, '::1', NULL),
+(17, 24, 52, '::1', NULL),
+(17, 22, 48, '::1', NULL),
+(17, 15, 34, '::1', NULL),
+(17, 29, 62, '::1', NULL),
+(17, 3, 6, '::1', NULL),
+(17, 23, 50, '::1', NULL),
+(17, 9, 20, '::1', NULL),
+(17, 5, 11, '::1', NULL),
+(17, 26, 56, '::1', NULL),
+(17, 20, 44, '::1', NULL),
+(17, 13, 29, '::1', NULL),
+(17, 28, 60, '::1', NULL),
+(17, 34, 72, '::1', NULL),
+(17, 6, 13, '::1', NULL),
+(17, 16, 36, '::1', NULL),
+(17, 11, 25, '::1', NULL),
+(17, 19, 42, '::1', NULL);
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `secciones`
+-- Table structure for table `secciones`
 --
 
-DROP TABLE IF EXISTS `secciones`;
-CREATE TABLE IF NOT EXISTS `secciones` (
-  `id` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `secciones` (
+  `id` int NOT NULL,
   `titulo` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `bloque` tinyint NOT NULL,
   `cuestionario` varchar(100) NOT NULL,
   `created_at` timestamp NOT NULL,
   `updated_at` timestamp NOT NULL,
-  `time_at` timestamp NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `time_at` timestamp NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `secciones`
+-- Dumping data for table `secciones`
 --
 
 INSERT INTO `secciones` (`id`, `titulo`, `bloque`, `cuestionario`, `created_at`, `updated_at`, `time_at`) VALUES
@@ -1141,87 +1178,203 @@ INSERT INTO `secciones` (`id`, `titulo`, `bloque`, `cuestionario`, `created_at`,
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `tokens_evaluaciones`
+-- Table structure for table `tokens_evaluaciones`
 --
 
-DROP TABLE IF EXISTS `tokens_evaluaciones`;
-CREATE TABLE IF NOT EXISTS `tokens_evaluaciones` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+CREATE TABLE `tokens_evaluaciones` (
+  `id` bigint UNSIGNED NOT NULL,
   `token` varchar(255) NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `tokens_evaluaciones`
+-- Dumping data for table `tokens_evaluaciones`
 --
 
 INSERT INTO `tokens_evaluaciones` (`id`, `token`, `user_id`, `created_at`) VALUES
-(14, '$2y$10$6CoZYLNZ9UWQjMIUS637Aun1Qgi/yLoGnupUSP7uv07KxpE0gPaNS', 11, '2025-04-08 10:28:21'),
-(15, '$2y$10$Iy43Qy9DWTMXGSJJRBsC3O/5Tg3Xof.yQ69y/PAlkwj5.mPLb0FCy', 11, '2025-04-08 10:31:45'),
-(16, '$2y$10$fOG19W2R6m9lHgrfRiPTMeam7m9inPcK07MXGoYGsFKyO2Lcl7Anq', 12, '2025-04-08 10:50:54');
+(2, '$2y$12$oFJmWOAENicykcHJzbWdyuhuuIfguMLvWs.oxtEC.dC9Jv68dK2Ny', 12, '2025-04-08 12:17:06');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `users`
+-- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+CREATE TABLE `users` (
+  `id` bigint UNSIGNED NOT NULL,
+  `is_admin` tinyint(1) NOT NULL DEFAULT '0',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Volcado de datos para la tabla `users`
+-- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(11, 'Luis Gomes No aplica', 'aaaa@gmail.com', NULL, '$2y$10$lEsdcm.0O.hV91KDOZupE.i9bkiJyOpeIM0e6O.E.UWobmVQ8K3lS', NULL, '2025-04-08 20:27:26', '2025-04-08 20:27:26'),
-(12, 'NOMBRE APELLIDO No aplica', 'smg01est@gmail.com', NULL, '$2y$10$RR4yKpIwOQ3xZydtUlixieAQ8GpLUtYVITEc02CJ./d6Rj1Xq8ozK', NULL, '2025-04-08 20:50:02', '2025-04-08 20:50:02');
+INSERT INTO `users` (`id`, `is_admin`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
+(11, 1, 'Fernadno asd Monroy', 'admin@admin.com', NULL, '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-08 23:59:42', '2025-04-08 23:59:42'),
+(19, 0, 'Fernando Sanchez Monroy', '1bmw_7373@hotmail.com', NULL, '$2y$12$smQcd4ZpWKXjvyHUn3NprOraoWZmIo.5qKNib4J25xtbSCZOwWmF2', NULL, '2025-04-09 01:53:09', '2025-04-09 01:53:09');
 
 --
--- Restricciones para tablas volcadas
+-- Indexes for dumped tables
 --
 
 --
--- Filtros para la tabla `imagenes_usuario`
+-- Indexes for table `aplicaciones`
+--
+ALTER TABLE `aplicaciones`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `imagenes_usuario`
+--
+ALTER TABLE `imagenes_usuario`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_usuario` (`id_usuario`),
+  ADD KEY `token_id` (`token_id`);
+
+--
+-- Indexes for table `migrations`
+--
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `preguntas`
+--
+ALTER TABLE `preguntas`
+  ADD PRIMARY KEY (`pregunta_id`),
+  ADD KEY `seccion_id` (`seccion_id`) USING BTREE;
+
+--
+-- Indexes for table `pregunta_y_respuesta_correcta`
+--
+ALTER TABLE `pregunta_y_respuesta_correcta`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `pregunta_id` (`pregunta_id`),
+  ADD KEY `respuesta_id` (`respuesta_id`);
+
+--
+-- Indexes for table `respuestas`
+--
+ALTER TABLE `respuestas`
+  ADD PRIMARY KEY (`respuesta_id`),
+  ADD KEY `pregunta_id` (`pregunta_id`);
+
+--
+-- Indexes for table `respuestas_usuario`
+--
+ALTER TABLE `respuestas_usuario`
+  ADD KEY `pregunta_id` (`pregunta_id`),
+  ADD KEY `respuesta_id` (`respuesta_id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `token_id` (`token_id`) USING BTREE;
+
+--
+-- Indexes for table `secciones`
+--
+ALTER TABLE `secciones`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tokens_evaluaciones`
+--
+ALTER TABLE `tokens_evaluaciones`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `aplicaciones`
+--
+ALTER TABLE `aplicaciones`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+
+--
+-- AUTO_INCREMENT for table `imagenes_usuario`
+--
+ALTER TABLE `imagenes_usuario`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT for table `migrations`
+--
+ALTER TABLE `migrations`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `pregunta_y_respuesta_correcta`
+--
+ALTER TABLE `pregunta_y_respuesta_correcta`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+
+--
+-- AUTO_INCREMENT for table `secciones`
+--
+ALTER TABLE `secciones`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT for table `tokens_evaluaciones`
+--
+ALTER TABLE `tokens_evaluaciones`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `imagenes_usuario`
 --
 ALTER TABLE `imagenes_usuario`
   ADD CONSTRAINT `imagenes_usuario_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `imagenes_usuario_ibfk_2` FOREIGN KEY (`token_id`) REFERENCES `tokens_evaluaciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `preguntas`
+-- Constraints for table `preguntas`
 --
 ALTER TABLE `preguntas`
   ADD CONSTRAINT `preguntas_ibfk_1` FOREIGN KEY (`seccion_id`) REFERENCES `secciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `pregunta_y_respuesta_correcta`
+-- Constraints for table `pregunta_y_respuesta_correcta`
 --
 ALTER TABLE `pregunta_y_respuesta_correcta`
   ADD CONSTRAINT `pregunta_y_respuesta_correcta_ibfk_1` FOREIGN KEY (`respuesta_id`) REFERENCES `respuestas` (`respuesta_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `pregunta_y_respuesta_correcta_ibfk_2` FOREIGN KEY (`pregunta_id`) REFERENCES `preguntas` (`pregunta_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `respuestas`
+-- Constraints for table `respuestas`
 --
 ALTER TABLE `respuestas`
   ADD CONSTRAINT `respuestas_ibfk_1` FOREIGN KEY (`pregunta_id`) REFERENCES `preguntas` (`pregunta_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `respuestas_usuario`
+-- Constraints for table `respuestas_usuario`
 --
 ALTER TABLE `respuestas_usuario`
   ADD CONSTRAINT `respuestas_usuario_ibfk_1` FOREIGN KEY (`respuesta_id`) REFERENCES `respuestas` (`respuesta_id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -1230,7 +1383,7 @@ ALTER TABLE `respuestas_usuario`
   ADD CONSTRAINT `respuestas_usuario_ibfk_4` FOREIGN KEY (`token_id`) REFERENCES `tokens_evaluaciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `tokens_evaluaciones`
+-- Constraints for table `tokens_evaluaciones`
 --
 ALTER TABLE `tokens_evaluaciones`
   ADD CONSTRAINT `tokens_evaluaciones_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
