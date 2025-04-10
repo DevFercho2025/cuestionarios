@@ -5,6 +5,11 @@ use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\RespuestaController;
 use App\Http\Controllers\RespuestaCorrectaController;
 use App\Http\Controllers\SeccionController;
+use App\Http\Controllers\CandidatoController;
+use App\Http\Controllers\CandidateRegisterController;
+use App\Http\Controllers\CandidateController;
+use App\Http\Controllers\EvaluacionController;
+use App\Http\Controllers\AplicacionController;
 use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -34,7 +39,7 @@ Route::get('postal-codes/{postalCode}/{phoneNumber}', [PostalCodeGoogleApiContro
 
 Route::group([
     'prefix' => 'admin',
-    'middleware' => ['auth', 'is_admin']
+    'middleware' => ['auth', 'is_admin', 'is_super_admin']
 ], function () {
 
     // Panel de administración principal
@@ -71,4 +76,33 @@ Route::group([
     Route::get('respuestas_correctas/{id}', [RespuestaCorrectaController::class, 'show'])->name('respuestas_correctas.show');
     Route::put('respuestas_correctas/{id}', [RespuestaCorrectaController::class, 'update'])->name('respuestas_correctas.update');
     Route::delete('respuestas_correctas/{id}', [RespuestaCorrectaController::class, 'destroy'])->name('respuestas_correctas.destroy');
+
+    // Rutas para candidatos
+    Route::get('candidatos', [CandidatoController::class, 'index'])->name('candidatos.index');
+    Route::get('candidatos/registrar-candidato', [CandidatoController::class, 'crearCandidato'])->name('candidatos.crear');
+    Route::post('/candidatos', [CandidatoController::class, 'store'])->name('candidatos.store');
+    Route::get('/candidatos/datatable', [CandidatoController::class, 'datatable'])->name('candidatos.datatable');
+    Route::get('candidatos/{id}', [CandidatoController::class, 'show'])->name('candidatos.show');
+    Route::put('candidatos/{id}', [CandidatoController::class, 'update'])->name('candidatos.update');
+    Route::delete('candidatos/{id}', [CandidatoController::class, 'destroy'])->name('candidatos.destroy');
+    Route::post('/generar-codigo', [CandidatoController::class, 'generarCodigo'])->name('generar.codigo');
+    Route::post('candidatos/codigo', [CandidatoController::class, 'guardarCodigo'])->name('guardar.codigo');
+    Route::get('candidatos/lista', [CandidatoController::class, 'listaUsuarios'])->name('candidatos.lista');
+
+
+    Route::get('/evaluaciones', [EvaluacionController::class, 'index'])->name('evaluaciones.index');
+
+    // Select de usuarios y vacantes
+    Route::get('usuarios/all', [AplicacionController::class, 'usuarios'])->name('usuarios.all');
+    Route::get('vacantes/all', [AplicacionController::class, 'vacantes'])->name('vacantes.all');
+
+});
+
+Route::group([
+    'prefix' => 'candidate',
+    'middleware' => ['auth', 'is_candidate::class']
+], function (){
+    Route::get('/', [CandidateController::class, 'index'])->name('candidate.index');
+    Route::post('/validar-codigo', [CandidateController::class, 'validarCodigo'])->name('validar.codigo');
+
 });

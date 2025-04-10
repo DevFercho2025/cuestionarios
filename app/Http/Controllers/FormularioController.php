@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\ImagenUsuario;
-use App\Models\Respuesta_Usuario;
 use App\Models\Aplicacion;
+use App\Models\Respuesta_Usuario;
+use App\Models\UserInfo;
 use App\Models\pregunta;
 use App\Models\Seccion;
 use App\Models\TokenEvaluacion;
@@ -29,7 +30,7 @@ class FormularioController extends Controller
 
         #limpia la sesión para evitar que use datos previos
         $request->session()->flush();
-
+/*
         $nombreCompleto = $request->input('nombre') . ' ' . $request->input('apellidoPaterno');
 
         $apellidoMaterno = $request->input('apellidoMaterno');
@@ -60,28 +61,13 @@ class FormularioController extends Controller
         ];
         $request->session()->put('candidato', $candidato);
 
-        Aplicacion::create([
+        UserInfo::create([
             'user_id' => $user->id,
-            'cargo_aplicado' => $candidato['cargoAlQueAplica'],
             'fecha_nacimiento' => $candidato['fechaNacimiento'],
             'genero' => $candidato['genero'],
             'codigo_postal' => $candidato['codigoPostal'],
             'celular' => $candidato['celular'],
-        ]);
-
-        #Guarda toda la info del candidato en la sesión, de forma que se pueda acceder a esta desde cualquier lado de la app.
-        /*$request->session()->put('candidato', [
-            'cargoAlQueAplica' => $request->input('cargo'),
-            'nombre' => $request->input('nombre'),
-            'apellidoPaterno' => $request->input('apellidoPaterno'),
-            'apellidoMaterno' => $request->input('apellidoMaterno'),
-            'correo' => $request->input('correo'),
-            'fechaNacimiento' => $request->input('fechaNacimiento'),
-            'genero' => $request->input('genero'),
-            'codigoPostal' => $request->input('codigoPostal'),
-            'celular' => $request->input('celular'),
         ]);*/
-
 
         // $request->session()->put('user_id', auth()->id()); si es un usurio autenticado (cuando tenga lo de perfil de usuarios)
         return view('public.permisos');

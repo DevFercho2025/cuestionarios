@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:8889
--- Generation Time: Apr 08, 2025 at 07:35 PM
--- Server version: 8.0.40
--- PHP Version: 7.4.33
+-- Servidor: 127.0.0.1:3306
+-- Tiempo de generación: 10-04-2025 a las 18:47:16
+-- Versión del servidor: 9.1.0
+-- Versión de PHP: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,58 +18,106 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `psicometria`
+-- Base de datos: `psicometria`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `aplicaciones`
+-- Estructura de tabla para la tabla `aplicaciones`
 --
 
-CREATE TABLE `aplicaciones` (
-  `id` bigint UNSIGNED NOT NULL,
-  `user_id` bigint UNSIGNED NOT NULL,
-  `cargo_aplicado` varchar(255) DEFAULT NULL,
-  `fecha_nacimiento` date DEFAULT NULL,
-  `genero` varchar(50) DEFAULT NULL,
-  `codigo_postal` int DEFAULT NULL,
-  `celular` text,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `aplicaciones`
---
-
-INSERT INTO `aplicaciones` (`id`, `user_id`, `cargo_aplicado`, `fecha_nacimiento`, `genero`, `codigo_postal`, `celular`, `created_at`) VALUES
-(24, 3, 'Doctor', '2025-04-01', 'masculino', 0, NULL, '2025-04-08 17:11:32'),
-(32, 11, 'Doctor', '2025-04-23', 'masculino', 54040, NULL, '2025-04-08 17:59:42'),
-(33, 12, 'Fernando', '2025-04-30', 'masculino', 54040, '59690793', '2025-04-08 18:16:01'),
-(34, 14, 'Fernando', '1993-10-20', 'masculino', 54040, '5559690793', '2025-04-08 19:09:39'),
-(35, 15, 'Fernando', '1993-10-17', 'masculino', 54040, '5559690793', '2025-04-08 19:13:00'),
-(36, 16, 'Fernando', '1993-10-17', 'masculino', 54040, '5559690793', '2025-04-08 19:14:36'),
-(37, 17, 'Fernando', '1993-04-14', 'masculino', 54040, '5638084595', '2025-04-08 19:17:02'),
-(38, 18, 'Fernando', '1993-10-17', 'masculino', 54040, '5559690793', '2025-04-08 19:21:26'),
-(39, 19, 'Demo', '2000-03-16', 'masculino', 54040, '5638084595', '2025-04-08 19:53:09');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `imagenes_usuario`
---
-
-CREATE TABLE `imagenes_usuario` (
+DROP TABLE IF EXISTS `aplicaciones`;
+CREATE TABLE IF NOT EXISTS `aplicaciones` (
   `id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  `vacante` varchar(255) NOT NULL,
+  `codigo` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `categorias`
+--
+
+DROP TABLE IF EXISTS `categorias`;
+CREATE TABLE IF NOT EXISTS `categorias` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `titulo_cuestionario` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL,
+  `updated_at` timestamp NOT NULL,
+  `time_at` timestamp NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `categorias`
+--
+
+INSERT INTO `categorias` (`id`, `titulo_cuestionario`, `created_at`, `updated_at`, `time_at`) VALUES
+(1, 'Prueba de Integridad de Reid (Reid Integrity Test)', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(2, 'Inventario de Honestidad de O\'\'connor', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(3, 'All port', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(4, 'Barsit', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(5, 'Cleaver', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(6, 'Gordon', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(7, 'Inglés', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(8, 'IPV', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(9, 'Kostick', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(10, 'LIFO', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(11, 'Moss', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(12, 'Raven', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(13, 'Terman', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(14, 'Wonderlic', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(15, 'Zavik', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
+(16, '16PF', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `company`
+--
+
+DROP TABLE IF EXISTS `company`;
+CREATE TABLE IF NOT EXISTS `company` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` text NOT NULL,
+  `created_at` timestamp NOT NULL,
+  `updated_at` timestamp NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `company`
+--
+
+INSERT INTO `company` (`id`, `nombre`, `created_at`, `updated_at`) VALUES
+(1, 'Compañía ejemplo', '2025-04-10 17:32:22', '2025-04-10 17:32:22');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `imagenes_usuario`
+--
+
+DROP TABLE IF EXISTS `imagenes_usuario`;
+CREATE TABLE IF NOT EXISTS `imagenes_usuario` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
   `id_usuario` bigint UNSIGNED NOT NULL,
   `file_name` varchar(255) NOT NULL,
   `file_path` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL,
-  `token_id` bigint UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `token_id` bigint UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_usuario` (`id_usuario`),
+  KEY `token_id` (`token_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `imagenes_usuario`
+-- Volcado de datos para la tabla `imagenes_usuario`
 --
 
 INSERT INTO `imagenes_usuario` (`id`, `id_usuario`, `file_name`, `file_path`, `created_at`, `token_id`) VALUES
@@ -83,31 +131,36 @@ INSERT INTO `imagenes_usuario` (`id`, `id_usuario`, `file_name`, `file_path`, `c
 -- --------------------------------------------------------
 
 --
--- Table structure for table `migrations`
+-- Estructura de tabla para la tabla `migrations`
 --
 
-CREATE TABLE `migrations` (
-  `id` int UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `migrations`;
+CREATE TABLE IF NOT EXISTS `migrations` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
   `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `batch` int NOT NULL
+  `batch` int NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `preguntas`
+-- Estructura de tabla para la tabla `preguntas`
 --
 
-CREATE TABLE `preguntas` (
+DROP TABLE IF EXISTS `preguntas`;
+CREATE TABLE IF NOT EXISTS `preguntas` (
   `pregunta_id` int NOT NULL,
   `pregunta` varchar(200) NOT NULL,
   `cuestionario` varchar(200) NOT NULL,
   `required` tinyint(1) NOT NULL DEFAULT '0',
-  `seccion_id` int NOT NULL
+  `seccion_id` int NOT NULL,
+  PRIMARY KEY (`pregunta_id`),
+  KEY `seccion_id` (`seccion_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `preguntas`
+-- Volcado de datos para la tabla `preguntas`
 --
 
 INSERT INTO `preguntas` (`pregunta_id`, `pregunta`, `cuestionario`, `required`, `seccion_id`) VALUES
@@ -380,17 +433,21 @@ INSERT INTO `preguntas` (`pregunta_id`, `pregunta`, `cuestionario`, `required`, 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pregunta_y_respuesta_correcta`
+-- Estructura de tabla para la tabla `pregunta_y_respuesta_correcta`
 --
 
-CREATE TABLE `pregunta_y_respuesta_correcta` (
-  `id` int NOT NULL,
+DROP TABLE IF EXISTS `pregunta_y_respuesta_correcta`;
+CREATE TABLE IF NOT EXISTS `pregunta_y_respuesta_correcta` (
+  `id` int NOT NULL AUTO_INCREMENT,
   `pregunta_id` int NOT NULL,
-  `respuesta_id` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `respuesta_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `pregunta_id` (`pregunta_id`),
+  KEY `respuesta_id` (`respuesta_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `pregunta_y_respuesta_correcta`
+-- Volcado de datos para la tabla `pregunta_y_respuesta_correcta`
 --
 
 INSERT INTO `pregunta_y_respuesta_correcta` (`id`, `pregunta_id`, `respuesta_id`) VALUES
@@ -433,18 +490,21 @@ INSERT INTO `pregunta_y_respuesta_correcta` (`id`, `pregunta_id`, `respuesta_id`
 -- --------------------------------------------------------
 
 --
--- Table structure for table `respuestas`
+-- Estructura de tabla para la tabla `respuestas`
 --
 
-CREATE TABLE `respuestas` (
+DROP TABLE IF EXISTS `respuestas`;
+CREATE TABLE IF NOT EXISTS `respuestas` (
   `respuesta_id` int NOT NULL,
   `respuesta` varchar(200) NOT NULL,
   `opcion` char(1) NOT NULL,
-  `pregunta_id` int NOT NULL
+  `pregunta_id` int NOT NULL,
+  PRIMARY KEY (`respuesta_id`),
+  KEY `pregunta_id` (`pregunta_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `respuestas`
+-- Volcado de datos para la tabla `respuestas`
 --
 
 INSERT INTO `respuestas` (`respuesta_id`, `respuesta`, `opcion`, `pregunta_id`) VALUES
@@ -1019,19 +1079,24 @@ INSERT INTO `respuestas` (`respuesta_id`, `respuesta`, `opcion`, `pregunta_id`) 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `respuestas_usuario`
+-- Estructura de tabla para la tabla `respuestas_usuario`
 --
 
-CREATE TABLE `respuestas_usuario` (
+DROP TABLE IF EXISTS `respuestas_usuario`;
+CREATE TABLE IF NOT EXISTS `respuestas_usuario` (
   `user_id` bigint UNSIGNED NOT NULL,
   `pregunta_id` int NOT NULL,
   `respuesta_id` int NOT NULL,
   `ip_usuario` varchar(40) NOT NULL,
-  `token_id` bigint UNSIGNED DEFAULT NULL
+  `token_id` bigint UNSIGNED DEFAULT NULL,
+  KEY `pregunta_id` (`pregunta_id`),
+  KEY `respuesta_id` (`respuesta_id`),
+  KEY `user_id` (`user_id`),
+  KEY `token_id` (`token_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `respuestas_usuario`
+-- Volcado de datos para la tabla `respuestas_usuario`
 --
 
 INSERT INTO `respuestas_usuario` (`user_id`, `pregunta_id`, `respuesta_id`, `ip_usuario`, `token_id`) VALUES
@@ -1138,58 +1203,63 @@ INSERT INTO `respuestas_usuario` (`user_id`, `pregunta_id`, `respuesta_id`, `ip_
 -- --------------------------------------------------------
 
 --
--- Table structure for table `secciones`
+-- Estructura de tabla para la tabla `secciones`
 --
 
-CREATE TABLE `secciones` (
-  `id` int NOT NULL,
+DROP TABLE IF EXISTS `secciones`;
+CREATE TABLE IF NOT EXISTS `secciones` (
+  `id` int NOT NULL AUTO_INCREMENT,
   `titulo` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `bloque` tinyint NOT NULL,
-  `cuestionario` varchar(100) NOT NULL,
+  `categoria_id` int DEFAULT NULL,
   `created_at` timestamp NOT NULL,
   `updated_at` timestamp NOT NULL,
-  `time_at` timestamp NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `time_at` timestamp NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `secciones`
+-- Volcado de datos para la tabla `secciones`
 --
 
-INSERT INTO `secciones` (`id`, `titulo`, `bloque`, `cuestionario`, `created_at`, `updated_at`, `time_at`) VALUES
-(1, 'Honestidad en el Trabajo', 1, 'Prueba de Integridad de Reid (Reid Integrity Test)', '2025-03-19 16:41:25', '2025-03-19 16:41:25', '2025-04-04 05:00:30'),
-(2, 'Ética Profesional y Responsabilidad', 2, 'Prueba de Integridad de Reid (Reid Integrity Test)', '2025-03-25 14:15:21', '2025-03-25 14:15:21', '0000-00-00 00:00:00'),
-(3, 'Habilidades de Resolución de Problemas y Toma de de decisiones', 3, 'Prueba de Integridad de Reid (Reid Integrity Test)', '2025-03-20 14:55:26', '2025-03-20 14:55:26', '2025-03-20 05:00:01'),
-(4, 'Comportamientos pasados', 1, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(5, 'Actitudes hacia el Comportamiento Deshonesto', 1, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(6, 'Reacciones ante Tentaciones', 1, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(7, 'Opiniones sobre Honestidad', 1, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(8, 'Actitudes hacia la Deshonestidad', 2, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(9, 'Justificaciones para la Deshonestidad', 2, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(10, 'Reacciones ante Situaciones Deshonestas', 2, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(11, 'Valoración de la Honestidad en Situaciones de Conf', 2, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(12, 'Percepción de la Honestidad', 2, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(13, 'Evaluación de Tolerancia a la Deshonestidad', 3, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(14, 'Conflicto de Intereses', 3, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(15, 'Responsabilidad y Decisiones en el Trabajo', 3, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(16, 'Reflexión sobre la Honestidad', 3, 'Inventario de Honestidad de O\'Connor', '2025-04-08 14:01:03', '2025-04-08 14:01:03', '0000-00-00 00:00:00'),
-(17, 'Reflexiones sobre la Honestidad en el Trabajo', 4, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
-(18, 'Actitudes hacia la Honestidad  en la Vida Cotidian', 4, 'Inventario de Honestidad de O\'Connor', '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01');
+INSERT INTO `secciones` (`id`, `titulo`, `bloque`, `categoria_id`, `created_at`, `updated_at`, `time_at`) VALUES
+(1, 'Honestidad en el Trabajo', 1, 1, '2025-03-19 16:41:25', '2025-03-19 16:41:25', '2025-04-04 05:00:30'),
+(2, 'Ética Profesional y Responsabilidad', 2, 1, '2025-03-25 14:15:21', '2025-03-25 14:15:21', '0000-00-00 00:00:00'),
+(3, 'Habilidades de Resolución de Problemas y Toma de de decisiones', 3, 1, '2025-03-20 14:55:26', '2025-03-20 14:55:26', '2025-03-20 05:00:01'),
+(4, 'Comportamientos pasados', 1, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(5, 'Actitudes hacia el Comportamiento Deshonesto', 1, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(6, 'Reacciones ante Tentaciones', 1, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(7, 'Opiniones sobre Honestidad', 1, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(8, 'Actitudes hacia la Deshonestidad', 2, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(9, 'Justificaciones para la Deshonestidad', 2, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(10, 'Reacciones ante Situaciones Deshonestas', 2, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(11, 'Valoración de la Honestidad en Situaciones de Conf', 2, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(12, 'Percepción de la Honestidad', 2, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(13, 'Evaluación de Tolerancia a la Deshonestidad', 3, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(14, 'Conflicto de Intereses', 3, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(15, 'Responsabilidad y Decisiones en el Trabajo', 3, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(16, 'Reflexión sobre la Honestidad', 3, 2, '2025-04-08 14:01:03', '2025-04-08 14:01:03', '0000-00-00 00:00:00'),
+(17, 'Reflexiones sobre la Honestidad en el Trabajo', 4, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01'),
+(18, 'Actitudes hacia la Honestidad  en la Vida Cotidian', 4, 2, '2025-03-19 16:50:36', '2025-03-19 16:50:36', '2025-03-21 05:00:01');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tokens_evaluaciones`
+-- Estructura de tabla para la tabla `tokens_evaluaciones`
 --
 
-CREATE TABLE `tokens_evaluaciones` (
-  `id` bigint UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `tokens_evaluaciones`;
+CREATE TABLE IF NOT EXISTS `tokens_evaluaciones` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `token` varchar(255) NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `tokens_evaluaciones`
+-- Volcado de datos para la tabla `tokens_evaluaciones`
 --
 
 INSERT INTO `tokens_evaluaciones` (`id`, `token`, `user_id`, `created_at`) VALUES
@@ -1198,195 +1268,109 @@ INSERT INTO `tokens_evaluaciones` (`id`, `token`, `user_id`, `created_at`) VALUE
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Estructura de tabla para la tabla `users`
 --
 
-CREATE TABLE `users` (
-  `id` bigint UNSIGNED NOT NULL,
-  `is_admin` tinyint(1) NOT NULL DEFAULT '0',
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `is_super_admin` tinyint(1) NOT NULL DEFAULT '0',
+  `is_admin` int NOT NULL DEFAULT '0',
+  `company_id` int DEFAULT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `users`
+-- Volcado de datos para la tabla `users`
 --
 
-INSERT INTO `users` (`id`, `is_admin`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(11, 1, 'Fernadno asd Monroy', 'admin@admin.com', NULL, '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-08 23:59:42', '2025-04-08 23:59:42'),
-(19, 0, 'Fernando Sanchez Monroy', '1bmw_7373@hotmail.com', NULL, '$2y$12$smQcd4ZpWKXjvyHUn3NprOraoWZmIo.5qKNib4J25xtbSCZOwWmF2', NULL, '2025-04-09 01:53:09', '2025-04-09 01:53:09');
+INSERT INTO `users` (`id`, `is_super_admin`, `is_admin`, `company_id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
+(1, 1, 0, NULL, 'Admin', 'admin@admin.com', NULL, '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-08 23:59:42', '2025-04-08 23:59:42'),
+(29, 0, 1, 1, 'Usuario_Company\r\n', 'usuario_company@admin.com', NULL, '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-08 23:59:42', '2025-04-08 23:59:42'),
+(31, 0, 0, 1, 'Usuario_prueba', 'usuario_prueba@gmail.com', '2025-04-17 18:00:00', '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-10 18:00:59', '2025-04-10 18:00:59');
+
+-- --------------------------------------------------------
 
 --
--- Indexes for dumped tables
+-- Estructura de tabla para la tabla `users_info`
 --
 
---
--- Indexes for table `aplicaciones`
---
-ALTER TABLE `aplicaciones`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+DROP TABLE IF EXISTS `users_info`;
+CREATE TABLE IF NOT EXISTS `users_info` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `fecha_nacimiento` date DEFAULT NULL,
+  `genero` varchar(50) DEFAULT NULL,
+  `codigo_postal` int DEFAULT NULL,
+  `celular` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
 
 --
--- Indexes for table `imagenes_usuario`
+-- Estructura de tabla para la tabla `usuarios_categorias`
 --
-ALTER TABLE `imagenes_usuario`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_usuario` (`id_usuario`),
-  ADD KEY `token_id` (`token_id`);
+
+DROP TABLE IF EXISTS `usuarios_categorias`;
+CREATE TABLE IF NOT EXISTS `usuarios_categorias` (
+  `id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `categorias_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `categorias_id` (`categorias_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
 
 --
--- Indexes for table `migrations`
+-- Estructura de tabla para la tabla `usuarios_tokens`
 --
-ALTER TABLE `migrations`
-  ADD PRIMARY KEY (`id`);
+
+DROP TABLE IF EXISTS `usuarios_tokens`;
+CREATE TABLE IF NOT EXISTS `usuarios_tokens` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `token` text NOT NULL,
+  `created_at` timestamp NOT NULL,
+  `updated_at` timestamp NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Indexes for table `preguntas`
---
-ALTER TABLE `preguntas`
-  ADD PRIMARY KEY (`pregunta_id`),
-  ADD KEY `seccion_id` (`seccion_id`) USING BTREE;
-
---
--- Indexes for table `pregunta_y_respuesta_correcta`
---
-ALTER TABLE `pregunta_y_respuesta_correcta`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `pregunta_id` (`pregunta_id`),
-  ADD KEY `respuesta_id` (`respuesta_id`);
-
---
--- Indexes for table `respuestas`
---
-ALTER TABLE `respuestas`
-  ADD PRIMARY KEY (`respuesta_id`),
-  ADD KEY `pregunta_id` (`pregunta_id`);
-
---
--- Indexes for table `respuestas_usuario`
---
-ALTER TABLE `respuestas_usuario`
-  ADD KEY `pregunta_id` (`pregunta_id`),
-  ADD KEY `respuesta_id` (`respuesta_id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `token_id` (`token_id`) USING BTREE;
-
---
--- Indexes for table `secciones`
---
-ALTER TABLE `secciones`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `tokens_evaluaciones`
---
-ALTER TABLE `tokens_evaluaciones`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
-
---
--- AUTO_INCREMENT for dumped tables
+-- Restricciones para tablas volcadas
 --
 
 --
--- AUTO_INCREMENT for table `aplicaciones`
---
-ALTER TABLE `aplicaciones`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
-
---
--- AUTO_INCREMENT for table `imagenes_usuario`
---
-ALTER TABLE `imagenes_usuario`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
-
---
--- AUTO_INCREMENT for table `migrations`
---
-ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `pregunta_y_respuesta_correcta`
---
-ALTER TABLE `pregunta_y_respuesta_correcta`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
-
---
--- AUTO_INCREMENT for table `secciones`
---
-ALTER TABLE `secciones`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
-
---
--- AUTO_INCREMENT for table `tokens_evaluaciones`
---
-ALTER TABLE `tokens_evaluaciones`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `imagenes_usuario`
---
-ALTER TABLE `imagenes_usuario`
-  ADD CONSTRAINT `imagenes_usuario_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `imagenes_usuario_ibfk_2` FOREIGN KEY (`token_id`) REFERENCES `tokens_evaluaciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `preguntas`
+-- Filtros para la tabla `preguntas`
 --
 ALTER TABLE `preguntas`
   ADD CONSTRAINT `preguntas_ibfk_1` FOREIGN KEY (`seccion_id`) REFERENCES `secciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `pregunta_y_respuesta_correcta`
+-- Filtros para la tabla `pregunta_y_respuesta_correcta`
 --
 ALTER TABLE `pregunta_y_respuesta_correcta`
   ADD CONSTRAINT `pregunta_y_respuesta_correcta_ibfk_1` FOREIGN KEY (`respuesta_id`) REFERENCES `respuestas` (`respuesta_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `pregunta_y_respuesta_correcta_ibfk_2` FOREIGN KEY (`pregunta_id`) REFERENCES `preguntas` (`pregunta_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `respuestas`
+-- Filtros para la tabla `respuestas`
 --
 ALTER TABLE `respuestas`
   ADD CONSTRAINT `respuestas_ibfk_1` FOREIGN KEY (`pregunta_id`) REFERENCES `preguntas` (`pregunta_id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `respuestas_usuario`
---
-ALTER TABLE `respuestas_usuario`
-  ADD CONSTRAINT `respuestas_usuario_ibfk_1` FOREIGN KEY (`respuesta_id`) REFERENCES `respuestas` (`respuesta_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `respuestas_usuario_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `respuestas_usuario_ibfk_3` FOREIGN KEY (`pregunta_id`) REFERENCES `preguntas` (`pregunta_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `respuestas_usuario_ibfk_4` FOREIGN KEY (`token_id`) REFERENCES `tokens_evaluaciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `tokens_evaluaciones`
---
-ALTER TABLE `tokens_evaluaciones`
-  ADD CONSTRAINT `tokens_evaluaciones_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

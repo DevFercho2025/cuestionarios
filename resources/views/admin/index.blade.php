@@ -68,6 +68,30 @@
                     </div>
                 </div>
             </div>
+            <!-- Tarjeta para gestionar candidatos -->
+            <div class="col s12 m6 l4">
+                <div class="card hoverable">
+                    <div class="card-content center">
+                        <i class="material-icons large">people</i>
+                        <h5>Candidatos</h5>
+                    </div>
+                    <div class="card-action center">
+                        <a href="{{ route('candidatos.index') }}" class="btn waves-effect waves-light">Gestionar</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Tarjeta para gestionar evaluaciones -->
+            <div class="col s12 m6 l4">
+                <div class="card hoverable">
+                    <div class="card-content center">
+                        <i class="material-icons large">assignment</i>
+                        <h5>Evaluaciones</h5>
+                    </div>
+                    <div class="card-action center">
+                        <a href="{{ route('evaluaciones.index') }}" class="btn waves-effect waves-light">Gestionar</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

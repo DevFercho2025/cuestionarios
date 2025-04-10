@@ -31,6 +31,11 @@
                                 Entrar
                             </button>
                         </div>
+                        <div class="center-align" style="margin-top: 20px;">
+                            <a href="{{ route('candidate.index') }}" class="btn grey lighten-1 black-text waves-effect waves-light">
+                                Soy candidato
+                            </a>
+                        </div>
                     </form>
                 </div>
             </div>
