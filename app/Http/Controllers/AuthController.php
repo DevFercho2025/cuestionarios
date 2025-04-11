@@ -22,15 +22,14 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             $user = Auth::user();
-            if ($user->is_admin) {
+            if ($user->is_admin || $user->is_super_admin) {
                 return redirect()->route('admin.index');
-            } else {
-                return redirect()->route('candidate.index');
             }
         }
 
+        Auth::logout(); // Por si se llegó por error
         return back()->withErrors([
-            'email' => 'Las credenciales no coinciden con nuestros registros.',
+            'email' => 'Los candidatos deben ingresar con su código de aplicación.',
         ]);
     }
 

@@ -16,13 +16,22 @@ class AplicacionController extends Controller
 
     // DataTable
     public function datatable()
-    {
-        $aplicaciones = Aplicacion::with('usuario')->get();
+{
+    $aplicaciones = \App\Models\Aplicacion::with('usuario')->get();
 
-        return response()->json([
-            'data' => $aplicaciones
-        ]);
-    }
+    $data = $aplicaciones->map(function ($aplicacion) {
+        return [
+            'id' => $aplicacion->id,
+            'user_id' => $aplicacion->user_id,
+            'nombre' => $aplicacion->usuario->name,
+            'email' => $aplicacion->usuario->email,
+            'vacante' => $aplicacion->vacante,
+            'codigo' => $aplicacion->codigo,
+        ];
+    });
+
+    return response()->json(['data' => $data]);
+}
 
     // Guardar nueva aplicación
     public function store(Request $request)
@@ -78,17 +87,15 @@ class AplicacionController extends Controller
         ]);
     }
 
-    // Para llenar el select de usuarios (si lo necesitas)
     public function usuarios()
     {
-        $usuarios = User::select('id', 'nombre')->get(); // o name si usás inglés
+        $usuarios = User::select('id', 'nombre')->get();
         return response()->json($usuarios);
     }
 
-    // (Opcional) Lista de vacantes si son fijas
     public function vacantes()
     {
-        $vacantes = Aplicacion::select('vacante')->distinct()->get(); // O podrías tener una tabla vacantes
+        $vacantes = Aplicacion::select('vacante')->distinct()->get();
         return response()->json($vacantes);
     }
 }

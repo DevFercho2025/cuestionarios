@@ -17,7 +17,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('candidate.validar.codigo') }}" method="POST">
+                <form action="{{ route('validar.codigo') }}" method="POST">
                     @csrf
                     <div class="input-field">
                         <input type="text" name="codigo" id="codigo" required>

@@ -46,6 +46,16 @@ class User extends Authenticatable
         ];
     }
 
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isSuperAdmin()
+    {
+        return $this->role === 'super_admin';
+    }
+
     public function info()
     {
         return $this->hasOne(UserInfo::class, 'user_id');
@@ -54,5 +64,10 @@ class User extends Authenticatable
     public function aplicaciones()
     {
         return $this->hasMany(Aplicacion::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 }

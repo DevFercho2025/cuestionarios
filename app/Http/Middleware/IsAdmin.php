@@ -17,7 +17,7 @@ class IsAdmin
     public function handle(Request $request, Closure $next)
     {
         // Verifica si el usuario está autenticado y si su propiedad is_admin es igual a 1
-        if (!auth()->check() || auth()->user()->is_admin != 1) {
+        if (!auth()->check() || (!auth()->user()->is_admin && !auth()->user()->is_super_admin)) {
             abort(403, 'Acceso no autorizado.');
         }
 

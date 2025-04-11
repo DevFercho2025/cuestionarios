@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Aplicacion;
+use Illuminate\Support\Facades\Auth;
 
 class CandidateController extends Controller
 {
@@ -17,18 +18,37 @@ class CandidateController extends Controller
         $request->validate([
             'codigo' => 'required|string',
         ]);
-
+    
         $codigoIngresado = $request->codigo;
-
+    
+        // Buscar la aplicación con el código
         $aplicacion = Aplicacion::where('codigo', $codigoIngresado)->first();
-
-        if (!$aplicacion) {
+    
+        if (!$aplicacion || !$aplicacion->usuario) {
             return back()->withErrors(['codigo' => 'El código ingresado no es válido.']);
         }
-
-        session(['aplicacion_id' => $aplicacion->id]);
-
-        return redirect('/formulario');
+    
+        $usuario = $aplicacion->usuario;
+    
+        // Verificar si es candidato (no admin)
+        if ($usuario->is_admin || $usuario->is_super_admin) {
+            return back()->withErrors(['codigo' => 'Este código no pertenece a un candidato.']);
+        }
+    
+        // Autenticar al usuario
+        Auth::login($usuario);
+    
+        // Redirigir al dashboard
+        return redirect()->route('candidate.dashboard');
     }
 
+    public function dashboard()
+    {
+        $user = Auth::user();
+        $aplicacion = $user->aplicacion ?? null;
+
+         $aplicacion = Aplicacion::where('user_id', $user->id)->first();
+
+        return view('candidate.dashboard', compact('user', 'aplicacion'));
+    }
 }

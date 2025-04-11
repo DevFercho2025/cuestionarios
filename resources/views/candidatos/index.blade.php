@@ -14,15 +14,13 @@
                         <a id="registrarCandidatoBtn" class="waves-effect waves-light btn-large green">
                             <i class="material-icons left">person_add</i>Registrar Candidato
                         </a>
-                        <a id="generarCodigoBtn" class="waves-effect waves-light btn-large blue">
-                            <i class="material-icons left">vpn_key</i>Generar Código
-                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    
     <!-- Tabla de candidatos -->
     <div class="row">
         <div class="col s12">
@@ -39,6 +37,7 @@
                                 <th>Código Postal</th>
                                 <th>Celular</th>
                                 <th>Fecha Registro</th>
+                                <th>Compañía</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -131,13 +130,32 @@
                         return new Date(data).toLocaleString();
                     }
                 },
+                { 
+                    data: 'company_name',
+                    render: function (data) {
+                        return data ?? '-';
+                    }
+                },
                 {
                     data: null,
                     render: function (data, type, row) {
-                        return `
+                        let botones = `
                             <a class="btn-floating btn-small red delete-btn tooltipped" data-id="${row.id}" data-tooltip="Eliminar">
                                 <i class="material-icons">delete</i>
-                            </a>`;
+                            </a>
+                        `;
+
+                        @auth
+                            @if ((bool) auth()->user()->is_admin && !(bool) auth()->user()->is_super_admin)
+                                botones += `
+                                    <a class="btn-floating btn-small blue generar-codigo-btn tooltipped" data-id="${row.id}" data-tooltip="Generar Código">
+                                        <i class="material-icons">vpn_key</i>
+                                    </a>
+                                `;
+                            @endif
+                        @endauth
+
+                        return botones;
                     }
                 }
             ],
@@ -278,55 +296,80 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        $('#generarCodigoBtn').click(function () {
-            $.get("{{ route('candidatos.lista') }}", function (usuarios) {
-                let selectHTML = `<select id="selectCandidato" class="swal2-select">`;
+        // generar código individual
+        $(document).on('click', '.generar-codigo-btn', function () {
+        const userId = $(this).data('id');
+        Swal.fire({
+            title: 'Generar código',
+            html: `
+                <p>Introduce el nombre de la vacante para este candidato:</p>
+                <input id="vacanteInput" class="swal2-input" placeholder="Vacante">
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Generar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const vacante = $('#vacanteInput').val().trim();
+                if (!vacante) {
+                    Swal.showValidationMessage('La vacante es obligatoria');
+                    return false;
+                }
 
-                usuarios.forEach(user => {
-                    selectHTML += `<option value="${user.id}">${user.name} (${user.email})</option>`;
-                });
-
-                selectHTML += `</select>`;
-
-                Swal.fire({
-                    title: 'Seleccionar Candidato',
-                    html: selectHTML,
-                    confirmButtonText: 'Generar Código',
-                    showCancelButton: true,
-                    preConfirm: () => {
-                        const userId = $('#selectCandidato').val();
-                        return $.post("{{ route('guardar.codigo') }}", {
-                            user_id: userId,
-                            _token: "{{ csrf_token() }}"
-                        }).then(response => {
-                            return response;
-                        }).catch(() => {
-                            Swal.showValidationMessage('Error al generar código');
-                        });
+                return $.post("{{ route('guardar.codigo') }}", {
+                    user_id: userId,
+                    vacante: vacante,
+                    _token: "{{ csrf_token() }}"
+                })
+                .then(response => {
+                    return response;
+                })
+                .catch(xhr => {
+                    if (xhr.status === 422) {
+                        const errores = xhr.responseJSON?.errors;
+                        console.error("Errores de validación:", errores);
+                        Swal.showValidationMessage(
+                            Object.values(errores).flat().join('<br>')
+                        );
+                    } else {
+                        console.error(xhr);
+                        Swal.showValidationMessage('Error inesperado al generar el código');
                     }
-                }).then(result => {
-                    if (result.isConfirmed && result.value) {
-                        const code = result.value.code;
-                        Swal.fire({
-                            title: '¡Código generado!',
-                            html: `
-                                <p><strong>Código:</strong></p>
-                                <input type="text" id="codigoGenerado" class="swal2-input" value="${code}" readonly>
-                                <button id="btnCopiarCodigo" class="swal2-confirm swal2-styled">Copiar</button>
-                            `,
-                            showConfirmButton: false,
-                            didOpen: () => {
-                                $('#btnCopiarCodigo').click(function () {
-                                    navigator.clipboard.writeText(code).then(() => {
-                                        Swal.fire('Copiado', 'Código copiado al portapapeles', 'success');
-                                    });
-                                });
+                });
+            }
+        }).then(result => {
+            if (result.isConfirmed && result.value) {
+                const code = result.value.code;
+                Swal.fire({
+                    title: '¡Código generado!',
+                    html: `
+                        <p><strong>Código:</strong></p>
+                        <input type="text" id="codigoGenerado" class="swal2-input" value="${code}" readonly>
+                        <button id="btnCopiarCodigo" class="swal2-confirm swal2-styled">Copiar</button>
+                    `,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        $('#btnCopiarCodigo').click(function () {
+                            const input = document.getElementById('codigoGenerado');
+                            input.select();
+                            input.setSelectionRange(0, 99999); // Para móviles
+
+                            try {
+                                const copiado = document.execCommand('copy');
+                                if (copiado) {
+                                    Swal.fire('Copiado', 'Código copiado al portapapeles', 'success');
+                                } else {
+                                    Swal.fire('Ups', 'No se pudo copiar automáticamente', 'warning');
+                                }
+                            } catch (err) {
+                                console.error('Error al copiar:', err);
+                                Swal.fire('Error', 'Hubo un problema al copiar el código', 'error');
                             }
                         });
                     }
                 });
-            });
+            }
         });
+    });
 
 
     });   

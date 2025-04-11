@@ -35,11 +35,11 @@ Route::post('/generar-token', [FormularioController::class, 'generarToken'])->na
 Route::get('/buscador-resultados', [FormularioController::class, 'verResultados'])->name('ver.resultados');
 Route::get('/buscar-resultados', [FormularioController::class, 'buscarResultados'])->name('buscar.resultados');
 Route::get('/exportar-pdf/token-id/{id}', [FormularioController::class, 'exportarPDF'])->name('exportar.pdf');
-Route::get('postal-codes/{postalCode}/{phoneNumber}', [PostalCodeGoogleApiController::class, 'getAddressByPostalCode']);
+//Route::get('postal-codes/{postalCode}/{phoneNumber}', [PostalCodeGoogleApiController::class, 'getAddressByPostalCode']);
 
 Route::group([
     'prefix' => 'admin',
-    'middleware' => ['auth', 'is_admin', 'is_super_admin']
+    'middleware' => ['auth', 'is_admin']
 ], function () {
 
     // Panel de administración principal
@@ -89,20 +89,29 @@ Route::group([
     Route::post('candidatos/codigo', [CandidatoController::class, 'guardarCodigo'])->name('guardar.codigo');
     Route::get('candidatos/lista', [CandidatoController::class, 'listaUsuarios'])->name('candidatos.lista');
 
-
+    // Rutas para evaluaciones
     Route::get('/evaluaciones', [EvaluacionController::class, 'index'])->name('evaluaciones.index');
+    Route::get('/aplicaciones/datatable', [AplicacionController::class, 'datatable'])->name('admin.aplicaciones.datatable');
+    Route::get('/categorias/listar', [EvaluacionController::class, 'listarCategorias'])->name('admin.categorias.listar');
+    Route::post('/evaluaciones/asignar', [EvaluacionController::class, 'asignarCategorias'])->name('admin.evaluaciones.asignar');
+    Route::get('/evaluaciones/usuario/{user_id}', [EvaluacionController::class, 'evaluacionesPorUsuario']);
+    Route::delete('/aplicaciones/{id}', [AplicacionController::class, 'destroy']);
+    Route::post('/evaluaciones/eliminar', [EvaluacionController::class, 'eliminarAsignacion']);
+
 
     // Select de usuarios y vacantes
     Route::get('usuarios/all', [AplicacionController::class, 'usuarios'])->name('usuarios.all');
     Route::get('vacantes/all', [AplicacionController::class, 'vacantes'])->name('vacantes.all');
 
+
 });
+
+    Route::get('/candidate', [CandidateController::class, 'index'])->name('candidate.index');
+    Route::post('/candidate/validar-codigo', [CandidateController::class, 'validarCodigo'])->name('validar.codigo');
 
 Route::group([
     'prefix' => 'candidate',
     'middleware' => ['auth', 'is_candidate::class']
 ], function (){
-    Route::get('/', [CandidateController::class, 'index'])->name('candidate.index');
-    Route::post('/validar-codigo', [CandidateController::class, 'validarCodigo'])->name('validar.codigo');
-
+    Route::get('/dashboard', [CandidateController::class, 'dashboard'])->name('candidate.dashboard');
 });

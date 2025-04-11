@@ -84,8 +84,13 @@
             transform: scale(1.1);
         }
     </style>
-
+<script>
+    const debugData = @json($data);
+    console.log("📊 Datos de relaciones cargadas:", debugData);
+</script>
     <script>
+
+        
         $(document).ready(function(){
             // Inicializar componentes de Materialize
             $('.modal').modal();

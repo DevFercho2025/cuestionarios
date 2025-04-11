@@ -13,13 +13,13 @@ class Respuesta_Correcta extends Model
     protected $fillable = ['pregunta_id', 'respuestas_id'];
     public $timestamps = false; 
 
-    public function respuesta()
-    {
-        return $this->belongsTo(Respuesta::class, 'respuestas_id'); // relación con la tabla de respuestas
-    }
-
     public function pregunta()
     {
-        return $this->belongsTo(Pregunta::class, 'pregunta_id');
+        return $this->belongsTo(Pregunta::class, 'pregunta_id', 'pregunta_id');
+    }
+
+    public function respuesta()
+    {
+        return $this->belongsTo(Respuesta::class, 'respuestas_id', 'respuesta_id');
     }
 }

@@ -9,7 +9,8 @@ class RespuestaCorrectaController extends Controller
 {
     public function index()
     {
-        return view('respuestas_correctas.index');
+        $data = Respuesta_Correcta::with(['pregunta', 'respuesta'])->get();
+        return view('respuestas_correctas.index', compact('data'));
     }
 
     public function datatable(Request $request)
