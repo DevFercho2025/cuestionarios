@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 10-04-2025 a las 18:47:16
+-- Tiempo de generación: 11-04-2025 a las 18:22:59
 -- Versión del servidor: 9.1.0
 -- Versión de PHP: 8.3.14
 
@@ -29,13 +29,21 @@ SET time_zone = "+00:00";
 
 DROP TABLE IF EXISTS `aplicaciones`;
 CREATE TABLE IF NOT EXISTS `aplicaciones` (
-  `id` bigint NOT NULL,
+  `id` bigint NOT NULL AUTO_INCREMENT,
   `user_id` bigint NOT NULL,
   `vacante` varchar(255) NOT NULL,
   `codigo` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `user_id` (`user_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `aplicaciones`
+--
+
+INSERT INTO `aplicaciones` (`id`, `user_id`, `vacante`, `codigo`) VALUES
+(3, 36, 'A', 'UK63PDHHOK'),
+(6, 37, 'D', 'QDLWOETLEP');
 
 -- --------------------------------------------------------
 
@@ -88,14 +96,15 @@ CREATE TABLE IF NOT EXISTS `company` (
   `created_at` timestamp NOT NULL,
   `updated_at` timestamp NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `company`
 --
 
 INSERT INTO `company` (`id`, `nombre`, `created_at`, `updated_at`) VALUES
-(1, 'Compañía ejemplo', '2025-04-10 17:32:22', '2025-04-10 17:32:22');
+(1, 'Compañía ejemplo', '2025-04-10 17:32:22', '2025-04-10 17:32:22'),
+(2, 'Compañía segunda', '2025-04-11 17:32:26', '2025-04-11 17:32:26');
 
 -- --------------------------------------------------------
 
@@ -1286,7 +1295,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `users`
@@ -1294,8 +1303,9 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 INSERT INTO `users` (`id`, `is_super_admin`, `is_admin`, `company_id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
 (1, 1, 0, NULL, 'Admin', 'admin@admin.com', NULL, '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-08 23:59:42', '2025-04-08 23:59:42'),
-(29, 0, 1, 1, 'Usuario_Company\r\n', 'usuario_company@admin.com', NULL, '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-08 23:59:42', '2025-04-08 23:59:42'),
-(31, 0, 0, 1, 'Usuario_prueba', 'usuario_prueba@gmail.com', '2025-04-17 18:00:00', '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-10 18:00:59', '2025-04-10 18:00:59');
+(29, 0, 1, 0, 'Usuario_Company\r\n', 'usuario_company@admin.com', NULL, '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-08 23:59:42', '2025-04-08 23:59:42'),
+(36, 0, 0, 1, 'Candidato Prueba', 'p@gmail.com', NULL, '$2y$12$N3LdTMigUlnMH6P44NkQvOys4pftfsjAUXxfQud.yhKifW7A6OMrq', NULL, '2025-04-11 19:50:50', '2025-04-11 19:51:58'),
+(37, 0, 0, 2, 'b b', 'bbalexa@gmail.com', NULL, '$2y$12$8iIjtTpfr//QNBqa7GGSHOENSZEr1LTVfK.PpFIobxtq8GIP7TC.C', NULL, '2025-04-11 21:06:07', '2025-04-11 21:06:07');
 
 -- --------------------------------------------------------
 
@@ -1309,12 +1319,20 @@ CREATE TABLE IF NOT EXISTS `users_info` (
   `user_id` bigint UNSIGNED NOT NULL,
   `fecha_nacimiento` date DEFAULT NULL,
   `genero` varchar(50) DEFAULT NULL,
-  `codigo_postal` int DEFAULT NULL,
+  `codigo_postal` varchar(20) DEFAULT NULL,
   `celular` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `users_info`
+--
+
+INSERT INTO `users_info` (`id`, `user_id`, `fecha_nacimiento`, `genero`, `codigo_postal`, `celular`, `created_at`) VALUES
+(42, 36, '1955-04-29', 'masculino', '12345', '3178905500', '2025-04-11 14:50:50'),
+(43, 37, '1958-05-30', 'femenino', 'aaaaaa', '3333333333', '2025-04-11 16:06:07');
 
 -- --------------------------------------------------------
 
@@ -1324,13 +1342,13 @@ CREATE TABLE IF NOT EXISTS `users_info` (
 
 DROP TABLE IF EXISTS `usuarios_categorias`;
 CREATE TABLE IF NOT EXISTS `usuarios_categorias` (
-  `id` bigint UNSIGNED NOT NULL,
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `categorias_id` int NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `categorias_id` (`categorias_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
