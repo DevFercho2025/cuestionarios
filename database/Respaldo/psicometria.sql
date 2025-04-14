@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 11-04-2025 a las 18:22:59
+-- Tiempo de generación: 14-04-2025 a las 16:02:14
 -- Versión del servidor: 9.1.0
 -- Versión de PHP: 8.3.14
 
@@ -24,11 +24,25 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `aplicaciones`
+-- Estructura de tabla para la tabla `migrations`
 --
 
-DROP TABLE IF EXISTS `aplicaciones`;
-CREATE TABLE IF NOT EXISTS `aplicaciones` (
+DROP TABLE IF EXISTS `migrations`;
+CREATE TABLE IF NOT EXISTS `migrations` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `psico_alobri_aplicaciones`
+--
+
+DROP TABLE IF EXISTS `psico_alobri_aplicaciones`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_aplicaciones` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `user_id` bigint NOT NULL,
   `vacante` varchar(255) NOT NULL,
@@ -38,21 +52,21 @@ CREATE TABLE IF NOT EXISTS `aplicaciones` (
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `aplicaciones`
+-- Volcado de datos para la tabla `psico_alobri_aplicaciones`
 --
 
-INSERT INTO `aplicaciones` (`id`, `user_id`, `vacante`, `codigo`) VALUES
+INSERT INTO `psico_alobri_aplicaciones` (`id`, `user_id`, `vacante`, `codigo`) VALUES
 (3, 36, 'A', 'UK63PDHHOK'),
 (6, 37, 'D', 'QDLWOETLEP');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `categorias`
+-- Estructura de tabla para la tabla `psico_alobri_categorias`
 --
 
-DROP TABLE IF EXISTS `categorias`;
-CREATE TABLE IF NOT EXISTS `categorias` (
+DROP TABLE IF EXISTS `psico_alobri_categorias`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_categorias` (
   `id` int NOT NULL AUTO_INCREMENT,
   `titulo_cuestionario` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL,
@@ -62,10 +76,10 @@ CREATE TABLE IF NOT EXISTS `categorias` (
 ) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `categorias`
+-- Volcado de datos para la tabla `psico_alobri_categorias`
 --
 
-INSERT INTO `categorias` (`id`, `titulo_cuestionario`, `created_at`, `updated_at`, `time_at`) VALUES
+INSERT INTO `psico_alobri_categorias` (`id`, `titulo_cuestionario`, `created_at`, `updated_at`, `time_at`) VALUES
 (1, 'Prueba de Integridad de Reid (Reid Integrity Test)', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
 (2, 'Inventario de Honestidad de O\'\'connor', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
 (3, 'All port', '2025-04-10 16:39:52', '2025-04-10 16:39:52', '0000-00-00 00:00:00'),
@@ -86,11 +100,11 @@ INSERT INTO `categorias` (`id`, `titulo_cuestionario`, `created_at`, `updated_at
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `company`
+-- Estructura de tabla para la tabla `psico_alobri_companies`
 --
 
-DROP TABLE IF EXISTS `company`;
-CREATE TABLE IF NOT EXISTS `company` (
+DROP TABLE IF EXISTS `psico_alobri_companies`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_companies` (
   `id` int NOT NULL AUTO_INCREMENT,
   `nombre` text NOT NULL,
   `created_at` timestamp NOT NULL,
@@ -99,21 +113,21 @@ CREATE TABLE IF NOT EXISTS `company` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `company`
+-- Volcado de datos para la tabla `psico_alobri_companies`
 --
 
-INSERT INTO `company` (`id`, `nombre`, `created_at`, `updated_at`) VALUES
+INSERT INTO `psico_alobri_companies` (`id`, `nombre`, `created_at`, `updated_at`) VALUES
 (1, 'Compañía ejemplo', '2025-04-10 17:32:22', '2025-04-10 17:32:22'),
 (2, 'Compañía segunda', '2025-04-11 17:32:26', '2025-04-11 17:32:26');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `imagenes_usuario`
+-- Estructura de tabla para la tabla `psico_alobri_imagenes_usuario`
 --
 
-DROP TABLE IF EXISTS `imagenes_usuario`;
-CREATE TABLE IF NOT EXISTS `imagenes_usuario` (
+DROP TABLE IF EXISTS `psico_alobri_imagenes_usuario`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_imagenes_usuario` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `id_usuario` bigint UNSIGNED NOT NULL,
   `file_name` varchar(255) NOT NULL,
@@ -126,10 +140,10 @@ CREATE TABLE IF NOT EXISTS `imagenes_usuario` (
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `imagenes_usuario`
+-- Volcado de datos para la tabla `psico_alobri_imagenes_usuario`
 --
 
-INSERT INTO `imagenes_usuario` (`id`, `id_usuario`, `file_name`, `file_path`, `created_at`, `token_id`) VALUES
+INSERT INTO `psico_alobri_imagenes_usuario` (`id`, `id_usuario`, `file_name`, `file_path`, `created_at`, `token_id`) VALUES
 (9, 12, '67f567f850e06.png', 'private/uploads/67f567f850e06.png', '2025-04-09 00:16:24', 2),
 (10, 12, '67f568014c1e7.png', 'private/uploads/67f568014c1e7.png', '2025-04-09 00:16:33', 2),
 (11, 12, '67f5680bbe7f5.png', 'private/uploads/67f5680bbe7f5.png', '2025-04-09 00:16:43', 2),
@@ -140,25 +154,11 @@ INSERT INTO `imagenes_usuario` (`id`, `id_usuario`, `file_name`, `file_path`, `c
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `migrations`
+-- Estructura de tabla para la tabla `psico_alobri_preguntas`
 --
 
-DROP TABLE IF EXISTS `migrations`;
-CREATE TABLE IF NOT EXISTS `migrations` (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
-  `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `batch` int NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `preguntas`
---
-
-DROP TABLE IF EXISTS `preguntas`;
-CREATE TABLE IF NOT EXISTS `preguntas` (
+DROP TABLE IF EXISTS `psico_alobri_preguntas`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_preguntas` (
   `pregunta_id` int NOT NULL,
   `pregunta` varchar(200) NOT NULL,
   `cuestionario` varchar(200) NOT NULL,
@@ -169,10 +169,10 @@ CREATE TABLE IF NOT EXISTS `preguntas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `preguntas`
+-- Volcado de datos para la tabla `psico_alobri_preguntas`
 --
 
-INSERT INTO `preguntas` (`pregunta_id`, `pregunta`, `cuestionario`, `required`, `seccion_id`) VALUES
+INSERT INTO `psico_alobri_preguntas` (`pregunta_id`, `pregunta`, `cuestionario`, `required`, `seccion_id`) VALUES
 (1, 'Si accidentalmente encuentras un sobre con dinero en la oficina, ¿Qué harías?', 'Prueba de Integridad de Reid (Reid Integrity Test)', 1, 1),
 (2, '¿Alguna vez has mentido para evitar recibir una reprimenda en el trabajo?', 'Prueba de Integridad de Reid (Reid Integrity Test)', 1, 1),
 (3, 'Si te encuentras con un error en tu trabajo que no puede ser fácilmente detectado por otros, ¿lo corregirías?', 'Prueba de Integridad de Reid (Reid Integrity Test)', 1, 1),
@@ -442,11 +442,11 @@ INSERT INTO `preguntas` (`pregunta_id`, `pregunta`, `cuestionario`, `required`, 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `pregunta_y_respuesta_correcta`
+-- Estructura de tabla para la tabla `psico_alobri_pregunta_y_respuesta_correcta`
 --
 
-DROP TABLE IF EXISTS `pregunta_y_respuesta_correcta`;
-CREATE TABLE IF NOT EXISTS `pregunta_y_respuesta_correcta` (
+DROP TABLE IF EXISTS `psico_alobri_pregunta_y_respuesta_correcta`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_pregunta_y_respuesta_correcta` (
   `id` int NOT NULL AUTO_INCREMENT,
   `pregunta_id` int NOT NULL,
   `respuesta_id` int NOT NULL,
@@ -456,10 +456,10 @@ CREATE TABLE IF NOT EXISTS `pregunta_y_respuesta_correcta` (
 ) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `pregunta_y_respuesta_correcta`
+-- Volcado de datos para la tabla `psico_alobri_pregunta_y_respuesta_correcta`
 --
 
-INSERT INTO `pregunta_y_respuesta_correcta` (`id`, `pregunta_id`, `respuesta_id`) VALUES
+INSERT INTO `psico_alobri_pregunta_y_respuesta_correcta` (`id`, `pregunta_id`, `respuesta_id`) VALUES
 (1, 1, 2),
 (2, 2, 5),
 (3, 3, 6),
@@ -499,11 +499,11 @@ INSERT INTO `pregunta_y_respuesta_correcta` (`id`, `pregunta_id`, `respuesta_id`
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `respuestas`
+-- Estructura de tabla para la tabla `psico_alobri_respuestas`
 --
 
-DROP TABLE IF EXISTS `respuestas`;
-CREATE TABLE IF NOT EXISTS `respuestas` (
+DROP TABLE IF EXISTS `psico_alobri_respuestas`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_respuestas` (
   `respuesta_id` int NOT NULL,
   `respuesta` varchar(200) NOT NULL,
   `opcion` char(1) NOT NULL,
@@ -513,10 +513,10 @@ CREATE TABLE IF NOT EXISTS `respuestas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `respuestas`
+-- Volcado de datos para la tabla `psico_alobri_respuestas`
 --
 
-INSERT INTO `respuestas` (`respuesta_id`, `respuesta`, `opcion`, `pregunta_id`) VALUES
+INSERT INTO `psico_alobri_respuestas` (`respuesta_id`, `respuesta`, `opcion`, `pregunta_id`) VALUES
 (1, 'Lo tomaría para mí', 'a', 1),
 (2, 'Lo devolvería al dueño', 'b', 1),
 (3, 'Lo entregaría al jefe', 'c', 1),
@@ -1088,11 +1088,11 @@ INSERT INTO `respuestas` (`respuesta_id`, `respuesta`, `opcion`, `pregunta_id`) 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `respuestas_usuario`
+-- Estructura de tabla para la tabla `psico_alobri_respuestas_usuario`
 --
 
-DROP TABLE IF EXISTS `respuestas_usuario`;
-CREATE TABLE IF NOT EXISTS `respuestas_usuario` (
+DROP TABLE IF EXISTS `psico_alobri_respuestas_usuario`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_respuestas_usuario` (
   `user_id` bigint UNSIGNED NOT NULL,
   `pregunta_id` int NOT NULL,
   `respuesta_id` int NOT NULL,
@@ -1105,10 +1105,10 @@ CREATE TABLE IF NOT EXISTS `respuestas_usuario` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `respuestas_usuario`
+-- Volcado de datos para la tabla `psico_alobri_respuestas_usuario`
 --
 
-INSERT INTO `respuestas_usuario` (`user_id`, `pregunta_id`, `respuesta_id`, `ip_usuario`, `token_id`) VALUES
+INSERT INTO `psico_alobri_respuestas_usuario` (`user_id`, `pregunta_id`, `respuesta_id`, `ip_usuario`, `token_id`) VALUES
 (12, 32, 68, '::1', 2),
 (12, 6, 14, '::1', 2),
 (12, 11, 25, '::1', 2),
@@ -1212,11 +1212,11 @@ INSERT INTO `respuestas_usuario` (`user_id`, `pregunta_id`, `respuesta_id`, `ip_
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `secciones`
+-- Estructura de tabla para la tabla `psico_alobri_secciones`
 --
 
-DROP TABLE IF EXISTS `secciones`;
-CREATE TABLE IF NOT EXISTS `secciones` (
+DROP TABLE IF EXISTS `psico_alobri_secciones`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_secciones` (
   `id` int NOT NULL AUTO_INCREMENT,
   `titulo` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `bloque` tinyint NOT NULL,
@@ -1228,10 +1228,10 @@ CREATE TABLE IF NOT EXISTS `secciones` (
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `secciones`
+-- Volcado de datos para la tabla `psico_alobri_secciones`
 --
 
-INSERT INTO `secciones` (`id`, `titulo`, `bloque`, `categoria_id`, `created_at`, `updated_at`, `time_at`) VALUES
+INSERT INTO `psico_alobri_secciones` (`id`, `titulo`, `bloque`, `categoria_id`, `created_at`, `updated_at`, `time_at`) VALUES
 (1, 'Honestidad en el Trabajo', 1, 1, '2025-03-19 16:41:25', '2025-03-19 16:41:25', '2025-04-04 05:00:30'),
 (2, 'Ética Profesional y Responsabilidad', 2, 1, '2025-03-25 14:15:21', '2025-03-25 14:15:21', '0000-00-00 00:00:00'),
 (3, 'Habilidades de Resolución de Problemas y Toma de de decisiones', 3, 1, '2025-03-20 14:55:26', '2025-03-20 14:55:26', '2025-03-20 05:00:01'),
@@ -1254,11 +1254,11 @@ INSERT INTO `secciones` (`id`, `titulo`, `bloque`, `categoria_id`, `created_at`,
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `tokens_evaluaciones`
+-- Estructura de tabla para la tabla `psico_alobri_tokens_evaluaciones`
 --
 
-DROP TABLE IF EXISTS `tokens_evaluaciones`;
-CREATE TABLE IF NOT EXISTS `tokens_evaluaciones` (
+DROP TABLE IF EXISTS `psico_alobri_tokens_evaluaciones`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_tokens_evaluaciones` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `token` varchar(255) NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
@@ -1268,11 +1268,79 @@ CREATE TABLE IF NOT EXISTS `tokens_evaluaciones` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Volcado de datos para la tabla `tokens_evaluaciones`
+-- Volcado de datos para la tabla `psico_alobri_tokens_evaluaciones`
 --
 
-INSERT INTO `tokens_evaluaciones` (`id`, `token`, `user_id`, `created_at`) VALUES
+INSERT INTO `psico_alobri_tokens_evaluaciones` (`id`, `token`, `user_id`, `created_at`) VALUES
 (2, '$2y$12$oFJmWOAENicykcHJzbWdyuhuuIfguMLvWs.oxtEC.dC9Jv68dK2Ny', 12, '2025-04-08 12:17:06');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `psico_alobri_users_info`
+--
+
+DROP TABLE IF EXISTS `psico_alobri_users_info`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_users_info` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `fecha_nacimiento` date DEFAULT NULL,
+  `genero` varchar(50) DEFAULT NULL,
+  `codigo_postal` varchar(20) DEFAULT NULL,
+  `celular` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `psico_alobri_users_info`
+--
+
+INSERT INTO `psico_alobri_users_info` (`id`, `user_id`, `fecha_nacimiento`, `genero`, `codigo_postal`, `celular`, `created_at`) VALUES
+(42, 36, '1955-04-29', 'masculino', '12345', '3178905500', '2025-04-11 14:50:50'),
+(43, 37, '1958-05-30', 'femenino', 'aaaaaa', '3333333333', '2025-04-11 16:06:07');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `psico_alobri_usuarios_categorias`
+--
+
+DROP TABLE IF EXISTS `psico_alobri_usuarios_categorias`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_usuarios_categorias` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `categorias_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `categorias_id` (`categorias_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `psico_alobri_usuarios_categorias`
+--
+
+INSERT INTO `psico_alobri_usuarios_categorias` (`id`, `user_id`, `categorias_id`) VALUES
+(11, 36, 1),
+(12, 37, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `psico_alobri_usuarios_tokens`
+--
+
+DROP TABLE IF EXISTS `psico_alobri_usuarios_tokens`;
+CREATE TABLE IF NOT EXISTS `psico_alobri_usuarios_tokens` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `token` text NOT NULL,
+  `created_at` timestamp NOT NULL,
+  `updated_at` timestamp NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1283,6 +1351,7 @@ INSERT INTO `tokens_evaluaciones` (`id`, `token`, `user_id`, `created_at`) VALUE
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `is_psico_alobri` tinyint NOT NULL DEFAULT '0',
   `is_super_admin` tinyint(1) NOT NULL DEFAULT '0',
   `is_admin` int NOT NULL DEFAULT '0',
   `company_id` int DEFAULT NULL,
@@ -1301,94 +1370,34 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Volcado de datos para la tabla `users`
 --
 
-INSERT INTO `users` (`id`, `is_super_admin`, `is_admin`, `company_id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 1, 0, NULL, 'Admin', 'admin@admin.com', NULL, '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-08 23:59:42', '2025-04-08 23:59:42'),
-(29, 0, 1, 0, 'Usuario_Company\r\n', 'usuario_company@admin.com', NULL, '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-08 23:59:42', '2025-04-08 23:59:42'),
-(36, 0, 0, 1, 'Candidato Prueba', 'p@gmail.com', NULL, '$2y$12$N3LdTMigUlnMH6P44NkQvOys4pftfsjAUXxfQud.yhKifW7A6OMrq', NULL, '2025-04-11 19:50:50', '2025-04-11 19:51:58'),
-(37, 0, 0, 2, 'b b', 'bbalexa@gmail.com', NULL, '$2y$12$8iIjtTpfr//QNBqa7GGSHOENSZEr1LTVfK.PpFIobxtq8GIP7TC.C', NULL, '2025-04-11 21:06:07', '2025-04-11 21:06:07');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `users_info`
---
-
-DROP TABLE IF EXISTS `users_info`;
-CREATE TABLE IF NOT EXISTS `users_info` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` bigint UNSIGNED NOT NULL,
-  `fecha_nacimiento` date DEFAULT NULL,
-  `genero` varchar(50) DEFAULT NULL,
-  `codigo_postal` varchar(20) DEFAULT NULL,
-  `celular` text,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `users_info`
---
-
-INSERT INTO `users_info` (`id`, `user_id`, `fecha_nacimiento`, `genero`, `codigo_postal`, `celular`, `created_at`) VALUES
-(42, 36, '1955-04-29', 'masculino', '12345', '3178905500', '2025-04-11 14:50:50'),
-(43, 37, '1958-05-30', 'femenino', 'aaaaaa', '3333333333', '2025-04-11 16:06:07');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `usuarios_categorias`
---
-
-DROP TABLE IF EXISTS `usuarios_categorias`;
-CREATE TABLE IF NOT EXISTS `usuarios_categorias` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` bigint UNSIGNED NOT NULL,
-  `categorias_id` int NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `categorias_id` (`categorias_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `usuarios_tokens`
---
-
-DROP TABLE IF EXISTS `usuarios_tokens`;
-CREATE TABLE IF NOT EXISTS `usuarios_tokens` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `token` text NOT NULL,
-  `created_at` timestamp NOT NULL,
-  `updated_at` timestamp NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+INSERT INTO `users` (`id`, `is_psico_alobri`, `is_super_admin`, `is_admin`, `company_id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
+(1, 0, 1, 0, NULL, 'Admin', 'admin@admin.com', NULL, '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-08 23:59:42', '2025-04-08 23:59:42'),
+(29, 0, 0, 1, 0, 'Usuario_Company\r\n', 'usuario_company@admin.com', NULL, '$2y$12$dae1aSsIBMHC0SQIiTy4Su2wn1MPlAwdJ9MegxAJnCI8kX8Sy1Ike', NULL, '2025-04-08 23:59:42', '2025-04-08 23:59:42'),
+(36, 0, 0, 0, 1, 'Candidato Prueba', 'p@gmail.com', NULL, '$2y$12$N3LdTMigUlnMH6P44NkQvOys4pftfsjAUXxfQud.yhKifW7A6OMrq', NULL, '2025-04-11 19:50:50', '2025-04-11 19:51:58'),
+(37, 0, 0, 0, 2, 'b b', 'bbalexa@gmail.com', NULL, '$2y$12$8iIjtTpfr//QNBqa7GGSHOENSZEr1LTVfK.PpFIobxtq8GIP7TC.C', NULL, '2025-04-11 21:06:07', '2025-04-11 21:06:07');
 
 --
 -- Restricciones para tablas volcadas
 --
 
 --
--- Filtros para la tabla `preguntas`
+-- Filtros para la tabla `psico_alobri_preguntas`
 --
-ALTER TABLE `preguntas`
-  ADD CONSTRAINT `preguntas_ibfk_1` FOREIGN KEY (`seccion_id`) REFERENCES `secciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `psico_alobri_preguntas`
+  ADD CONSTRAINT `psico_alobri_preguntas_ibfk_1` FOREIGN KEY (`seccion_id`) REFERENCES `psico_alobri_secciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `pregunta_y_respuesta_correcta`
+-- Filtros para la tabla `psico_alobri_pregunta_y_respuesta_correcta`
 --
-ALTER TABLE `pregunta_y_respuesta_correcta`
-  ADD CONSTRAINT `pregunta_y_respuesta_correcta_ibfk_1` FOREIGN KEY (`respuesta_id`) REFERENCES `respuestas` (`respuesta_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `pregunta_y_respuesta_correcta_ibfk_2` FOREIGN KEY (`pregunta_id`) REFERENCES `preguntas` (`pregunta_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `psico_alobri_pregunta_y_respuesta_correcta`
+  ADD CONSTRAINT `psico_alobri_pregunta_y_respuesta_correcta_ibfk_1` FOREIGN KEY (`respuesta_id`) REFERENCES `psico_alobri_respuestas` (`respuesta_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `psico_alobri_pregunta_y_respuesta_correcta_ibfk_2` FOREIGN KEY (`pregunta_id`) REFERENCES `psico_alobri_preguntas` (`pregunta_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `respuestas`
+-- Filtros para la tabla `psico_alobri_respuestas`
 --
-ALTER TABLE `respuestas`
-  ADD CONSTRAINT `respuestas_ibfk_1` FOREIGN KEY (`pregunta_id`) REFERENCES `preguntas` (`pregunta_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `psico_alobri_respuestas`
+  ADD CONSTRAINT `psico_alobri_respuestas_ibfk_1` FOREIGN KEY (`pregunta_id`) REFERENCES `psico_alobri_preguntas` (`pregunta_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

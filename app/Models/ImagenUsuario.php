@@ -9,7 +9,7 @@ class ImagenUsuario extends Model
 {
     use HasFactory;
 
-    protected $table = 'imagenes_usuario';
+    protected $table = 'psico_alobri_imagenes_usuario';
     protected $fillable = ['id_usuario', 'file_name', 'file_path', 'created_at','token_id'];
     public $timestamps = false;
 

@@ -9,7 +9,7 @@ class respuesta extends Model
 {
     use HasFactory;
 
-    protected $table = "respuestas"; 
+    protected $table = "psico_alobri_respuestas"; 
     protected $fillable = ["respuesta", "opcion"];
     protected $primaryKey = "respuesta_id";
 

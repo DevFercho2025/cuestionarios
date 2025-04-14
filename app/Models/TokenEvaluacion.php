@@ -9,7 +9,7 @@ class TokenEvaluacion extends Model
 {
     use HasFactory;
 
-    protected $table = 'tokens_evaluaciones';
+    protected $table = 'psico_alobri_tokens_evaluaciones';
     protected $fillable = ['token', 'user_id'];
     public $timestamps = false;
 

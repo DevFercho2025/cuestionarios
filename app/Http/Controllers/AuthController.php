@@ -22,8 +22,9 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             $user = Auth::user();
-            if ($user->is_admin || $user->is_super_admin) {
-                return redirect()->route('admin.index');
+            $config = $user->config;
+            if ($config->is_admin || $config->is_super_admin) {
+                return redirect()->route('admin.index'); 
             }
         }
 

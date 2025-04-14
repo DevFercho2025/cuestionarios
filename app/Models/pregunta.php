@@ -10,7 +10,7 @@ class pregunta extends Model
     use HasFactory;
 
     #define qué tabla es preguntas
-    protected $table = "preguntas"; #título tabla
+    protected $table = "psico_alobri_preguntas"; #título tabla
     protected $fillable = ["pregunta", "cuestionario", "bloque"]; #columnas, 
     protected $primaryKey = "pregunta_id"; #se especifica si la llave primaria no se llama solo "id" en la bd.
 

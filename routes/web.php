@@ -23,18 +23,9 @@ Route::get('/', function () {
 });
 
 // Endpoints públicos
-Route::get('/formulario', [FormularioController::class, 'index'])->name('index');
-Route::post('/permisos-preliminares', [FormularioController::class, 'guardarCandidato'])->name('guardar.candidato');
-Route::post('/formulario', [FormularioController::class, 'guardarRespuestas'])->name('guardar.respuestas');
-Route::post('/guardar-foto', [FormularioController::class, 'guardarFoto'])->name('guardar.foto');
-Route::get('/cargar-formulario', [FormularioController::class, 'cargarFormulario'])->name('cargar.formulario');
-Route::get('/gracias', function () {
-    return view('gracias');
-})->name('gracias');
-Route::post('/generar-token', [FormularioController::class, 'generarToken'])->name('generar.token');
-Route::get('/buscador-resultados', [FormularioController::class, 'verResultados'])->name('ver.resultados');
-Route::get('/buscar-resultados', [FormularioController::class, 'buscarResultados'])->name('buscar.resultados');
-Route::get('/exportar-pdf/token-id/{id}', [FormularioController::class, 'exportarPDF'])->name('exportar.pdf');
+Route::get('/candidate', [CandidateController::class, 'index'])->name('candidate.index');
+Route::post('/candidate/validar-codigo', [CandidateController::class, 'validarCodigo'])->name('validar.codigo');
+
 //Route::get('postal-codes/{postalCode}/{phoneNumber}', [PostalCodeGoogleApiController::class, 'getAddressByPostalCode']);
 
 Route::group([
@@ -106,12 +97,22 @@ Route::group([
 
 });
 
-    Route::get('/candidate', [CandidateController::class, 'index'])->name('candidate.index');
-    Route::post('/candidate/validar-codigo', [CandidateController::class, 'validarCodigo'])->name('validar.codigo');
-
 Route::group([
     'prefix' => 'candidate',
     'middleware' => ['auth', 'is_candidate::class']
 ], function (){
     Route::get('/dashboard', [CandidateController::class, 'dashboard'])->name('candidate.dashboard');
+    Route::get('/formulario', [FormularioController::class, 'index'])->name('index');
+    Route::get('/permisos-preliminares', [FormularioController::class, 'mostrarPermisos'])->name('permisos-preliminares');
+    //Route::post('/permisos-preliminares', [FormularioController::class, 'guardarCandidato'])->name('guardar.candidato');
+    Route::post('/formulario', [FormularioController::class, 'guardarRespuestas'])->name('guardar.respuestas');
+    Route::post('/guardar-foto', [FormularioController::class, 'guardarFoto'])->name('guardar.foto');
+    Route::get('/cargar-formulario', [FormularioController::class, 'cargarFormulario'])->name('cargar.formulario');
+    Route::get('/gracias', function () {
+        return view('gracias');
+    })->name('gracias');
+    Route::post('/generar-token', [FormularioController::class, 'generarToken'])->name('generar.token');
+    Route::get('/buscador-resultados', [FormularioController::class, 'verResultados'])->name('ver.resultados');
+    Route::get('/buscar-resultados', [FormularioController::class, 'buscarResultados'])->name('buscar.resultados');
+    Route::get('/exportar-pdf/token-id/{id}', [FormularioController::class, 'exportarPDF'])->name('exportar.pdf');
 });

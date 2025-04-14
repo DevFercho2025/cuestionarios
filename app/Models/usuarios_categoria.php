@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class usuarios_categoria extends Model
 {
     use HasFactory;
-    protected $table = 'usuarios_categorias';
+    protected $table = 'psico_alobri_usuarios_categorias';
     protected $fillable = ['user_id', 'categorias_id'];
     public $timestamps = false;
 

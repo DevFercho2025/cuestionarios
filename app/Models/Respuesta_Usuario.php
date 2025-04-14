@@ -9,7 +9,7 @@ class Respuesta_Usuario extends Model
 {
     use HasFactory;
 
-    protected $table = "respuestas_usuario";
+    protected $table = "psico_alobri_respuestas_usuario";
     protected $fillable = ['user_id','pregunta_id', 'respuesta_id','ip_usuario','token_id'];
     public $timestamps = false; 
 

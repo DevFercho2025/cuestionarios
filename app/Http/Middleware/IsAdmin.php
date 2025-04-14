@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class IsAdmin
 {
@@ -16,8 +17,16 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        // Verifica si el usuario está autenticado y si su propiedad is_admin es igual a 1
-        if (!auth()->check() || (!auth()->user()->is_admin && !auth()->user()->is_super_admin)) {
+        if (!$request->user()) {
+            abort(403, 'Acceso no autorizado.');
+        }
+
+        $user = $request->user();
+        $user->load('config');
+        $config = $user->config;
+
+        // Verificar si el usuario tiene configuración y si es administrador o superadmin
+        if (!$config || (!$config->is_admin && !$config->is_super_admin)) {
             abort(403, 'Acceso no autorizado.');
         }
 

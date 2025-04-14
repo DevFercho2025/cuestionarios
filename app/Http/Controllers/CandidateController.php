@@ -48,7 +48,8 @@ class CandidateController extends Controller
         $aplicacion = $user->aplicacion ?? null;
 
          $aplicacion = Aplicacion::where('user_id', $user->id)->first();
+         $categorias = $user->categorias;
 
-        return view('candidate.dashboard', compact('user', 'aplicacion'));
+        return view('candidate.dashboard', compact('user', 'aplicacion', 'categorias'));
     }
 }

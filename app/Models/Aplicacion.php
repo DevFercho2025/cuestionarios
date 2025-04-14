@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Aplicacion extends Model
 {
-    protected $table = 'aplicaciones';
+    protected $table = 'psico_alobri_aplicaciones';
     protected $fillable = ['user_id', 'vacante', 'codigo'];
     public $timestamps = false;
     public function usuario()

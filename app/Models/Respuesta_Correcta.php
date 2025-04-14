@@ -9,7 +9,7 @@ class Respuesta_Correcta extends Model
 {
     use HasFactory;
 
-    protected $table = "pregunta_y_respuesta_correcta";
+    protected $table = "psico_alobri_pregunta_y_respuesta_correcta";
     protected $fillable = ['pregunta_id', 'respuestas_id'];
     public $timestamps = false; 
 

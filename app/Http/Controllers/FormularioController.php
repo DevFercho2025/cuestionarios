@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use App\Models\ImagenUsuario;
 use App\Models\Aplicacion;
 use App\Models\Respuesta_Usuario;
-use App\Models\UserInfo;
 use App\Models\pregunta;
 use App\Models\Seccion;
 use App\Models\TokenEvaluacion;
@@ -25,12 +25,21 @@ class FormularioController extends Controller
         return view('formulario.index');
     }
 
+    public function mostrarPermisos(Request $request)
+    {
+        // Obtener el parámetro categoria_id desde la URL (si es necesario)
+        $categoria_id = $request->query('categoria_id'); 
+        
+        // Pasar el categoria_id a la vista
+        return view('candidate.permisos', compact('categoria_id'));
+    }
+
     public function guardarCandidato(Request $request)
     {
 
         #limpia la sesión para evitar que use datos previos
         $request->session()->flush();
-/*
+        /*
         $nombreCompleto = $request->input('nombre') . ' ' . $request->input('apellidoPaterno');
 
         $apellidoMaterno = $request->input('apellidoMaterno');
@@ -67,7 +76,8 @@ class FormularioController extends Controller
             'genero' => $candidato['genero'],
             'codigo_postal' => $candidato['codigoPostal'],
             'celular' => $candidato['celular'],
-        ]);*/
+        ]);
+        */
 
         // $request->session()->put('user_id', auth()->id()); si es un usurio autenticado (cuando tenga lo de perfil de usuarios)
         return view('public.permisos');
@@ -75,6 +85,7 @@ class FormularioController extends Controller
 
     public function cargarFormulario(Request $request)
     {
+        $user = Auth::user();
         #grupos de preguntas
         $rango_inicio = $request->input('rango_inicio', 1);
         $rango_fin = $request->input('rango_fin', 35);
@@ -85,16 +96,20 @@ class FormularioController extends Controller
             $rango_fin += 35;
         }
 
+        $categoriaIds = $user->categorias->pluck('id');
+        $seccionIds = Seccion::whereIn('categoria_id', $categoriaIds)->pluck('id');
+
         #Cargar preguntas del rango
         $preguntas = Pregunta::with([
             'respuestas' => function ($query) {
                 $query->select('respuesta_id', 'pregunta_id', 'respuesta', 'opcion');
             }
-        ])->whereBetween('pregunta_id', [$rango_inicio, $rango_fin])
-            ->get()->groupBy('seccion_id') //esto agrupa las preguntas por sección a la que pertenencen.
-            ->map(function ($grupo) {
-                return $grupo->shuffle(); //e'to mezcla preguntas de la misma sección
-            })->collapse();
+        ])->whereIn('seccion_id', $seccionIds)
+          ->whereBetween('pregunta_id', [$rango_inicio, $rango_fin])
+          ->get()->groupBy('seccion_id') //esto agrupa las preguntas por sección a la que pertenencen.
+          ->map(function ($grupo) {
+            return $grupo->shuffle(); //e'to mezcla preguntas de la misma sección
+          })->collapse();
 
         #cantidad de preguntas a repetir (actualmente 6% = 2, 10% = 3)
         $cantidadRepeticiones = intval($preguntas->count() * 0.06);

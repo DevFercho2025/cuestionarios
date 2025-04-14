@@ -46,15 +46,26 @@ class User extends Authenticatable
         ];
     }
 
+    public function config()
+    {
+        return $this->hasOne(ConfigUser::class, 'user_id');
+    }
+
     public function isAdmin()
     {
-        return $this->role === 'admin';
+        return $this->config && $this->config->is_admin;
     }
 
     public function isSuperAdmin()
     {
-        return $this->role === 'super_admin';
+        return $this->config && $this->config->is_super_admin;
     }
+
+    public function isTalentinaUser()
+    {
+        return $this->config && $this->config->is_talentina_user;
+    }
+
 
     public function info()
     {
@@ -65,6 +76,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Aplicacion::class);
     }
+
+    public function categorias()
+    {
+        return $this->belongsToMany(Categoria::class, 'psico_alobri_usuarios_categorias', 'user_id', 'categorias_id');
+    }
+    
 
     public function company()
     {

@@ -2,13 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class company extends Model
+class Company extends Model
 {
     use HasFactory;
-    protected $table = "company";
-    protected $fillable = ["nombre","created_at","updated_at","time_at",""];
-    public $timestamps = true;
+
+    protected $table = 'companies';
+
+    protected $fillable = [
+        'name',
+        'description',
+        'logo',
+        'active',
+        'is_pisco_alobri'
+    ];
+
+    public function users()
+    {
+        return $this->hasMany(User::class, 'company_id');
+    }
+
 }
