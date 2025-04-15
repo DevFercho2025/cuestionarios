@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\RespuestaController;
 use App\Http\Controllers\RespuestaCorrectaController;
@@ -18,9 +19,8 @@ Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('login.post');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/', function () {
-    // Página de inicio o redirección
-});
+Route::get('/', [HomeController::class, 'index'])->name('home.index');
+
 
 // Endpoints públicos
 Route::get('/candidate', [CandidateController::class, 'index'])->name('candidate.index');
