@@ -13,7 +13,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-    <title>Dashboard - Alobri</title>
+    <title>Dashboard</title>
 
     <meta name="description" content="" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -38,11 +38,39 @@
     <script src="{{asset('/assets/js/config.js')}}"></script>
 </head>
 <body>
-<div class="container" id="contenidoPagina">
-    @yield('content')
+<style>
+    #template-customizer .template-customizer-open-btn{
+        display: none !important;
+    }
+</style>
+<!-- Layout wrapper -->
+<div class="layout-wrapper layout-content-navbar">
+    <div class="layout-container">
+        <!-- Menu -->
+        @include('partials.sidebar')
+        <!-- / Menu -->
 
-    @include('partials.footer')
+        <!-- Layout container -->
+        <div class="layout-page">
+            <!-- Navbar -->
+
+            @include('partials.header')
+
+            <!-- / Navbar -->
+
+            <!-- Content wrapper -->
+            @yield('content')
+            <!-- Content wrapper -->
+
+            @include('partials.footer')
+        </div>
+        <!-- / Layout page -->
+    </div>
+
+
 </div>
+<!-- / Layout wrapper -->
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{asset('/assets/vendor/libs/jquery/jquery.js')}}"></script>
