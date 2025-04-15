@@ -16,22 +16,22 @@ class AplicacionController extends Controller
 
     // DataTable
     public function datatable()
-{
-    $aplicaciones = \App\Models\Aplicacion::with('usuario')->get();
+    {
+        $aplicaciones = \App\Models\Aplicacion::with('usuario')->get();
 
-    $data = $aplicaciones->map(function ($aplicacion) {
-        return [
-            'id' => $aplicacion->id,
-            'user_id' => $aplicacion->user_id,
-            'nombre' => $aplicacion->usuario->name,
-            'email' => $aplicacion->usuario->email,
-            'vacante' => $aplicacion->vacante,
-            'codigo' => $aplicacion->codigo,
-        ];
-    });
+        $data = $aplicaciones->map(function ($aplicacion) {
+            return [
+                'id' => $aplicacion->id,
+                'user_id' => $aplicacion->user_id,
+                'nombre' => $aplicacion->usuario->name,
+                'email' => $aplicacion->usuario->email,
+                'vacante' => $aplicacion->vacante,
+                'codigo' => $aplicacion->codigo,
+            ];
+        });
 
-    return response()->json(['data' => $data]);
-}
+        return response()->json(['data' => $data]);
+    }
 
     // Guardar nueva aplicación
     public function store(Request $request)

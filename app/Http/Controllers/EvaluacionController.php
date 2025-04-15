@@ -26,16 +26,23 @@ class EvaluacionController extends Controller
             'categorias' => 'required|array',
             'categorias.*' => 'exists:categorias,id',
         ]);
-
-        foreach ($request->categorias as $catId) {
-            Usuarios_categoria::firstOrCreate([
-                'user_id' => $request->user_id,
-                'categorias_id' => $catId,
-            ]);
+    
+        try {
+            foreach ($request->categorias as $catId) {
+                Usuarios_categoria::firstOrCreate([
+                    'user_id' => $request->user_id,
+                    'categorias_id' => $catId,
+                ]);
+            }
+    
+            return response()->json(['success' => true, 'message' => 'Evaluaciones asignadas']);
+        } catch (\Exception $e) {
+            
+            return response()->json(['success' => false, 'message' => 'Error al asignar evaluaciones'], 500);
         }
-
-        return response()->json(['success' => true, 'message' => 'Evaluaciones asignadas']);
     }
+    
+    
 
 
 

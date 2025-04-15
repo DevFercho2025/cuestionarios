@@ -45,11 +45,23 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
+    public $timestamps = false;
+    
     public function config()
     {
         return $this->hasOne(ConfigUser::class, 'user_id');
     }
+
+    public function info()
+    {
+        return $this->hasOne(UserInfo::class, 'user_id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
 
     public function isAdmin()
     {
@@ -67,11 +79,6 @@ class User extends Authenticatable
     }
 
 
-    public function info()
-    {
-        return $this->hasOne(UserInfo::class, 'user_id');
-    }
-
     public function aplicaciones()
     {
         return $this->hasMany(Aplicacion::class);
@@ -83,8 +90,5 @@ class User extends Authenticatable
     }
     
 
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
+    
 }

@@ -51,6 +51,14 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col s12">
+        <a href="{{ route('admin.index') }}" class="waves-effect waves-light btn-large blue">
+            <i class="material-icons left">home</i>Regresar a Admin
+        </a>
+    </div>
+</div>
+
 <!-- ESTILOS -->
 <style>
     .gradient-card {
@@ -82,8 +90,9 @@
 
 <!-- SCRIPT -->
 <script>
+    let table;
     $(document).ready(function () {
-        const table = $('#candidatosTable').DataTable({
+        table = $('#candidatosTable').DataTable({
             ajax: "{{ route('candidatos.datatable') }}",
             dataSrc: 'data',
             columns: [
@@ -146,7 +155,7 @@
                         `;
 
                         @auth
-                            @if ((bool) auth()->user()->is_admin && !(bool) auth()->user()->is_super_admin)
+                        @if ((bool) auth()->user()->config?->is_admin && !(bool) auth()->user()->config?->is_super_admin)
                                 botones += `
                                     <a class="btn-floating btn-small blue generar-codigo-btn tooltipped" data-id="${row.id}" data-tooltip="Generar Código">
                                         <i class="material-icons">vpn_key</i>
@@ -184,32 +193,39 @@
             span.replaceWith(input);
             input.focus();
 
-            input.on('blur keydown', function (e) {
-                if (e.type === 'blur' || e.key === 'Enter') {
-                    const newValue = input.val();
+                input.on('blur keydown', function (e) {
+                    if (e.type === 'blur' || e.key === 'Enter') {
+                        const newValue = input.val().trim();
 
-                    if (newValue !== original) {
-                        $.ajax({
-                            url: `/admin/candidatos/${id}`,
-                            method: 'PUT',
-                            data: {
-                                _token: "{{ csrf_token() }}",
-                                [field]: newValue
-                            },
-                            success: function () {
-                                const nuevoSpan = $(`<span class="editable" data-id="${id}" data-field="${field}">${newValue}</span>`);
-                                input.replaceWith(nuevoSpan);
-                                M.toast({ html: 'Actualizado correctamente', classes: 'green' });
-                            },
-                            error: function () {
-                                input.replaceWith(`<span class="editable" data-id="${id}" data-field="${field}">${original}</span>`);
-                                M.toast({ html: 'Error al actualizar', classes: 'red' });
-                            }
-                        });
-                    } else {
-                        input.replaceWith(`<span class="editable" data-id="${id}" data-field="${field}">${original}</span>`);
+                        if (newValue === '') {
+                            M.toast({ html: 'El campo no puede estar vacío', classes: 'red' });
+                            input.replaceWith(`<span class="editable" data-id="${id}" data-field="${field}">${original}</span>`);
+                            return;
+                        }
+
+                        if (newValue !== original) {
+                            $.ajax({
+                                url: `/admin/candidatos/${id}`,
+                                method: 'PUT',
+                                data: {
+                                    _token: "{{ csrf_token() }}",
+                                    [field]: newValue
+                                },
+                                success: function () {
+                                    const nuevoSpan = $(`<span class="editable" data-id="${id}" data-field="${field}">${newValue}</span>`);
+                                    input.replaceWith(nuevoSpan);
+                                    M.toast({ html: 'Actualizado correctamente', classes: 'green' });
+                                },
+                                error: function () {
+                                    input.replaceWith(`<span class="editable" data-id="${id}" data-field="${field}">${original}</span>`);
+                                    M.toast({ html: 'Error al actualizar', classes: 'red' });
+                                }
+                            });
+                        } else {
+                            input.replaceWith(`<span class="editable" data-id="${id}" data-field="${field}">${original}</span>`);
+                        }
                     }
-                }
+                });
             });
         });
 
@@ -223,32 +239,55 @@
         $(document).on('click', '.edit-btn', function () {
             const id = $(this).data('id');
 
+            // Solicitar los datos del candidato para editar
             $.get(`/candidatos/${id}`, function (data) {
+                // Mostrar el formulario de edición con todos los campos necesarios
                 Swal.fire({
                     title: 'Editar Candidato',
                     html: `
                         <input id="edit-nombre" class="swal2-input" placeholder="Nombre" value="${data.name}">
                         <input id="edit-email" class="swal2-input" placeholder="Email" value="${data.email}">
+                        <input id="edit-codigo_postal" class="swal2-input" placeholder="Código Postal" value="${data.info.codigo_postal}">
+                        <input id="edit-celular" class="swal2-input" placeholder="Celular" value="${data.info.celular}">
+                        <input id="edit-fecha_nacimiento" type="date" class="swal2-input" placeholder="Fecha de Nacimiento" value="${data.info.fecha_nacimiento ? data.info.fecha_nacimiento.split('T')[0] : ''}">
+                        <select id="edit-genero" class="swal2-input">
+                            <option value="Masculino" ${data.info.genero === 'Masculino' ? 'selected' : ''}>Masculino</option>
+                            <option value="Femenino" ${data.info.genero === 'Femenino' ? 'selected' : ''}>Femenino</option>
+                            <option value="Otro" ${data.info.genero === 'Otro' ? 'selected' : ''}>Otro</option>
+                        </select>
                     `,
                     confirmButtonText: 'Guardar',
                     showCancelButton: true,
                     preConfirm: () => {
+                        // Obtener los valores de los campos
                         const name = $('#edit-nombre').val().trim();
                         const email = $('#edit-email').val().trim();
+                        const codigo_postal = $('#edit-codigo_postal').val().trim();
+                        const celular = $('#edit-celular').val().trim();
+                        const fecha_nacimiento = $('#edit-fecha_nacimiento').val().trim();
+                        const genero = $('#edit-genero').val().trim();
 
-                        if (!name || !email) {
+                        // Validación de los campos
+                        if (!name || !email || !codigo_postal || !celular || !fecha_nacimiento || !genero) {
                             Swal.showValidationMessage('Todos los campos son requeridos');
                             return false;
                         }
+
+                        // Enviar la solicitud PUT con todos los datos
                         return $.ajax({
                             url: `/admin/candidatos/${id}`,
                             method: 'PUT',
                             data: {
                                 name: name,
                                 email: email,
+                                codigo_postal: codigo_postal,
+                                celular: celular,
+                                fecha_nacimiento: fecha_nacimiento,
+                                genero: genero,
                                 _token: "{{ csrf_token() }}"
                             }
                         }).then(response => {
+                            // Recargar la tabla con los nuevos datos
                             table.ajax.reload();
                             return response;
                         }).catch(() => {
@@ -258,6 +297,7 @@
                 });
             });
         });
+
 
 
         //eliminar candidato
@@ -371,7 +411,5 @@
         });
     });
 
-
-    });   
 </script>
 @endsection

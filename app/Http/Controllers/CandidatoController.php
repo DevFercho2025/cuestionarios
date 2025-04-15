@@ -13,32 +13,47 @@ use function Ramsey\Uuid\v1;
 class CandidatoController extends Controller
 {
     public function index()
-    {
-        $candidatos = User::where('is_admin', 0)->where('is_super_admin', 0)->get();
-        return view('candidatos.index', compact('candidatos'));
+    { 
+        return view('candidatos.index');
     }
 
     public function datatable(Request $request)
     {
-        $candidatos = User::with('info', 'company')
-            ->where('is_admin', 0)
-            ->where('is_super_admin', 0)
-            ->get()
-            ->map(function ($user) {
+        try {
+            // Obtener candidatos con relaciones necesarias
+            $candidatos = User::with(['info', 'config.company'])
+                ->whereHas('config', function ($q) {
+                    $q->where('is_admin', 0)->where('is_super_admin', 0);
+                })
+                ->get();
+
+            //Formatear datos antes
+            $candidatosData = $candidatos->map(function ($user) {
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'fecha_nacimiento' => optional($user->info)->fecha_nacimiento,
+                    'fecha_nacimiento' => optional($user->info)->fecha_nacimiento ? \Carbon\Carbon::parse($user->info->fecha_nacimiento)->toDateString() : null, // Formato de fecha
                     'genero' => optional($user->info)->genero,
                     'codigo_postal' => optional($user->info)->codigo_postal,
                     'celular' => optional($user->info)->celular,
-                    'company_name' => optional($user->company)->nombre,
-                    'created_at' => $user->created_at->toDateTimeString(),
+                    'created_at' => $user->created_at ? $user->created_at->toDateTimeString() : null,
+                    'company_name' => optional($user->config->company)->nombre,
                 ];
             });
 
-        return response()->json(['data' => $candidatos]);
+            return response()->json(['data' => $candidatosData]);
+
+        } catch (\Exception $e) {
+
+            // Retornar error con detalles
+            return response()->json([
+                'error' => 'Hubo un problema al obtener los candidatos.',
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ], 500);
+        }
     }
 
 
@@ -86,6 +101,11 @@ class CandidatoController extends Controller
             'password' => bcrypt(Str::random(10)),
         ]);
 
+        $user->config()->create([
+            'is_admin' => 0,
+            'is_super_admin' => 0,
+        ]);
+
         $user->info()->create([
             'fecha_nacimiento' => $request->input('fechaNacimiento'),
             'genero' => $request->input('genero'),
@@ -104,46 +124,82 @@ class CandidatoController extends Controller
 
     public function update(Request $request, $id)
     {
-        $candidato = User::where('is_admin', 0)->findOrFail($id);
+        try {
+            // Obtener el candidato (User) por ID
+            $candidato = User::whereHas('config', function ($query) {
+                $query->where('is_admin', 0)->where('is_super_admin', 0);
+            })->findOrFail($id);
 
-        $data = $request->only(['name', 'email', 'codigo_postal', 'celular']);
-
-        // Actualizar campos del modelo User
-        if (isset($data['name']) || isset($data['email'])) {
-            $validated = $request->validate([
+            // Validación de los datos de User (nombre, email)
+            $validatedUser = $request->validate([
                 'name' => 'sometimes|required|string|max:255',
                 'email' => 'sometimes|required|email|unique:users,email,' . $id,
             ]);
-            $candidato->update($validated);
-        }
 
-        // Actualizar campos del modelo UserInfo
-        if (isset($data['codigo_postal']) || isset($data['celular'])) {
-            $info = $candidato->info()->firstOrCreate([]);
-            $info->update([
-                'codigo_postal' => $data['codigo_postal'] ?? $info->codigo_postal,
-                'celular' => $data['celular'] ?? $info->celular,
+            // Actualizar el modelo User (name, email)
+            if (isset($validatedUser['name']) || isset($validatedUser['email'])) {
+                $candidato->update($validatedUser);
+            }
+
+            // Actualizar los campos del modelo UserInfo (codigo_postal, celular)
+            $validatedInfo = $request->only(['codigo_postal', 'celular', 'fecha_nacimiento', 'genero']);
+
+            if (count($validatedInfo) > 0) {
+                // Si no existe un registro, lo crea; si existe, lo actualiza
+                $info = $candidato->info()->firstOrCreate([]);
+                $info->update([
+                    'codigo_postal' => $validatedInfo['codigo_postal'] ?? $info->codigo_postal,
+                    'celular' => $validatedInfo['celular'] ?? $info->celular,
+                    'fecha_nacimiento' => $validatedInfo['fecha_nacimiento'] ?? $info->fecha_nacimiento,
+                    'genero' => $validatedInfo['genero'] ?? $info->genero,
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Candidato actualizado correctamente.'
             ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Hubo un problema al actualizar el candidato.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Candidato actualizado correctamente.'
-        ]);
     }
 
 
 
     public function destroy($id)
     {
-        $candidato = User::where('is_admin', 0)->findOrFail($id);
-        $candidato->delete();
-
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Candidato eliminado correctamente'
-        ]);
+        try {
+            // Obtener el candidato (User) por ID, asegurándose de que no sea admin
+            $candidato = User::whereHas('config', function ($query) {
+                $query->where('is_admin', 0)->where('is_super_admin', 0);
+            })->findOrFail($id);
+    
+            // Eliminar la información relacionada en la tabla UserInfo
+            $candidato->info()->delete(); // Elimina el registro relacionado en psico_alobri_users_info
+    
+            // Eliminar la configuración relacionada en la tabla ConfigUser
+            $candidato->config()->delete(); // Elimina el registro relacionado en config_users
+    
+            // Eliminar al usuario de la tabla users
+            $candidato->delete();
+    
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Candidato y sus datos eliminados correctamente'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Hubo un problema al eliminar el candidato.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
+    
 
     public function generarCodigo()
     {

@@ -193,22 +193,41 @@
                             Swal.showValidationMessage('Debes seleccionar al menos una categoría');
                             return false;
                         }
+
                         console.log({
                             user_id: userId,
                             categorias: seleccionadas
                         });
-                        return $.post("{{ route('admin.evaluaciones.asignar') }}", {
-                            user_id: userId,
-                            categorias: seleccionadas,
-                            _token: "{{ csrf_token() }}"
-                        })
-                        .then(response => {
-                            return response;
-                        })
-                        .catch(error => {
-                            Swal.showValidationMessage('Error al asignar evaluaciones');
+
+                        $.ajax({
+                            url: "http://practicas-psico/admin/evaluaciones/asignar",
+                            method: 'POST',
+                            data: {
+                                user_id: userId,
+                                categorias: seleccionadas,
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                console.log(response); // Para ver cómo es la respuesta
+
+                                if (response && response.success) {
+                                    Swal.fire('Éxito', 'Las evaluaciones fueron asignadas correctamente.', 'success');
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: '¡Oops!',
+                                        text: response.message || 'Error al asignar evaluaciones'
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                Swal.showValidationMessage('Error al asignar evaluaciones');
+                                console.log('Error:', status, error);
+                            }
                         });
+
                     }
+
                 });
             });
         });

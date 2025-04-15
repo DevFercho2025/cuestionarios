@@ -19,6 +19,7 @@ class ConfigUser extends Model
         'is_psico_ser',
         'active',
     ];
+    public $timestamps = false;
 
     public function user()
     {
@@ -30,30 +31,19 @@ class ConfigUser extends Model
         return $this->belongsTo(Company::class, 'company_id'); // Relación con el modelo Company
     }
 
+
     public function isAdmin()
     {
         return $this->is_admin;
     }
-
-    /**
-     * Método para comprobar si el usuario es super admin
-     */
     public function isSuperAdmin()
     {
         return $this->is_super_admin;
     }
-
-    /**
-     * Método para comprobar si el usuario es de Talentina
-     */
     public function isTalentinaUser()
     {
         return $this->is_talentina_user;
     }
-
-    /**
-     * Método para comprobar si el usuario es psico ser
-     */
     public function isPsicoSer()
     {
         return $this->is_psico_ser;

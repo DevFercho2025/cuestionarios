@@ -9,6 +9,7 @@ class Aplicacion extends Model
     protected $table = 'psico_alobri_aplicaciones';
     protected $fillable = ['user_id', 'vacante', 'codigo'];
     public $timestamps = false;
+    
     public function usuario()
     {
         return $this->belongsTo(User::class, 'user_id');
