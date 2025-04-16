@@ -29,6 +29,9 @@
     <link rel="stylesheet" href="{{asset('/assets/css/demo.css')}}" />
     <link rel="stylesheet" href="{{asset('/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css')}}" />
     <link rel="stylesheet" href="{{asset('/assets/vendor/libs/typeahead-js/typeahead.css')}}" />
+    <link rel="stylesheet" href="{{asset('/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}" />
+    <link rel="stylesheet" href="{{asset('/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}" />
+    <link rel="stylesheet" href="{{asset('/assets/vendor/libs/flatpickr/flatpickr.css')}}" />
     <link rel="stylesheet" href="{{asset('/assets/vendor/libs/apex-charts/apex-charts.css')}}" />
     <link rel="stylesheet" href="{{asset('/assets/vendor/libs/swiper/swiper.css')}}" />
     <link rel="stylesheet" href="{{asset('/assets/vendor/css/pages/cards-statistics.css')}}" />
@@ -82,10 +85,16 @@
 <script src="{{asset('/assets/vendor/libs/i18n/i18n.js')}}"></script>
 <script src="{{asset('/assets/vendor/libs/typeahead-js/typeahead.js')}}"></script>
 <script src="{{asset('/assets/vendor/js/menu.js')}}"></script>
+<script src="{{asset('/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')}}"></script>
+<script src="{{asset('/assets/vendor/libs/moment/moment.js')}}"></script>
+<script src="{{asset('/assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
+<script src="{{asset('/assets/js/main.js')}}"></script>
+<script src="{{asset('/assets/js/tables-datatables-advanced.js')}}"></script>
 <script src="{{asset('/assets/vendor/libs/apex-charts/apexcharts.js')}}"></script>
 <script src="{{asset('/assets/vendor/libs/swiper/swiper.js')}}"></script>
 <script src="{{asset('/assets/js/main.js')}}"></script>
 <script src="{{asset('/assets/js/dashboards-analytics.js')}}"></script>
+<script src="{{asset('/assets/js/tables-datatables-advanced.js')}}"></script>
 
 @yield('scripts')
 

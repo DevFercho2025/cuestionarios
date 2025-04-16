@@ -19,14 +19,13 @@
                 </div>
             </div>
         </div>
-
         <!-- Tabla de Secciones -->
         <div class="row">
             <div class="col s12">
                 <div class="card dark-card z-depth-3">
-                    <div class="card-content">
-                        <table id="seccionesTable" class="responsive-table centered">
-                            <thead class="dark-thead">
+                    <div class="card-datatable table-responsive">
+                        <table id="seccionesTable" class="dt-responsive table table-bordered">
+                            <thead>
                             <tr>
                                 <th>Título</th>
                                 <th>Bloque</th>
@@ -35,7 +34,6 @@
                                 <th>Acciones</th>
                             </tr>
                             </thead>
-                            <tbody></tbody>
                         </table>
                     </div>
                 </div>
@@ -122,15 +120,17 @@
                         data: null,
                         render: function (data, type, row) {
                             return `
-                            <div class="action-buttons">
-                                <a class="btn-floating btn-small gradient-btn edit-btn tooltipped pulse" data-position="top" data-tooltip="Editar" data-id="${row.id}">
-                                    <i class="material-icons">edit</i>
-                                </a>
-                                <a class="btn-floating btn-small red darken-2 delete-btn tooltipped pulse" data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
-                                    <i class="material-icons">delete</i>
-                                </a>
-                            </div>
-                        `;
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-info waves-effect waves-light edit-btn tooltipped"
+                            data-position="top" data-tooltip="Editar" data-id="${row.id}">
+                        <i class="material-icons">edit</i>
+                    </button>
+                    <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
+                            data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
+                        <i class="material-icons">delete</i>
+                    </button>
+                </div>
+            `;
                         }
                     }
                 ],
@@ -173,39 +173,40 @@
                     return;
                 }
                 Swal.fire({
-                    title: 'Crear Sección',
                     html: `
-                    <div class="input-field mb-3">
-                        <i class="material-icons prefix">title</i>
-                        <input id="swal-titulo" type="text" class="validate">
-                        <label for="swal-titulo">Título</label>
+                 <div class="col-md mb-6 mb-md-0">
+                  <div class="card">
+                    <h2 class="card-header">Crear Sección</h2>
+                    <div class="card-body">
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input id="swal-titulo" type="text" class="form-control" placeholder="Titulo" required="">
+                          <label for="swal-titulo">Título</label>
+                        </div>
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input type="text" id="swal-bloque" class="form-control" placeholder="Bloque" required="">
+                          <label for="swal-bloque">Bloque</label>
+                        </div>
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input type="text" id="swal-cuestionario" class="form-control" placeholder="Bloque" required="">
+                          <label for="swal-cuestionario">Cuestionario</label>
+                        </div>
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input type="text" id="swal-time_at" class="form-control" placeholder="Bloque" required="">
+                          <label for="swal-time_at">Tiempo</label>
+                        </div>
                     </div>
-                    <div class="input-field mb-3">
-                        <i class="material-icons prefix">view_module</i>
-                        <input id="swal-bloque" type="text" class="validate">
-                        <label for="swal-bloque">Bloque</label>
-                    </div>
-                    <div class="input-field mb-3">
-                        <i class="material-icons prefix">assignment</i>
-                        <input id="swal-cuestionario" type="text" class="validate">
-                        <label for="swal-cuestionario">Cuestionario</label>
-                    </div>
-                    <div class="input-field mb-3">
-                        <i class="material-icons prefix">access_time</i>
-                        <input id="swal-time_at" type="text" class="validate" placeholder="HH:MM:SS">
-                        <label for="swal-time_at">Tiempo</label>
-                    </div>
+                  </div>
+                </div>
                 `,
                     showClass: { popup: 'animate__animated animate__fadeInDown' },
                     hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                     focusConfirm: false,
-                    confirmButtonText: '<i class="material-icons left">check</i> Crear',
+                    confirmButtonText: 'Crear',
                     confirmButtonColor: '#3d4e81',
-                    cancelButtonText: '<i class="material-icons left">close</i> Cancelar',
+                    cancelButtonText: 'Cancelar',
                     cancelButtonColor: '#d32f2f',
                     showCancelButton: true,
                     buttonsStyling: true,
-                    background: '#262b3c',
                     preConfirm: () => {
                         return {
                             titulo: document.getElementById('swal-titulo').value,
@@ -272,35 +273,38 @@
                 let row = table.row(jQuery(this).parents('tr')).data();
 
                 Swal.fire({
-                    title: '<i class="material-icons" style="vertical-align: middle; margin-right: 10px; color: #5e6fa1;">edit</i> Editar Sección',
+                    title: '',
                     html: `
-                    <div class="input-field mb-3">
-                        <i class="material-icons prefix">title</i>
-                        <input id="swal-titulo" type="text" class="validate" value="${row.titulo}">
-                        <label for="swal-titulo" class="active">Título</label>
+                 <div class="col-md mb-6 mb-md-0">
+                  <div class="card">
+                    <h2 class="card-header">Editar Sección</h2>
+                    <div class="card-body">
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input id="swal-titulo" type="text" class="form-control" placeholder="Titulo" required="" value="${row.titulo}">
+                          <label for="swal-titulo">Título</label>
+                        </div>
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input type="text" id="swal-bloque" class="form-control" placeholder="Bloque" required="" value="${row.bloque}">
+                          <label for="swal-bloque">Bloque</label>
+                        </div>
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input type="text" id="swal-cuestionario" class="form-control" placeholder="Bloque" required="" value="${row.cuestionario}">
+                          <label for="swal-cuestionario">Cuestionario</label>
+                        </div>
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input type="text" id="swal-time_at" class="form-control" placeholder="Bloque" required="" value="${row.time_at}">
+                          <label for="swal-time_at">Tiempo</label>
+                        </div>
                     </div>
-                    <div class="input-field mb-3">
-                        <i class="material-icons prefix">view_module</i>
-                        <input id="swal-bloque" type="text" class="validate" value="${row.bloque}">
-                        <label for="swal-bloque" class="active">Bloque</label>
-                    </div>
-                    <div class="input-field mb-3">
-                        <i class="material-icons prefix">assignment</i>
-                        <input id="swal-cuestionario" type="text" class="validate" value="${row.cuestionario}">
-                        <label for="swal-cuestionario" class="active">Cuestionario</label>
-                    </div>
-                    <div class="input-field mb-3">
-                        <i class="material-icons prefix">access_time</i>
-                        <input id="swal-time_at" type="text" class="validate" value="${row.time_at}">
-                        <label for="swal-time_at" class="active">Tiempo</label>
-                    </div>
+                  </div>
+                </div>
                 `,
                     showClass: { popup: 'animate__animated animate__fadeInDown' },
                     hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                     focusConfirm: false,
-                    confirmButtonText: '<i class="material-icons left">save</i> Actualizar',
+                    confirmButtonText: 'Actualizar',
                     confirmButtonColor: '#3d4e81',
-                    cancelButtonText: '<i class="material-icons left">close</i> Cancelar',
+                    cancelButtonText: 'Cancelar',
                     cancelButtonColor: '#d32f2f',
                     showCancelButton: true,
                     background: '#262b3c',
