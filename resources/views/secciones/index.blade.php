@@ -120,17 +120,17 @@
                         data: null,
                         render: function (data, type, row) {
                             return `
-                <div class="action-buttons">
-                    <button type="button" class="btn btn-info waves-effect waves-light edit-btn tooltipped"
-                            data-position="top" data-tooltip="Editar" data-id="${row.id}">
-                        <i class="material-icons">edit</i>
-                    </button>
-                    <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
-                            data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
-                        <i class="material-icons">delete</i>
-                    </button>
-                </div>
-            `;
+                                <div class="action-buttons">
+                                    <button type="button" class="btn btn-info waves-effect waves-light edit-btn tooltipped"
+                                            data-position="top" data-tooltip="Editar" data-id="${row.id}">
+                                        <i class="material-icons">edit</i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
+                                            data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
+                                        <i class="material-icons">delete</i>
+                                    </button>
+                                </div>
+                            `;
                         }
                     }
                 ],

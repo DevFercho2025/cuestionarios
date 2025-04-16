@@ -1,33 +1,32 @@
-@extends('layout.app')
+@extends('layout.admin')
 @section('title', 'Gestión de Candidatos')
-
 @section('content')
-<div class="container">
-    <div class="row">
-        <div class="col s12">
-            <div class="card-panel gradient-card">
-                <div class="row valign-wrapper mb-0">
-                    <div class="col s6">
-                        <h4 class="white-text"><i class="material-icons left">person</i>Gestión de Candidatos</h4>
-                    </div>
-                    <div class="col s6 right-align">
-                        <a id="registrarCandidatoBtn" class="waves-effect waves-light btn-large green">
-                            <i class="material-icons left">person_add</i>Registrar Candidato
-                        </a>
+    <div class="container">
+        <!-- emcabezado-->
+        <div class="row">
+            <div class="col s12">
+                <div class="card-panel dark-gradient">
+                    <div class="row valign-wrapper mb-0">
+                        <div class="col s8">
+                            <h4 class="white-text">Gestión de Candidatos</h4>
+                        </div>
+                        <div class="col s4 right-align">
+                            <a id="registrarCandidatoBtn" class="btn btn-large gradient-btn pulse">
+                                Nuevo Candidato
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    
-    <!-- Tabla de candidatos -->
-    <div class="row">
-        <div class="col s12">
-            <div class="card z-depth-3">
-                <div class="card-content">
-                    <table id="candidatosTable" class="highlight responsive-table centered striped">
-                        <thead>
+        <!-- Tabla de candidatos -->
+        <div class="row">
+            <div class="col s12">
+                <div class="card dark-card z-depth-3">
+                    <div class="card-datatable table-responsive">
+                        <table id="candidatosTable" class="dt-responsive table table-bordered">
+                            <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Nombre</th>
@@ -40,376 +39,392 @@
                                 <th>Compañía</th>
                                 <th>Acciones</th>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Llenado vía AJAX -->
-                        </tbody>
-                    </table>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
+        <!--Volver a dashboard-->
+        <div class="row">
+            <div class="col s12">
+                <a href="{{ route('admin.index') }}" class="waves-effect waves-light btn-large blue">
+                    Regresar a Admin
+                </a>
+            </div>
+        </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col s12">
-        <a href="{{ route('admin.index') }}" class="waves-effect waves-light btn-large blue">
-            <i class="material-icons left">home</i>Regresar a Admin
-        </a>
-    </div>
-</div>
+    <!-- jQuery y Scripts adicionales -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- ESTILOS -->
-<style>
-    .gradient-card {
-        background: linear-gradient(to right, #1976d2, #64b5f6);
-        border-radius: 8px;
-        margin-top: 20px;
-    }
-
-    .btn {
-        margin: 0 5px;
-    }
-
-    .card {
-        border-radius: 8px;
-        margin-top: 10px;
-    }
-    .inline-input {
-        border: none;
-        border-bottom: 1px solid #2196F3;
-        outline: none;
-        font-size: inherit;
-        background-color: #f3f3f3;
-    }
-    .editable {
-        cursor: pointer;
-    }
-</style>
-
-
-<!-- SCRIPT -->
-<script>
-    let table;
-    $(document).ready(function () {
-        table = $('#candidatosTable').DataTable({
-            ajax: "{{ route('candidatos.datatable') }}",
-            dataSrc: 'data',
-            columns: [
-                { data: 'id' },
-                {
-                    data: 'name',
-                    render: function (data, type, row) {
-                        return `<span class="editable" data-id="${row.id}" data-field="name">${data}</span>`;
-                    }
-                },
-                {
-                    data: 'email',
-                    render: function (data, type, row) {
-                        return `<span class="editable" data-id="${row.id}" data-field="email">${data}</span>`;
-                    }
-                },
-                {
-                    data: 'fecha_nacimiento',
-                    render: function (data) {
-                        return data ? new Date(data).toLocaleDateString() : '-';
-                    }
-                },
-                { 
-                    data: 'genero',
-                    render: function (data, type, row) {
-                        return `<span class="editable" data-id="${row.id}" data-field="genero">${data ?? '-'}</span>`;
-                    }
-                },
-                { 
-                    data: 'codigo_postal',
-                    render: function (data, type, row) {
-                        return `<span class="editable" data-id="${row.id}" data-field="codigo_postal">${data ?? '-'}</span>`;
-                    }
-                },
-                { 
-                    data: 'celular',
-                    render: function (data, type, row) {
-                        return `<span class="editable" data-id="${row.id}" data-field="celular">${data ?? '-'}</span>`;
-                    }
-                },
-                {
-                    data: 'created_at',
-                    render: function (data) {
-                        return new Date(data).toLocaleString();
-                    }
-                },
-                { 
-                    data: 'company_name',
-                    render: function (data) {
-                        return data ?? '-';
-                    }
-                },
-                {
-                    data: null,
-                    render: function (data, type, row) {
-                        let botones = `
-                            <a class="btn-floating btn-small red delete-btn tooltipped" data-id="${row.id}" data-tooltip="Eliminar">
-                                <i class="material-icons">delete</i>
-                            </a>
-                        `;
-
-                        @auth
-                        @if ((bool) auth()->user()->config?->is_admin && !(bool) auth()->user()->config?->is_super_admin)
-                                botones += `
-                                    <a class="btn-floating btn-small blue generar-codigo-btn tooltipped" data-id="${row.id}" data-tooltip="Generar Código">
-                                        <i class="material-icons">vpn_key</i>
-                                    </a>
-                                `;
-                            @endif
-                        @endauth
-
-                        return botones;
-                    }
-                }
-            ],
-
-
-            responsive: true,
-            language: {
-                url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
-            },
-            drawCallback: function () {
-                $('.tooltipped').tooltip();
+    @push('scripts')
+        @php
+            $userPermissions = [
+                'isAuthenticated' => auth()->check(),
+                'isAdmin' => auth()->user()?->config?->is_admin ?? false,
+                'isSuperAdmin' => auth()->user()?->config?->is_super_admin ?? false,
+            ];
+        @endphp
+        <script>
+            
+            if (typeof jQuery === 'undefined') {
+                document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
             }
-        });
 
-        // Hacer registro de candidato editable con doble clic
-        $(document).on('dblclick', '.editable', function () {
-            const span = $(this);
-            const original = span.text();
-            const field = span.data('field');
-            const id = span.data('id');
-
-            const input = $('<input type="text" class="inline-input"/>')
-                .val(original)
-                .css('width', '100%');
-
-            span.replaceWith(input);
-            input.focus();
-
-                input.on('blur keydown', function (e) {
-                    if (e.type === 'blur' || e.key === 'Enter') {
-                        const newValue = input.val().trim();
-
-                        if (newValue === '') {
-                            M.toast({ html: 'El campo no puede estar vacío', classes: 'red' });
-                            input.replaceWith(`<span class="editable" data-id="${id}" data-field="${field}">${original}</span>`);
-                            return;
-                        }
-
-                        if (newValue !== original) {
-                            $.ajax({
-                                url: `/admin/candidatos/${id}`,
-                                method: 'PUT',
-                                data: {
-                                    _token: "{{ csrf_token() }}",
-                                    [field]: newValue
-                                },
-                                success: function () {
-                                    const nuevoSpan = $(`<span class="editable" data-id="${id}" data-field="${field}">${newValue}</span>`);
-                                    input.replaceWith(nuevoSpan);
-                                    M.toast({ html: 'Actualizado correctamente', classes: 'green' });
-                                },
-                                error: function () {
-                                    input.replaceWith(`<span class="editable" data-id="${id}" data-field="${field}">${original}</span>`);
-                                    M.toast({ html: 'Error al actualizar', classes: 'red' });
-                                }
-                            });
-                        } else {
-                            input.replaceWith(`<span class="editable" data-id="${id}" data-field="${field}">${original}</span>`);
-                        }
+                document.addEventListener('DOMContentLoaded', function () {
+                    if (typeof jQuery !== 'undefined') {
+                        initializeApp();
+                    } else {
+                        console.error('jQuery no está disponible. Intenta incluirlo manualmente en tu plantilla.');
+                        alert('Error: jQuery no está cargado correctamente. Por favor, contacta al administrador.');
                     }
                 });
-            });
-        });
 
-        //Ir a formulario de registro de candidato
-        $('#registrarCandidatoBtn').click(function () {
-            window.location.href = "{{ route('candidatos.crear') }}";
-        });
-
-
-        //editar candidato        
-        $(document).on('click', '.edit-btn', function () {
-            const id = $(this).data('id');
-
-            // Solicitar los datos del candidato para editar
-            $.get(`/candidatos/${id}`, function (data) {
-                // Mostrar el formulario de edición con todos los campos necesarios
-                Swal.fire({
-                    title: 'Editar Candidato',
-                    html: `
-                        <input id="edit-nombre" class="swal2-input" placeholder="Nombre" value="${data.name}">
-                        <input id="edit-email" class="swal2-input" placeholder="Email" value="${data.email}">
-                        <input id="edit-codigo_postal" class="swal2-input" placeholder="Código Postal" value="${data.info.codigo_postal}">
-                        <input id="edit-celular" class="swal2-input" placeholder="Celular" value="${data.info.celular}">
-                        <input id="edit-fecha_nacimiento" type="date" class="swal2-input" placeholder="Fecha de Nacimiento" value="${data.info.fecha_nacimiento ? data.info.fecha_nacimiento.split('T')[0] : ''}">
-                        <select id="edit-genero" class="swal2-input">
-                            <option value="Masculino" ${data.info.genero === 'Masculino' ? 'selected' : ''}>Masculino</option>
-                            <option value="Femenino" ${data.info.genero === 'Femenino' ? 'selected' : ''}>Femenino</option>
-                            <option value="Otro" ${data.info.genero === 'Otro' ? 'selected' : ''}>Otro</option>
-                        </select>
-                    `,
-                    confirmButtonText: 'Guardar',
-                    showCancelButton: true,
-                    preConfirm: () => {
-                        // Obtener los valores de los campos
-                        const name = $('#edit-nombre').val().trim();
-                        const email = $('#edit-email').val().trim();
-                        const codigo_postal = $('#edit-codigo_postal').val().trim();
-                        const celular = $('#edit-celular').val().trim();
-                        const fecha_nacimiento = $('#edit-fecha_nacimiento').val().trim();
-                        const genero = $('#edit-genero').val().trim();
-
-                        // Validación de los campos
-                        if (!name || !email || !codigo_postal || !celular || !fecha_nacimiento || !genero) {
-                            Swal.showValidationMessage('Todos los campos son requeridos');
-                            return false;
-                        }
-
-                        // Enviar la solicitud PUT con todos los datos
-                        return $.ajax({
-                            url: `/admin/candidatos/${id}`,
-                            method: 'PUT',
-                            data: {
-                                name: name,
-                                email: email,
-                                codigo_postal: codigo_postal,
-                                celular: celular,
-                                fecha_nacimiento: fecha_nacimiento,
-                                genero: genero,
-                                _token: "{{ csrf_token() }}"
-                            }
-                        }).then(response => {
-                            // Recargar la tabla con los nuevos datos
-                            table.ajax.reload();
-                            return response;
-                        }).catch(() => {
-                            Swal.showValidationMessage('Error al guardar');
-                        });
-                    }
-                });
-            });
-        });
-
-
-
-        //eliminar candidato
-        $(document).on('click', '.delete-btn', function () {
-            const id = $(this).data('id');
-
-            Swal.fire({
-                title: '¿Eliminar candidato?',
-                text: 'Esta acción no se puede deshacer',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then(result => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `/admin/candidatos/${id}`,
-                        method: 'DELETE',
-                        data: {
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function () {
-                            table.ajax.reload();
-                            Swal.fire('Eliminado', 'Candidato eliminado correctamente', 'success');
-                        },
-                        error: function () {
-                            Swal.fire('Error', 'No se pudo eliminar el candidato', 'error');
+                function initializeApp() {
+                    // Configuración global de AJAX: token CSRF
+                    jQuery.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         }
                     });
-                }
-            });
-        });
 
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        // generar código individual
-        $(document).on('click', '.generar-codigo-btn', function () {
-        const userId = $(this).data('id');
-        Swal.fire({
-            title: 'Generar código',
-            html: `
-                <p>Introduce el nombre de la vacante para este candidato:</p>
-                <input id="vacanteInput" class="swal2-input" placeholder="Vacante">
-            `,
-            showCancelButton: true,
-            confirmButtonText: 'Generar',
-            cancelButtonText: 'Cancelar',
-            preConfirm: () => {
-                const vacante = $('#vacanteInput').val().trim();
-                if (!vacante) {
-                    Swal.showValidationMessage('La vacante es obligatoria');
-                    return false;
-                }
-
-                return $.post("{{ route('guardar.codigo') }}", {
-                    user_id: userId,
-                    vacante: vacante,
-                    _token: "{{ csrf_token() }}"
-                })
-                .then(response => {
-                    return response;
-                })
-                .catch(xhr => {
-                    if (xhr.status === 422) {
-                        const errores = xhr.responseJSON?.errors;
-                        console.error("Errores de validación:", errores);
-                        Swal.showValidationMessage(
-                            Object.values(errores).flat().join('<br>')
-                        );
-                    } else {
-                        console.error(xhr);
-                        Swal.showValidationMessage('Error inesperado al generar el código');
+                    // Inicializar componentes del template
+                    if (typeof M !== 'undefined') {
+                        M.Modal.init(document.querySelectorAll('.modal'));
+                        M.FormSelect.init(document.querySelectorAll('select'));
+                        M.Tooltip.init(document.querySelectorAll('.tooltipped'));
                     }
-                });
-            }
-        }).then(result => {
-            if (result.isConfirmed && result.value) {
-                const code = result.value.code;
-                Swal.fire({
-                    title: '¡Código generado!',
-                    html: `
-                        <p><strong>Código:</strong></p>
-                        <input type="text" id="codigoGenerado" class="swal2-input" value="${code}" readonly>
-                        <button id="btnCopiarCodigo" class="swal2-confirm swal2-styled">Copiar</button>
-                    `,
-                    showConfirmButton: false,
-                    didOpen: () => {
-                        $('#btnCopiarCodigo').click(function () {
-                            const input = document.getElementById('codigoGenerado');
-                            input.select();
-                            input.setSelectionRange(0, 99999); // Para móviles
 
-                            try {
-                                const copiado = document.execCommand('copy');
-                                if (copiado) {
-                                    Swal.fire('Copiado', 'Código copiado al portapapeles', 'success');
-                                } else {
-                                    Swal.fire('Ups', 'No se pudo copiar automáticamente', 'warning');
+                    // Inicialización de DataTable
+                    if (typeof jQuery.fn.DataTable === 'undefined') {
+                        console.error('DataTables no está disponible.');
+                        var dtCss = document.createElement('link');
+                        dtCss.rel = 'stylesheet';
+                        dtCss.href = 'https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css';
+                        document.head.appendChild(dtCss);
+
+                        var dtScript = document.createElement('script');
+                        dtScript.src = 'https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js';
+                        dtScript.onload = function () {
+                            initializeDataTable();
+                        };
+                        document.body.appendChild(dtScript);
+                    } else {
+                        initializeDataTable();
+                    }
+                }
+
+
+                function initializeDataTable(){
+                    try {
+                        var table = jQuery('#candidatosTable').DataTable({
+                            ajax: {
+                                url: "{{ route('candidatos.datatable')}}",
+                                dataSrc: '',
+                                error: function (xhr, error, thrown) {
+                                    console.error('Error en la carga de datos:', error, thrown);
+                                    if (typeof M !== 'undefined') {
+                                        M.toast({
+                                            html: '<i class="material-icons left">error</i> Error al cargar los datos',
+                                            classes: 'rounded red'
+                                        });
+                                    } else {
+                                        alert('Error al cargar los datos de la tabla');
+                                    }
                                 }
-                            } catch (err) {
-                                console.error('Error al copiar:', err);
-                                Swal.fire('Error', 'Hubo un problema al copiar el código', 'error');
+                            },
+                            columns: [
+                                {data: 'id'},
+                                {
+                                    data: 'name',
+                                    render: function (data, type, row) {
+                                        return `<span class="editable" data-id="${row.id}" data-field="name">${data}</span>`;
+                                    }
+                                },
+                                {
+                                    data: 'email',
+                                    render: function (data, type, row) {
+                                        return `<span class="editable" data-id="${row.id}" data-field="email">${data}</span>`;
+                                    }
+                                },
+                                {
+                                    data: 'fecha_nacimiento',
+                                    render: function (data) {
+                                        return data ? new Date(data).toLocaleDateString() : '-';
+                                    }
+                                },
+                                { 
+                                    data: 'genero',
+                                    render: function (data, type, row) {
+                                        return `<span class="editable" data-id="${row.id}" data-field="genero">${data ?? '-'}</span>`;
+                                    }
+                                },
+                                { 
+                                    data: 'codigo_postal',
+                                    render: function (data, type, row) {
+                                        return `<span class="editable" data-id="${row.id}" data-field="codigo_postal">${data ?? '-'}</span>`;
+                                    }
+                                },
+                                { 
+                                    data: 'celular',
+                                    render: function (data, type, row) {
+                                        return `<span class="editable" data-id="${row.id}" data-field="celular">${data ?? '-'}</span>`;
+                                    }
+                                },
+                                {
+                                    data: 'created_at',
+                                    render: function (data) {
+                                        return new Date(data).toLocaleString();
+                                    }
+                                },
+                                { 
+                                    data: 'company_name',
+                                    render: function (data) {
+                                        return data ?? '-';
+                                    }
+                                },
+                                {
+                                    data: null,
+                                    render: function(data, type, row){
+                                        let botones = `
+                                            <div class="action-buttons">
+                                                <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
+                                                        data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
+                                                    <i class="material-icons">delete</i>
+                                                </button>
+                                        `;
+
+                                        if (userPermissions.isAuthenticated && userPermissions.isAdmin && !userPermissions.isSuperAdmin) {
+                                            botones += `
+                                                <button type="button" class="btn btn-primary waves-effect waves-light generar-codigo-btn tooltipped" data-id="${row.id}" data-tooltip="Generar Código">
+                                                    <i class="material-icons">vpn_key</i>
+                                                </button>
+                                            `;
+                                        }
+
+                                        // Cerrar el div 'action-buttons'
+                                        botones += '</div>';
+
+                                        return botones;
+                                    }
+                                }
+                            ],
+                            responsive: true,
+                            // Se elimina la opción de idioma para evitar textos extra de traducción
+                            drawCallback: function () {
+                                if (typeof M !== 'undefined') {
+                                    M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+                                }
+                            },
+                            initComplete: function () {
+                                console.log('DataTable inicializada completamente');
                             }
                         });
-                    }
-                });
-            }
-        });
-    });
 
-</script>
+                        // Función para recargar la tabla
+                        function reloadTable() {
+                            table.ajax.reload(function () {
+                                if (typeof M !== 'undefined') {
+                                    M.toast({
+                                        html: '<i class="material-icons left">refresh</i> Tabla actualizada',
+                                        classes: 'rounded'
+                                    });
+                                }
+                            }, false);
+                        }
+
+                        // Comprobar disponibilidad de SweetAlert2
+                        if (typeof Swal === 'undefined') {
+                            console.error('SweetAlert2 no está disponible.');
+                            var swalScript = document.createElement('script');
+                            swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+                            document.body.appendChild(swalScript);
+                        }
+
+                        // Eliminar Candidato
+                        jQuery('#candidatosTable').on('click', '.delete-btn', function () {
+                            if (typeof Swal === 'undefined') {
+                                alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
+                                return;
+                            }
+                            var id = jQuery(this).data('id');
+
+                            Swal.fire({
+                                title: '¿Eliminar Candidato?',
+                                text: "Esta acción no se puede deshacer",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#d32f2f',
+                                cancelButtonColor: '#4b5563',
+                                confirmButtonText: '<i class="material-icons left">delete</i> Sí, eliminar',
+                                cancelButtonText: '<i class="material-icons left">cancel</i> Cancelar',
+                                background: '#262b3c',
+                                showClass: { popup: 'animate__animated animate__fadeIn' },
+                                hideClass: { popup: 'animate__animated animate__fadeOut' }
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    jQuery.ajax({
+                                        url: "/admin/candidatos/${id}" + id,
+                                        method: "DELETE",
+                                        data: {_token: '{{ csrf_token() }}'},
+                                        dataType: "json",
+                                        success: function (response) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: '¡Eliminada!',
+                                                text: response.message,
+                                                confirmButtonColor: '#3d4e81',
+                                                timer: 2000,
+                                                timerProgressBar: true,
+                                                background: '#262b3c',
+                                            });
+                                            reloadTable();
+                                        },
+                                        error: function (xhr) {
+                                            let errorMsg = 'No se pudo eliminar al candidato.';
+                                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                                errorMsg = xhr.responseJSON.message;
+                                            }
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Error',
+                                                text: errorMsg,
+                                                confirmButtonColor: '#d32f2f',
+                                                background: '#262b3c',
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                        
+                        //Ir a formulario de registro de candidato
+                        $('#registrarCandidatoBtn').click(function () {
+                            window.location.href = "{{ route('candidatos.crear') }}";
+                        });
+
+                        ////eliminar candidato
+                        $(document).on('click', '.delete-btn', function () {
+                            const id = $(this).data('id');
+
+                            Swal.fire({
+                                title: '¿Eliminar candidato?',
+                                text: 'Esta acción no se puede deshacer',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Sí, eliminar',
+                                cancelButtonText: 'Cancelar'
+                            }).then(result => {
+                                if (result.isConfirmed) {
+                                    $.ajax({
+                                        url: `/admin/candidatos/${id}`,
+                                        method: 'DELETE',
+                                        data: {
+                                            _token: "{{ csrf_token() }}"
+                                        },
+                                        success: function () {
+                                            table.ajax.reload();
+                                            Swal.fire('Eliminado', 'Candidato eliminado correctamente', 'success');
+                                        },
+                                        error: function () {
+                                            Swal.fire('Error', 'No se pudo eliminar el candidato', 'error');
+                                        }
+                                    });
+                                }
+                            });
+                        });
+
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+                        // generar código individual
+                        $(document).on('click', '.generar-codigo-btn', function () {
+                            const userId = $(this).data('id');
+                            Swal.fire({
+                                title: 'Generar código',
+                                html: `
+                                    <p>Introduce el nombre de la vacante para este candidato:</p>
+                                    <input id="vacanteInput" class="swal2-input" placeholder="Vacante">
+                                `,
+                                showCancelButton: true,
+                                confirmButtonText: 'Generar',
+                                cancelButtonText: 'Cancelar',
+                                preConfirm: () => {
+                                    const vacante = $('#vacanteInput').val().trim();
+                                    if (!vacante) {
+                                        Swal.showValidationMessage('La vacante es obligatoria');
+                                        return false;
+                                    }
+
+                                    return $.post("{{ route('guardar.codigo') }}", {
+                                        user_id: userId,
+                                        vacante: vacante,
+                                        _token: "{{ csrf_token() }}"
+                                    })
+                                    .then(response => {
+                                        return response;
+                                    })
+                                    .catch(xhr => {
+                                        if (xhr.status === 422) {
+                                            const errores = xhr.responseJSON?.errors;
+                                            console.error("Errores de validación:", errores);
+                                            Swal.showValidationMessage(
+                                                Object.values(errores).flat().join('<br>')
+                                            );
+                                        } else {
+                                            console.error(xhr);
+                                            Swal.showValidationMessage('Error inesperado al generar el código');
+                                        }
+                                    });
+                                }
+                            }).then(result => {
+                                if (result.isConfirmed && result.value) {
+                                    const code = result.value.code;
+                                    Swal.fire({
+                                        title: '¡Código generado!',
+                                        html: `
+                                            <p><strong>Código:</strong></p>
+                                            <input type="text" id="codigoGenerado" class="swal2-input" value="${code}" readonly>
+                                            <button id="btnCopiarCodigo" class="swal2-confirm swal2-styled">Copiar</button>
+                                        `,
+                                        showConfirmButton: false,
+                                        didOpen: () => {
+                                            $('#btnCopiarCodigo').click(function () {
+                                                const input = document.getElementById('codigoGenerado');
+                                                input.select();
+                                                input.setSelectionRange(0, 99999); // Para móviles
+
+                                                try {
+                                                    const copiado = document.execCommand('copy');
+                                                    if (copiado) {
+                                                        Swal.fire('Copiado', 'Código copiado al portapapeles', 'success');
+                                                    } else {
+                                                        Swal.fire('Ups', 'No se pudo copiar automáticamente', 'warning');
+                                                    }
+                                                } catch (err) {
+                                                    console.error('Error al copiar:', err);
+                                                    Swal.fire('Error', 'Hubo un problema al copiar el código', 'error');
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        });
+
+                        // Reinicializar tooltips
+                        if (typeof M !== 'undefined') {
+                            M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error al inicializar la tabla:', error);
+                        alert('Ocurrió un error al inicializar la aplicación: ' + error.message);
+                    }
+                }
+        </script>
+    @endpush
 @endsection
