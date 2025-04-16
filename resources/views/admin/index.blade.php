@@ -92,6 +92,38 @@
                     </div>
                 </div>
             </div>
+
+
+            <!-- Solo si el usuario es superadmin -->
+            @auth
+                @if(auth()->user()->config?->is_super_admin)
+                    <!-- Tarjeta para gestionar compañías -->
+                    <div class="col s12 m6 l4">
+                        <div class="card hoverable">
+                            <div class="card-content center">
+                                <i class="material-icons large">business</i>
+                                <h5>Compañías</h5>
+                            </div>
+                            <div class="card-action center">
+                                <a href="{{ route('companias.index') }}" class="btn waves-effect waves-light">Gestionar</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta para gestionar usuarios -->
+                    <div class="col s12 m6 l4">
+                        <div class="card hoverable">
+                            <div class="card-content center">
+                                <i class="material-icons large">person</i>
+                                <h5>Usuarios</h5>
+                            </div>
+                            <div class="card-action center">
+                                <a href="{{ route('usuarios.index') }}" class="btn waves-effect waves-light">Gestionar</a>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            @endauth
         </div>
     </div>
 @endsection

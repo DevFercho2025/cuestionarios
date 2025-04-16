@@ -170,67 +170,64 @@
 
         //asignar una evalaución a una aplicacion
         $(document).on('click', '.asignar-evaluacion-btn', function () {
-            const userId = $(this).data('id');
+    const userId = $(this).data('id');
 
-            $.get("{{ route('admin.categorias.listar') }}", function (categorias) {
-                let opciones = categorias.map(cat => `<option value="${cat.id}">${cat.titulo_cuestionario}</option>`).join('');
+    $.get("{{ route('admin.categorias.listar') }}", function (categorias) {
+        let opciones = categorias.map(cat => `<option value="${cat.id}">${cat.titulo_cuestionario}</option>`).join('');
 
-                Swal.fire({
-                    title: 'Asignar Evaluaciones',
-                    html: `
-                        <p>Selecciona una o varias categorías:</p>
-                        <select id="categoriasSelect" class="browser-default" multiple style="width:100%;height:150px;">
-                            ${opciones}
-                        </select>
-                    `,
-                    showCancelButton: true,
-                    confirmButtonText: 'Asignar',
-                    cancelButtonText: 'Cancelar',
-                    preConfirm: () => {
-                        const seleccionadas = $('#categoriasSelect').val();
+        Swal.fire({
+            title: 'Asignar Evaluaciones',
+            html: `
+                <p>Selecciona una o varias categorías:</p>
+                <select id="categoriasSelect" class="browser-default" multiple style="width:100%;height:150px;">
+                    ${opciones}
+                </select>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Asignar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const seleccionadas = $('#categoriasSelect').val();
 
-                        if (!seleccionadas || seleccionadas.length === 0) {
-                            Swal.showValidationMessage('Debes seleccionar al menos una categoría');
-                            return false;
-                        }
+                if (!seleccionadas || seleccionadas.length === 0) {
+                    Swal.showValidationMessage('Debes seleccionar al menos una categoría');
+                    return false;
+                }
 
-                        console.log({
-                            user_id: userId,
-                            categorias: seleccionadas
-                        });
-
-                        $.ajax({
-                            url: "http://practicas-psico/admin/evaluaciones/asignar",
-                            method: 'POST',
-                            data: {
-                                user_id: userId,
-                                categorias: seleccionadas,
-                                _token: "{{ csrf_token() }}"
-                            },
-                            success: function(response) {
-                                console.log(response); // Para ver cómo es la respuesta
-
-                                if (response && response.success) {
-                                    Swal.fire('Éxito', 'Las evaluaciones fueron asignadas correctamente.', 'success');
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: '¡Oops!',
-                                        text: response.message || 'Error al asignar evaluaciones'
-                                    });
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                Swal.showValidationMessage('Error al asignar evaluaciones');
-                                console.log('Error:', status, error);
-                            }
-                        });
-
-                    }
-
+                console.log({
+                    user_id: userId,
+                    categorias: seleccionadas
                 });
-            });
+
+                // Asegurarnos de que estamos manejando la respuesta como JSON
+                return $.ajax({
+                    url: "{{ route('admin.evaluaciones.asignar') }}",
+                    type: 'POST',
+                    data: {
+                        user_id: userId,
+                        categorias: seleccionadas,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    dataType: 'json', // Asegurarnos de que la respuesta sea JSON
+                    success: function (response) {
+                        console.log(response);  // Para ver la respuesta en consola
+                        if (response.success) {
+                            Swal.fire('¡Éxito!', response.message, 'success');
+                        } else {
+                            Swal.fire('Error', 'No se pudieron asignar las evaluaciones.', 'error');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Mostramos el error para depuración
+                        console.error('Error al asignar evaluaciones:', error);
+                        Swal.fire('Error', 'Hubo un problema al asignar las evaluaciones.', 'error');
+                    }
+                });
+            }
         });
+    });
+});
+
 
         //eliminar un registro con código/aplicacino. (El candidato ya no tiene que hacer las pruebas)
         $(document).on('click', '.eliminar-aplicacion-btn', function () {

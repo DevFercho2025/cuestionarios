@@ -6,7 +6,8 @@ use App\Http\Controllers\RespuestaController;
 use App\Http\Controllers\RespuestaCorrectaController;
 use App\Http\Controllers\SeccionController;
 use App\Http\Controllers\CandidatoController;
-use App\Http\Controllers\CandidateRegisterController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\AplicacionController;
@@ -95,11 +96,28 @@ Route::group([
     Route::get('vacantes/all', [AplicacionController::class, 'vacantes'])->name('vacantes.all');
 
 
+    // Rutas para solo superadmin
+    Route::group(['middleware' => 'is_super_admin'], function () {
+        //gestionar compañías
+        Route::get('companias', [CompanyController::class, 'index'])->name('companias.index');
+        Route::post('companias', [CompanyController::class, 'store'])->name('companias.store');
+        Route::get('companias/{id}', [CompanyController::class, 'show'])->name('companias.show');
+        Route::put('companias/{id}', [CompanyController::class, 'update'])->name('companias.update');
+        Route::delete('companias/{id}', [CompanyController::class, 'destroy'])->name('companias.destroy');
+        //gestionar usuarios
+        Route::get('usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
+        Route::post('usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
+        Route::get('usuarios/{id}', [UsuarioController::class, 'show'])->name('usuarios.show');
+        Route::put('usuarios/{id}', [UsuarioController::class, 'update'])->name('usuarios.update');
+        Route::delete('usuarios/{id}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
+    });
+
+
 });
 
 Route::group([
     'prefix' => 'candidate',
-    'middleware' => ['auth', 'is_candidate::class']
+    'middleware' => ['auth', 'is_candidate']
 ], function (){
     Route::get('/dashboard', [CandidateController::class, 'dashboard'])->name('candidate.dashboard');
     Route::get('/formulario', [FormularioController::class, 'index'])->name('index');
@@ -107,7 +125,7 @@ Route::group([
     //Route::post('/permisos-preliminares', [FormularioController::class, 'guardarCandidato'])->name('guardar.candidato');
     Route::post('/formulario', [FormularioController::class, 'guardarRespuestas'])->name('guardar.respuestas');
     Route::post('/guardar-foto', [FormularioController::class, 'guardarFoto'])->name('guardar.foto');
-    Route::get('/cargar-formulario', [FormularioController::class, 'cargarFormulario'])->name('cargar.formulario');
+    Route::get('/cargar-formulario', [FormularioController::class, 'cargarFormulario'])->name('candidate.cargar.formulario');
     Route::get('/gracias', function () {
         return view('gracias');
     })->name('gracias');

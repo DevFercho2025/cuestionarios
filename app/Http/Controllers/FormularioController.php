@@ -27,10 +27,8 @@ class FormularioController extends Controller
 
     public function mostrarPermisos(Request $request)
     {
-        // Obtener el parámetro categoria_id desde la URL (si es necesario)
         $categoria_id = $request->query('categoria_id'); 
         
-        // Pasar el categoria_id a la vista
         return view('candidate.permisos', compact('categoria_id'));
     }
 
@@ -39,96 +37,59 @@ class FormularioController extends Controller
 
         #limpia la sesión para evitar que use datos previos
         $request->session()->flush();
-        /*
-        $nombreCompleto = $request->input('nombre') . ' ' . $request->input('apellidoPaterno');
-
-        $apellidoMaterno = $request->input('apellidoMaterno');
-        if (strtolower(trim($apellidoMaterno)) !== 'no aplica') {
-            $nombreCompleto .= ' ' . $apellidoMaterno;
-        } else {
-            $apellidoMaterno = null;
-        }
-
-        #crea un usuario para poner en la BD tras llenar el formulario
-        $user = User::create([
-            'name' => $nombreCompleto,
-            'email' => $request->input('correo'),
-            'password' => bcrypt(Str::random(10)), //esto es por ahora, contrseña generada automáticamente y encriptado
-        ]);
-        session(['user_id' => $user->id]);
-
-        $candidato = [
-            'cargoAlQueAplica' => $request->input('cargo'),
-            'nombre' => $request->input('nombre'),
-            'apellidoPaterno' => $request->input('apellidoPaterno'),
-            'apellidoMaterno' => $apellidoMaterno,
-            'correo' => $request->input('correo'),
-            'fechaNacimiento' => $request->input('fechaNacimiento'),
-            'genero' => $request->input('genero'),
-            'codigoPostal' => $request->input('codigoPostal'),
-            'celular' => $request->input('celular'),
-        ];
-        $request->session()->put('candidato', $candidato);
-
-        UserInfo::create([
-            'user_id' => $user->id,
-            'fecha_nacimiento' => $candidato['fechaNacimiento'],
-            'genero' => $candidato['genero'],
-            'codigo_postal' => $candidato['codigoPostal'],
-            'celular' => $candidato['celular'],
-        ]);
-        */
-
+        
         // $request->session()->put('user_id', auth()->id()); si es un usurio autenticado (cuando tenga lo de perfil de usuarios)
         return view('public.permisos');
     }
-
     public function cargarFormulario(Request $request)
     {
-        $user = Auth::user();
-        #grupos de preguntas
-        $rango_inicio = $request->input('rango_inicio', 1);
-        $rango_fin = $request->input('rango_fin', 35);
-
-        #Si ya está todo respondido, pasa al siguiente rango
-        if ($request->isMethod('post')) {
-            $rango_inicio += 35;
-            $rango_fin += 35;
-        }
-
-        $categoriaIds = $user->categorias->pluck('id');
-        $seccionIds = Seccion::whereIn('categoria_id', $categoriaIds)->pluck('id');
-
-        #Cargar preguntas del rango
-        $preguntas = Pregunta::with([
-            'respuestas' => function ($query) {
-                $query->select('respuesta_id', 'pregunta_id', 'respuesta', 'opcion');
+        try {
+            $user = Auth::user();
+            $rango_inicio = $request->input('rango_inicio', 1);
+            $rango_fin = $request->input('rango_fin', 35);
+    
+            // Si ya está todo respondido, pasa al siguiente rango
+            if ($request->isMethod('post')) {
+                $rango_inicio += 35;
+                $rango_fin += 35;
             }
-        ])->whereIn('seccion_id', $seccionIds)
-          ->whereBetween('pregunta_id', [$rango_inicio, $rango_fin])
-          ->get()->groupBy('seccion_id') //esto agrupa las preguntas por sección a la que pertenencen.
-          ->map(function ($grupo) {
-            return $grupo->shuffle(); //e'to mezcla preguntas de la misma sección
-          })->collapse();
-
-        #cantidad de preguntas a repetir (actualmente 6% = 2, 10% = 3)
-        $cantidadRepeticiones = intval($preguntas->count() * 0.06);
-        $preguntasRepetidas = $preguntas->random($cantidadRepeticiones);
-
-        //echo $preguntasRepetidas;
-        # Combinar las preguntas originales con las repetidas
-        $preguntas = $preguntas->concat($preguntasRepetidas)->shuffle();
-
-        $secciones = Seccion::with([
-            'seccion' => function ($query) {
-                $query->select('id', 'bloque', 'titulo', 'cuestionario', 'time_at');
+    
+            $categoriaIds = $user->categorias->pluck('id');
+            $seccionIds = Seccion::whereIn('categoria_id', $categoriaIds)->pluck('id');
+    
+            $preguntas = Pregunta::with([
+                'respuestas' => function ($query) {
+                    $query->select('respuesta_id', 'pregunta_id', 'respuesta', 'opcion');
+                }
+            ])->whereIn('seccion_id', $seccionIds)
+              ->whereBetween('pregunta_id', [$rango_inicio, $rango_fin])
+              ->get()->groupBy('seccion_id')
+              ->map(function ($grupo) {
+                return $grupo->shuffle();
+              })->collapse();
+    
+            $cantidadRepeticiones = intval($preguntas->count() * 0.06);
+            $preguntasRepetidas = $preguntas->random($cantidadRepeticiones);
+    
+            $preguntas = $preguntas->concat($preguntasRepetidas)->shuffle();
+    
+            $secciones = Seccion::with([
+                'seccion' => function ($query) {
+                    $query->select('id', 'bloque', 'titulo', 'cuestionario', 'time_at');
+                }
+            ]);
+    
+            foreach ($preguntas as $pregunta) {
+                $pregunta->tiempoRestante = gmdate("i:s", strtotime($pregunta->seccion->time_at) - strtotime('00:00:00'));
             }
-        ]);
-        foreach ($preguntas as $pregunta) {
-            $pregunta->tiempoRestante = gmdate("i:s", strtotime($pregunta->seccion->time_at) - strtotime('00:00:00'));
+    
+            $candidato = $request->session()->get('candidato');
+            return view('candidate.formulario.parcial', compact('preguntas', 'secciones', 'candidato', 'rango_inicio', 'rango_fin'));
+    
+        } catch (\Exception $e) {
+            // Esto te ayudará a identificar si hay algún error en el código
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-        $candidato = $request->session()->get('candidato');
-        return view('formulario.parcial', compact('preguntas', 'secciones', 'candidato', 'rango_inicio', 'rango_fin'));
     }
 
     public function guardarFoto(Request $request)

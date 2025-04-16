@@ -4,23 +4,20 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class IsSuperAdmin
 {
-    /**
-     * Maneja la petición entrante.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  Closure  $next
-     * @return mixed
-     */
     public function handle(Request $request, Closure $next)
     {
-        // Verifica si el usuario está autenticado y si su propiedad is_admin es igual a 1
-        if (!auth()->check() || auth()->user()->is_super_admin != 1) {
-            abort(403, 'Acceso no autorizado.');
+        $user = Auth::user();
+
+        // Verificamos si el usuario está autenticado y si es superadmin
+        if ($user && $user->config && $user->config->is_super_admin) {
+            return $next($request); // Si es superadmin, permite continuar con la petición
         }
 
-        return $next($request);
+        // Si no es superadmin, devuelve un error 403
+        abort(403, 'No tienes permiso para acceder a esta página.');
     }
 }

@@ -24,7 +24,7 @@ class EvaluacionController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'categorias' => 'required|array',
-            'categorias.*' => 'exists:categorias,id',
+            'categorias.*' => 'exists:psico_alobri_categorias,id',
         ]);
     
         try {
@@ -41,10 +41,6 @@ class EvaluacionController extends Controller
             return response()->json(['success' => false, 'message' => 'Error al asignar evaluaciones'], 500);
         }
     }
-    
-    
-
-
 
     public function evaluacionesPorUsuario($user_id)
     {

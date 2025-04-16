@@ -11,7 +11,7 @@
                     <p><strong>Nombre:</strong> {{ Auth::user()->name }}</p>
                     <p><strong>Email:</strong> {{ Auth::user()->email }}</p>
                     <p><strong>Código de Aplicación:</strong> {{ $aplicacion->codigo ?? 'N/A' }}</p>
-                    <p><strong>Fecha de Registro:</strong> {{ Auth::user()->created_at->format('d/m/Y') }}</p>
+                    <p><strong>Fecha de Registro:</strong>  {{ optional(Auth::user()->info)->created_at ? \Carbon\Carbon::parse(Auth::user()->info->created_at)->format('d/m/Y') : 'N/A' }}</p>
                 </div>
             </div>
         </div>

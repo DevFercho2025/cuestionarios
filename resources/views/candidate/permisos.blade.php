@@ -116,7 +116,7 @@
                 //vs marca esto como error pero está bien y funciona
                 let rangoInicio = {{ $rango_inicio }};
                 let rangoFin = {{ $rango_fin }};
-                fetch("{{ route('cargar.formulario') }}?rango_inicio=" + rangoInicio + "&rango_fin=" + rangoFin)
+                fetch("{{ route('candidate.cargar.formulario') }}?rango_inicio=" + rangoInicio + "&rango_fin=" + rangoFin)
                             .then(response => {
                                 if (!response.ok) { //response.ok verifica solicites HTTP en js. da True si da código 200 o similar(respuesta exitosa)
                                     throw new Error(`Error de HTTP: ${response.status}`); 
