@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('layout.admin')
 @section('title', 'Gestión de Preguntas')
 @section('content')
     <div class="container">

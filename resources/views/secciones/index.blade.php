@@ -1,42 +1,39 @@
-@extends('layout.app')
+@extends('layout.admin')
 @section('title', 'Gestión de Secciones')
 @section('content')
     <div class="container">
+        <!-- Encabezado -->
         <div class="row">
             <div class="col s12">
-                <div class="card-panel gradient-card">
+                <div class="card-panel dark-gradient">
                     <div class="row valign-wrapper mb-0">
                         <div class="col s8">
-                            <h4 class="white-text"><i class="material-icons left">view_list</i>Gestión de Secciones</h4>
+                            <h4 class="white-text">Gestión de Secciones</h4>
                         </div>
                         <div class="col s4 right-align">
-                            <a id="createSeccionBtn" class="waves-effect waves-light btn-large pulse">
-                                <i class="material-icons left">add_circle</i>Nueva Sección
+                            <a id="createSeccionBtn" class="btn btn-large gradient-btn pulse">
+                               Nueva Sección
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
+        <!-- Tabla de Secciones -->
         <div class="row">
             <div class="col s12">
-                <div class="card z-depth-3">
-                    <div class="card-content">
-                        <table id="seccionesTable" class="highlight responsive-table centered striped">
+                <div class="card dark-card z-depth-3">
+                    <div class="card-datatable table-responsive">
+                        <table id="seccionesTable" class="dt-responsive table table-bordered">
                             <thead>
                             <tr>
-                                <th><i class="material-icons left tiny">fingerprint</i>ID</th>
-                                <th><i class="material-icons left tiny">title</i>Título</th>
-                                <th><i class="material-icons left tiny">view_module</i>Bloque</th>
-                                <th><i class="material-icons left tiny">assignment</i>Cuestionario</th>
-                                <th><i class="material-icons left tiny">access_time</i>Tiempo</th>
-                                <th><i class="material-icons left tiny">settings</i>Acciones</th>
+                                <th>Título</th>
+                                <th>Bloque</th>
+                                <th>Cuestionario</th>
+                                <th>Tiempo</th>
+                                <th>Acciones</th>
                             </tr>
                             </thead>
-                            <tbody>
-                            <!-- Se llenará vía AJAX -->
-                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -44,152 +41,170 @@
         </div>
     </div>
 
-    <style>
-        .gradient-card {
-            background: linear-gradient(to right, #1976d2, #64b5f6);
-            border-radius: 8px;
-            margin-top: 20px;
+    <!-- jQuery y Scripts adicionales -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+    if (typeof jQuery === 'undefined') {
+        document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof jQuery !== 'undefined') {
+            initializeApp();
+        } else {
+            console.error('jQuery no está disponible. Intenta incluirlo manualmente en tu plantilla.');
+            alert('Error: jQuery no está cargado correctamente. Por favor, contacta al administrador.');
         }
+    });
 
-        .btn-floating {
-            margin: 0 5px;
-        }
-
-        .card {
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-
-        .dataTables_wrapper .dataTables_filter input {
-            border: 1px solid #ccc !important;
-            border-radius: 4px !important;
-            padding: 0 10px !important;
-            margin-bottom: 10px !important;
-        }
-
-        .swal2-popup {
-            border-radius: 10px !important;
-        }
-
-        .swal2-input, .swal2-select {
-            border-radius: 4px !important;
-            border: 1px solid #ccc !important;
-            margin: 10px 0 !important;
-            width: 100% !important;
-        }
-
-        .btn-action {
-            transition: all 0.3s ease;
-        }
-
-        .btn-action:hover {
-            transform: scale(1.1);
-        }
-    </style>
-
-    <script>
-        $(document).ready(function(){
-            // Configuración global de AJAX para enviar el token CSRF en todas las solicitudes
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-            // Inicializar componentes de Materialize
-            $('.modal').modal();
-            $('select').formSelect();
-
-            // Funciones de loader eliminadas
-            function showLoader() {
-                // Función vacía para mantener compatibilidad
+    function initializeApp() {
+        // Configuración global de AJAX: token CSRF
+        jQuery.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             }
+        });
 
-            function hideLoader() {
-                // Función vacía para mantener compatibilidad
-            }
+        // Inicializar componentes del template
+        if (typeof M !== 'undefined') {
+            M.Modal.init(document.querySelectorAll('.modal'));
+            M.FormSelect.init(document.querySelectorAll('select'));
+            M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+        }
 
-            var table = $('#seccionesTable').DataTable({
+        // Inicialización de DataTable
+        if (typeof jQuery.fn.DataTable === 'undefined') {
+            console.error('DataTables no está disponible.');
+            var dtCss = document.createElement('link');
+            dtCss.rel = 'stylesheet';
+            dtCss.href = 'https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css';
+            document.head.appendChild(dtCss);
+
+            var dtScript = document.createElement('script');
+            dtScript.src = 'https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js';
+            dtScript.onload = function () {
+                initializeDataTable();
+            };
+            document.body.appendChild(dtScript);
+        } else {
+            initializeDataTable();
+        }
+    }
+
+    function initializeDataTable() {
+        try {
+            var table = jQuery('#seccionesTable').DataTable({
                 ajax: {
                     url: "{{ route('secciones.datatable') }}",
-                    dataSrc: ''
+                    dataSrc: '',
+                    error: function (xhr, error, thrown) {
+                        console.error('Error en la carga de datos:', error, thrown);
+                        if (typeof M !== 'undefined') {
+                            M.toast({
+                                html: '<i class="material-icons left">error</i> Error al cargar los datos',
+                                classes: 'rounded red'
+                            });
+                        } else {
+                            alert('Error al cargar los datos de la tabla');
+                        }
+                    }
                 },
                 columns: [
-                    { data: 'id' },
-                    { data: 'titulo' },
-                    { data: 'bloque' },
-                    { data: 'cuestionario' },
-                    { data: 'time_at' },
+                    {data: 'titulo'},
+                    {data: 'bloque'},
+                    {data: 'cuestionario'},
+                    {data: 'time_at'},
                     {
                         data: null,
-                        render: function(data, type, row) {
+                        render: function (data, type, row) {
                             return `
-                                <div class="action-buttons">
-                                    <a class="btn-floating btn-small waves-effect waves-light blue edit-btn btn-action tooltipped" data-position="top" data-tooltip="Editar" data-id="${row.id}">
-                                        <i class="material-icons">edit</i>
-                                    </a>
-                                    <a class="btn-floating btn-small waves-effect waves-light red delete-btn btn-action tooltipped" data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </div>
-                            `;
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-info waves-effect waves-light edit-btn tooltipped"
+                            data-position="top" data-tooltip="Editar" data-id="${row.id}">
+                        <i class="material-icons">edit</i>
+                    </button>
+                    <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
+                            data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
+                        <i class="material-icons">delete</i>
+                    </button>
+                </div>
+            `;
                         }
                     }
                 ],
                 responsive: true,
-                language: {
-                    url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+                // Se elimina la opción de idioma para evitar textos extra de traducción
+                drawCallback: function () {
+                    if (typeof M !== 'undefined') {
+                        M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+                    }
                 },
-                drawCallback: function() {
-                    // Reinicializar tooltips después de cada redibujado
-                    $('.tooltipped').tooltip();
+                initComplete: function () {
+                    console.log('DataTable inicializada completamente');
                 }
             });
 
+            // Función para recargar la tabla
             function reloadTable() {
-                table.ajax.reload(function() {
-                    M.toast({html: '<i class="material-icons left">refresh</i> Tabla actualizada', classes: 'rounded'});
+                table.ajax.reload(function () {
+                    if (typeof M !== 'undefined') {
+                        M.toast({
+                            html: '<i class="material-icons left">refresh</i> Tabla actualizada',
+                            classes: 'rounded'
+                        });
+                    }
                 }, false);
             }
 
+            // Comprobar disponibilidad de SweetAlert2
+            if (typeof Swal === 'undefined') {
+                console.error('SweetAlert2 no está disponible.');
+                var swalScript = document.createElement('script');
+                swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+                document.body.appendChild(swalScript);
+            }
+
             // Crear Sección
-            $("#createSeccionBtn").click(function(){
-                // Usar SweetAlert2 con estilos de Materialize
+            jQuery("#createSeccionBtn").click(function () {
+                if (typeof Swal === 'undefined') {
+                    alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
+                    return;
+                }
                 Swal.fire({
-                    title: '<i class="material-icons">add_circle_outline</i> Crear Sección',
                     html: `
-                        <div class="input-field">
-                            <i class="material-icons prefix">title</i>
-                            <input id="swal-titulo" type="text" class="validate">
-                            <label for="swal-titulo">Título</label>
+                 <div class="col-md mb-6 mb-md-0">
+                  <div class="card">
+                    <h2 class="card-header">Crear Sección</h2>
+                    <div class="card-body">
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input id="swal-titulo" type="text" class="form-control" placeholder="Titulo" required="">
+                          <label for="swal-titulo">Título</label>
                         </div>
-                        <div class="input-field">
-                            <i class="material-icons prefix">view_module</i>
-                            <input id="swal-bloque" type="text" class="validate">
-                            <label for="swal-bloque">Bloque</label>
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input type="text" id="swal-bloque" class="form-control" placeholder="Bloque" required="">
+                          <label for="swal-bloque">Bloque</label>
                         </div>
-                        <div class="input-field">
-                            <i class="material-icons prefix">assignment</i>
-                            <input id="swal-cuestionario" type="text" class="validate">
-                            <label for="swal-cuestionario">Cuestionario</label>
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input type="text" id="swal-cuestionario" class="form-control" placeholder="Bloque" required="">
+                          <label for="swal-cuestionario">Cuestionario</label>
                         </div>
-                        <div class="input-field">
-                            <i class="material-icons prefix">access_time</i>
-                            <input id="swal-time_at" type="text" class="validate" placeholder="HH:MM:SS">
-                            <label for="swal-time_at">Tiempo</label>
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input type="text" id="swal-time_at" class="form-control" placeholder="Bloque" required="">
+                          <label for="swal-time_at">Tiempo</label>
                         </div>
-                    `,
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown'
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp'
-                    },
+                    </div>
+                  </div>
+                </div>
+                `,
+                    showClass: { popup: 'animate__animated animate__fadeInDown' },
+                    hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                     focusConfirm: false,
-                    confirmButtonText: '<i class="material-icons left">check</i> Crear',
-                    confirmButtonColor: '#26a69a',
-                    cancelButtonText: '<i class="material-icons left">close</i> Cancelar',
-                    cancelButtonColor: '#ef5350',
+                    confirmButtonText: 'Crear',
+                    confirmButtonColor: '#3d4e81',
+                    cancelButtonText: 'Cancelar',
+                    cancelButtonColor: '#d32f2f',
                     showCancelButton: true,
                     buttonsStyling: true,
                     preConfirm: () => {
@@ -202,87 +217,97 @@
                         }
                     }
                 }).then((result) => {
-                    if(result.isConfirmed){
-                        $.ajax({
+                    if (result.isConfirmed) {
+                        jQuery.ajax({
                             url: "{{ route('secciones.store') }}",
                             type: "POST",
                             data: result.value,
                             dataType: "json",
-                            success: function(response){
+                            success: function (response) {
                                 Swal.fire({
                                     icon: 'success',
                                     title: '¡Éxito!',
                                     text: response.message,
-                                    confirmButtonColor: '#26a69a',
+                                    confirmButtonColor: '#3d4e81',
                                     timer: 2000,
-                                    timerProgressBar: true
+                                    timerProgressBar: true,
+                                    background: '#262b3c',
                                 });
                                 reloadTable();
                             },
-                            error: function(xhr){
+                            error: function (xhr) {
                                 let errorMsg = 'No se pudo crear la sección.';
-                                if(xhr.responseJSON && xhr.responseJSON.message) {
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
                                     errorMsg = xhr.responseJSON.message;
                                 }
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Error',
                                     text: errorMsg,
-                                    confirmButtonColor: '#ef5350'
+                                    confirmButtonColor: '#d32f2f',
+                                    background: '#262b3c',
                                 });
                             }
                         });
                     }
                 });
 
-                // Activar etiquetas de Materialize dentro de SweetAlert
-                setTimeout(function(){
-                    $('input.validate').characterCounter();
-                    $('label').addClass('active');
+                // Inicializar componentes Materialize dentro de SweetAlert
+                setTimeout(function () {
+                    if (jQuery('input.validate').length && typeof M !== 'undefined') {
+                        M.CharacterCounter.init(document.querySelectorAll('input.validate'));
+                        document.querySelectorAll('label').forEach(function (label) {
+                            label.classList.add('active');
+                        });
+                    }
                 }, 100);
             });
 
             // Editar Sección
-            $('#seccionesTable').on('click', '.edit-btn', function(){
-                var id = $(this).data('id');
-                let row = table.row($(this).parents('tr')).data();
+            jQuery('#seccionesTable').on('click', '.edit-btn', function () {
+                if (typeof Swal === 'undefined') {
+                    alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
+                    return;
+                }
+                var id = jQuery(this).data('id');
+                let row = table.row(jQuery(this).parents('tr')).data();
 
                 Swal.fire({
-                    title: '<i class="material-icons">edit</i> Editar Sección',
+                    title: '',
                     html: `
-                        <div class="input-field">
-                            <i class="material-icons prefix">title</i>
-                            <input id="swal-titulo" type="text" class="validate" value="${row.titulo}">
-                            <label for="swal-titulo" class="active">Título</label>
+                 <div class="col-md mb-6 mb-md-0">
+                  <div class="card">
+                    <h2 class="card-header">Editar Sección</h2>
+                    <div class="card-body">
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input id="swal-titulo" type="text" class="form-control" placeholder="Titulo" required="" value="${row.titulo}">
+                          <label for="swal-titulo">Título</label>
                         </div>
-                        <div class="input-field">
-                            <i class="material-icons prefix">view_module</i>
-                            <input id="swal-bloque" type="text" class="validate" value="${row.bloque}">
-                            <label for="swal-bloque" class="active">Bloque</label>
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input type="text" id="swal-bloque" class="form-control" placeholder="Bloque" required="" value="${row.bloque}">
+                          <label for="swal-bloque">Bloque</label>
                         </div>
-                        <div class="input-field">
-                            <i class="material-icons prefix">assignment</i>
-                            <input id="swal-cuestionario" type="text" class="validate" value="${row.cuestionario}">
-                            <label for="swal-cuestionario" class="active">Cuestionario</label>
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input type="text" id="swal-cuestionario" class="form-control" placeholder="Bloque" required="" value="${row.cuestionario}">
+                          <label for="swal-cuestionario">Cuestionario</label>
                         </div>
-                        <div class="input-field">
-                            <i class="material-icons prefix">access_time</i>
-                            <input id="swal-time_at" type="text" class="validate" value="${row.time_at}">
-                            <label for="swal-time_at" class="active">Tiempo</label>
+                        <div class="form-floating form-floating-outline mb-6">
+                          <input type="text" id="swal-time_at" class="form-control" placeholder="Bloque" required="" value="${row.time_at}">
+                          <label for="swal-time_at">Tiempo</label>
                         </div>
-                    `,
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown'
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp'
-                    },
+                    </div>
+                  </div>
+                </div>
+                `,
+                    showClass: { popup: 'animate__animated animate__fadeInDown' },
+                    hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                     focusConfirm: false,
-                    confirmButtonText: '<i class="material-icons left">save</i> Actualizar',
-                    confirmButtonColor: '#26a69a',
-                    cancelButtonText: '<i class="material-icons left">close</i> Cancelar',
-                    cancelButtonColor: '#ef5350',
+                    confirmButtonText: 'Actualizar',
+                    confirmButtonColor: '#3d4e81',
+                    cancelButtonText: 'Cancelar',
+                    cancelButtonColor: '#d32f2f',
                     showCancelButton: true,
+                    background: '#262b3c',
                     preConfirm: () => {
                         return {
                             titulo: document.getElementById('swal-titulo').value,
@@ -293,92 +318,98 @@
                         }
                     },
                 }).then((result) => {
-                    if(result.isConfirmed){
-                        $.ajax({
+                    if (result.isConfirmed) {
+                        jQuery.ajax({
                             url: "/admin/secciones/" + id,
                             type: "PUT",
                             data: result.value,
                             dataType: "json",
-                            success: function(response){
+                            success: function (response) {
                                 Swal.fire({
                                     icon: 'success',
                                     title: '¡Actualizado!',
                                     text: response.message,
-                                    confirmButtonColor: '#26a69a',
+                                    confirmButtonColor: '#3d4e81',
                                     timer: 2000,
-                                    timerProgressBar: true
+                                    timerProgressBar: true,
+                                    background: '#262b3c',
                                 });
                                 reloadTable();
                             },
-                            error: function(xhr){
+                            error: function (xhr) {
                                 let errorMsg = 'No se pudo actualizar la sección.';
-                                if(xhr.responseJSON && xhr.responseJSON.message) {
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
                                     errorMsg = xhr.responseJSON.message;
                                 }
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Error',
                                     text: errorMsg,
-                                    confirmButtonColor: '#ef5350'
+                                    confirmButtonColor: '#d32f2f',
+                                    background: '#262b3c',
                                 });
                             }
                         });
                     }
                 });
 
-                // Activar etiquetas de Materialize dentro de SweetAlert
-                setTimeout(function(){
-                    $('input.validate').characterCounter();
+                setTimeout(function () {
+                    if (jQuery('input.validate').length && typeof M !== 'undefined') {
+                        M.CharacterCounter.init(document.querySelectorAll('input.validate'));
+                    }
                 }, 100);
             });
 
             // Eliminar Sección
-            $('#seccionesTable').on('click', '.delete-btn', function(){
-                var id = $(this).data('id');
+            jQuery('#seccionesTable').on('click', '.delete-btn', function () {
+                if (typeof Swal === 'undefined') {
+                    alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
+                    return;
+                }
+                var id = jQuery(this).data('id');
 
                 Swal.fire({
                     title: '¿Eliminar Sección?',
                     text: "Esta acción no se puede deshacer",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#f44336',
-                    cancelButtonColor: '#9e9e9e',
+                    confirmButtonColor: '#d32f2f',
+                    cancelButtonColor: '#4b5563',
                     confirmButtonText: '<i class="material-icons left">delete</i> Sí, eliminar',
                     cancelButtonText: '<i class="material-icons left">cancel</i> Cancelar',
-                    showClass: {
-                        popup: 'animate__animated animate__fadeIn'
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOut'
-                    }
+                    background: '#262b3c',
+                    showClass: { popup: 'animate__animated animate__fadeIn' },
+                    hideClass: { popup: 'animate__animated animate__fadeOut' }
                 }).then((result) => {
-                    if(result.isConfirmed){
-                        $.ajax({
+                    if (result.isConfirmed) {
+                        jQuery.ajax({
                             url: "/admin/secciones/" + id,
                             type: "DELETE",
-                            data: { _token: '{{ csrf_token() }}' },
+                            data: {_token: '{{ csrf_token() }}'},
                             dataType: "json",
-                            success: function(response){
+                            success: function (response) {
                                 Swal.fire({
                                     icon: 'success',
                                     title: '¡Eliminada!',
                                     text: response.message,
-                                    confirmButtonColor: '#26a69a',
+                                    confirmButtonColor: '#3d4e81',
                                     timer: 2000,
-                                    timerProgressBar: true
+                                    timerProgressBar: true,
+                                    background: '#262b3c',
                                 });
                                 reloadTable();
                             },
-                            error: function(xhr){
+                            error: function (xhr) {
                                 let errorMsg = 'No se pudo eliminar la sección.';
-                                if(xhr.responseJSON && xhr.responseJSON.message) {
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
                                     errorMsg = xhr.responseJSON.message;
                                 }
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Error',
                                     text: errorMsg,
-                                    confirmButtonColor: '#ef5350'
+                                    confirmButtonColor: '#d32f2f',
+                                    background: '#262b3c',
                                 });
                             }
                         });
@@ -386,8 +417,14 @@
                 });
             });
 
-            // Inicializar tooltips
-            $('.tooltipped').tooltip();
-        });
-    </script>
+            // Reinicializar tooltips
+            if (typeof M !== 'undefined') {
+                M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+            }
+        } catch (error) {
+            console.error('Error al inicializar la tabla:', error);
+            alert('Ocurrió un error al inicializar la aplicación: ' + error.message);
+        }
+    }
+</script>
 @endsection
