@@ -39,6 +39,9 @@
     <script src="{{asset('/assets/vendor/js/helpers.js')}}"></script>
     <script src="{{asset('/assets/vendor/js/template-customizer.js')}}"></script>
     <script src="{{asset('/assets/js/config.js')}}"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
 </head>
 <body>
 <style>

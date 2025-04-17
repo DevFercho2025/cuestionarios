@@ -1,4 +1,4 @@
-<!doctype>
+<!doctype html>
 <html
     lang="en"
     class="light-style layout-navbar-fixed layout-menu-fixed layout-compact"
@@ -51,12 +51,15 @@
 
     <!-- Helpers -->
     <script src="{{asset('/assets/vendor/js/helpers.js')}}"></script>
-    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-    <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+
+    <!-- Template customizer and theme config files -->
     <script src="{{asset('/assets/vendor/js/template-customizer.js')}}"></script>
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{asset('/assets/js/config.js')}}"></script>
 
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.17.2/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -66,13 +69,13 @@
     }
 </style>
 
-
 <!-- Layout wrapper -->
-@yield('content')
+<div class="container" id="contenidoPagina">
+    @yield('content')
+</div>
 <!-- / Layout wrapper -->
 
-
-
+<!-- Scripts de bibliotecas -->
 <script src="{{asset('/assets/vendor/libs/jquery/jquery.js')}}"></script>
 <script src="{{asset('/assets/vendor/libs/popper/popper.js')}}"></script>
 <script src="{{asset('/assets/vendor/js/bootstrap.js')}}"></script>
@@ -83,16 +86,24 @@
 <script src="{{asset('/assets/vendor/libs/typeahead-js/typeahead.js')}}"></script>
 <script src="{{asset('/assets/vendor/js/menu.js')}}"></script>
 
-<!-- endbuild -->
-
 <!-- Vendors JS -->
 <script src="{{asset('/assets/vendor/libs/apex-charts/apexcharts.js')}}"></script>
 <script src="{{asset('/assets/vendor/libs/swiper/swiper.js')}}"></script>
+
+<!-- Materialize JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.17.2/dist/sweetalert2.all.min.js"></script>
 
 <!-- Main JS -->
 <script src="{{asset('/assets/js/main.js')}}"></script>
 
 <!-- Page JS -->
 <script src="{{asset('/assets/js/dashboards-analytics.js')}}"></script>
+
+<!-- Scripts adicionales de vistas -->
+@stack('scripts')
+
 </body>
 </html>

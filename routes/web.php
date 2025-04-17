@@ -88,7 +88,7 @@ Route::group([
     Route::post('/evaluaciones/asignar', [EvaluacionController::class, 'asignarCategorias'])->name('admin.evaluaciones.asignar');
     Route::get('/evaluaciones/usuario/{user_id}', [EvaluacionController::class, 'evaluacionesPorUsuario']);
     Route::delete('/aplicaciones/{id}', [AplicacionController::class, 'destroy']);
-    Route::post('/evaluaciones/eliminar', [EvaluacionController::class, 'eliminarAsignacion']);
+    Route::post('/evaluaciones/eliminar', [EvaluacionController::class, 'eliminarAsignacion'])->name('admin.evaluaciones.eliminar');
 
 
     // Select de usuarios y vacantes

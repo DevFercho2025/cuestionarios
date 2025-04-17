@@ -175,9 +175,9 @@
                         <div class="content-left">
                             <span class="fw-medium d-block mb-1">Evaluaciones</span>
                             <div class="d-flex align-items-center my-2">
-                                <h4 class="mb-0 me-2">Resultados y Estadísticas</h4>
+                                <h4 class="mb-0 me-2">Códigos, Resultados y Estadísticas</h4>
                             </div>
-                            <p class="mb-0">Visualice y analice los resultados de las evaluaciones</p>
+                            <p class="mb-0">Gestione los códigos de acceso a evaluaciones para candidatos, y visualice los resultados de cada una</p>
                         </div>
                         <div class="avatar">
                         <span class="avatar-initial rounded bg-label-secondary">
@@ -197,64 +197,63 @@
 
         <!-- Solo si el usuario es superadmin -->
         @auth
-        @if(auth()->user()->config?->is_super_admin)
-        <div class="row">
-            
-        </div>
-            <!-- Compañías -->
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start justify-content-between">
-                            <div class="content-left">
-                                <span class="fw-medium d-block mb-1">Compañías</span>
-                                <div class="d-flex align-items-center my-2">
-                                    <h4 class="mb-0 me-2">Gestión de Compañías</h4>
+            @if(auth()->user()->config?->is_super_admin)
+                
+            </div>
+                <!-- Compañías -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start justify-content-between">
+                                <div class="content-left">
+                                    <span class="fw-medium d-block mb-1">Compañías</span>
+                                    <div class="d-flex align-items-center my-2">
+                                        <h4 class="mb-0 me-2">Gestión de Compañías</h4>
+                                    </div>
+                                    <p class="mb-0">Administre y organice las compañías asociadas</p>
                                 </div>
-                                <p class="mb-0">Administre y organice las compañías asociadas</p>
+                                <div class="avatar">
+                                <span class="avatar-initial rounded" style="background-color:rgb(223, 223, 223); color:#4b4b4b">
+                                    <i class="ri-building-fill fs-4"></i>
+                                </span>
+                                </div>
                             </div>
-                            <div class="avatar">
-                            <span class="avatar-initial rounded" style="background-color:rgb(223, 223, 223); color:#4b4b4b">
-                                <i class="ri-building-fill fs-4"></i>
-                            </span>
+                            <div class="d-grid mt-3">
+                                <a href="{{ route('companias.index') }}" class="btn btn-dark waves-effect waves-light">
+                                    <i class="ri-arrow-right-line me-1"></i> Gestionar
+                                </a>
                             </div>
-                        </div>
-                        <div class="d-grid mt-3">
-                            <a href="{{ route('companias.index') }}" class="btn btn-dark waves-effect waves-light">
-                                <i class="ri-arrow-right-line me-1"></i> Gestionar
-                            </a>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!--Usuarios-->
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start justify-content-between">
-                            <div class="content-left">
-                                <span class="fw-medium d-block mb-1">Usuarios</span>
-                                <div class="d-flex align-items-center my-2">
-                                    <h4 class="mb-0 me-2">Gestión de Usuarios</h4>
+                <!--Usuarios-->
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start justify-content-between">
+                                <div class="content-left">
+                                    <span class="fw-medium d-block mb-1">Usuarios</span>
+                                    <div class="d-flex align-items-center my-2">
+                                        <h4 class="mb-0 me-2">Gestión de Usuarios</h4>
+                                    </div>
+                                    <p class="mb-0">Administre  la información de los diferentes usuarios del sistema</p>
                                 </div>
-                                <p class="mb-0">Administre  la información de los diferentes usuarios del sistema</p>
+                                <div class="avatar">
+                                <span class="avatar-initial rounded" style="background-color: rgb(250, 212, 255); color:rgb(194, 56, 212)">
+                                    <i class="ri-user-settings-fill fs-4"></i>
+                                </span>
+                                </div>
                             </div>
-                            <div class="avatar">
-                            <span class="avatar-initial rounded" style="background-color: rgb(250, 212, 255); color:rgb(194, 56, 212)">
-                                <i class="ri-user-settings-fill fs-4"></i>
-                            </span>
+                            <div class="d-grid mt-3">
+                                <a href="{{ route('usuarios.index') }}" class="btn waves-effect waves-light" style="background-color: rgb(194, 56, 212); color:white">
+                                    <i class="ri-arrow-right-line me-1"></i> Gestionar
+                                </a>
                             </div>
-                        </div>
-                        <div class="d-grid mt-3">
-                            <a href="{{ route('usuarios.index') }}" class="btn waves-effect waves-light" style="background-color: rgb(194, 56, 212); color:white">
-                                <i class="ri-arrow-right-line me-1"></i> Gestionar
-                            </a>
                         </div>
                     </div>
                 </div>
-            </div>
-        @endif
+            @endif
         @endauth
 
 

@@ -57,7 +57,7 @@ class EvaluacionController extends Controller
         $request->validate([
             'user_id' => 'required|integer|exists:users,id',
             'categorias' => 'required|array',
-            'categorias.*' => 'exists:categorias,id',
+            'categorias.*' => 'exists:psico_alobri_categorias,id',
         ]);
     
         Usuarios_categoria::where('user_id', $request->user_id)

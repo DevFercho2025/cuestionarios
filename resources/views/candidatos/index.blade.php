@@ -192,14 +192,14 @@
                                             <div class="action-buttons">
                                                 <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
                                                         data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
-                                                    <i class="material-icons">delete</i>
+                                                    <i class="ri-delete-bin-6-line"></i>
                                                 </button>
                                         `;
 
                                         if (userPermissions.isAuthenticated && userPermissions.isAdmin && !userPermissions.isSuperAdmin) {
                                             botones += `
                                                 <button type="button" class="btn btn-primary waves-effect waves-light generar-codigo-btn tooltipped" data-id="${row.id}" data-tooltip="Generar Código">
-                                                    <i class="material-icons">vpn_key</i>
+                                                    <i class="ri-key-fill"></i>
                                                 </button>
                                             `;
                                         }
@@ -242,6 +242,55 @@
                             swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
                             document.body.appendChild(swalScript);
                         }
+
+                        //hacer editable con doble clic
+                        $(document).on('dblclick', '.editable', function () {
+                            const span = $(this);
+                            const original = span.text();
+                            const field = span.data('field');
+                            const id = span.data('id');
+
+                            const input = $('<input type="text" class="inline-input"/>')
+                                .val(original)
+                                .css('width', '100%');
+
+                            span.replaceWith(input);
+                            input.focus();
+
+                            input.on('blur keydown', function (e) {
+                                if (e.type === 'blur' || e.key === 'Enter') {
+                                    const newValue = input.val();
+
+                                    if (newValue !== original) {
+                                        $.ajax({
+                                            url: `/admin/candidatos/${id}`,  // Corregí la interpolación de la URL
+                                            method: 'PUT',
+                                            data: {
+                                                _token: "{{ csrf_token() }}",
+                                                [field]: newValue
+                                            },
+                                            success: function () {
+                                                // Crear un nuevo span con el nuevo valor
+                                                const nuevoSpan = $(`<span class="editable" data-id="${id}" data-field="${field}">${newValue}</span>`);
+                                                input.replaceWith(nuevoSpan);
+                                                M.toast({ html: 'Actualizado correctamente', classes: 'green' });
+                                            },
+                                            error: function () {
+                                                // Reemplazar el input por el span original si hay error
+                                                const nuevoSpan = $(`<span class="editable" data-id="${id}" data-field="${field}">${original}</span>`);
+                                                input.replaceWith(nuevoSpan);
+                                                M.toast({ html: 'Error al actualizar', classes: 'red' });
+                                            }
+                                        });
+                                    } else {
+                                        // Si no se ha cambiado el valor, restauramos el span original
+                                        const nuevoSpan = $(`<span class="editable" data-id="${id}" data-field="${field}">${original}</span>`);
+                                        input.replaceWith(nuevoSpan);
+                                    }
+                                }
+                            });
+                        });
+
 
                         // Eliminar Candidato
                         jQuery('#candidatosTable').on('click', '.delete-btn', function () {
@@ -341,6 +390,7 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             }
                         });
+                        
                         // generar código individual
                         $(document).on('click', '.generar-codigo-btn', function () {
                             const userId = $(this).data('id');

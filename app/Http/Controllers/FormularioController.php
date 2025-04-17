@@ -44,9 +44,16 @@ class FormularioController extends Controller
     public function cargarFormulario(Request $request)
     {
         try {
+            
             $user = Auth::user();
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401); // Si no está autenticado, retorna un error
+            }
             $rango_inicio = $request->input('rango_inicio', 1);
             $rango_fin = $request->input('rango_fin', 35);
+            
     
             // Si ya está todo respondido, pasa al siguiente rango
             if ($request->isMethod('post')) {
@@ -56,7 +63,7 @@ class FormularioController extends Controller
     
             $categoriaIds = $user->categorias->pluck('id');
             $seccionIds = Seccion::whereIn('categoria_id', $categoriaIds)->pluck('id');
-    
+            dd($user, $rango_inicio, $rango_fin, $categoriaIds, $seccionIds);
             $preguntas = Pregunta::with([
                 'respuestas' => function ($query) {
                     $query->select('respuesta_id', 'pregunta_id', 'respuesta', 'opcion');
@@ -88,7 +95,7 @@ class FormularioController extends Controller
     
         } catch (\Exception $e) {
             // Esto te ayudará a identificar si hay algún error en el código
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()], 500);
         }
     }
 

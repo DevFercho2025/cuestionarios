@@ -12,9 +12,25 @@
     <div id="contenedorForm">
         
     </div>
+    <style>
+        .swal2-container {
+            z-index: 9999 !important;
+        }
+    </style>
 
-@section('scripts')
+@push('scripts')
     <script src="{{ asset('js/ubicacion.js') }}"></script>
+    <script>
+        let rangoInicio = {{ $rango_inicio }};
+let rangoFin = {{ $rango_fin }};
+console.log(`Rango inicio: ${rangoInicio}, Rango fin: ${rangoFin}`);
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            M.AutoInit(); // Inicia todos los componentes automáticamente
+        });
+    </script>
     @if(isset($rango_inicio) && $rango_inicio < 35)
         <script>
             solicitarPermisos();
@@ -116,7 +132,9 @@
                 //vs marca esto como error pero está bien y funciona
                 let rangoInicio = {{ $rango_inicio }};
                 let rangoFin = {{ $rango_fin }};
-                fetch("{{ route('candidate.cargar.formulario') }}?rango_inicio=" + rangoInicio + "&rango_fin=" + rangoFin)
+                let url = "{{ route('candidate.cargar.formulario') }}?rango_inicio=" + rangoInicio + "&rango_fin=" + rangoFin;
+                console.log(url);
+                fetch(url)
                             .then(response => {
                                 if (!response.ok) { //response.ok verifica solicites HTTP en js. da True si da código 200 o similar(respuesta exitosa)
                                     throw new Error(`Error de HTTP: ${response.status}`); 
@@ -142,4 +160,4 @@
                 document.body.appendChild(script);
             }
         </script>
-@endsection
+@endpush
