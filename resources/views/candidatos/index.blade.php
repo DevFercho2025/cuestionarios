@@ -117,11 +117,12 @@
 
 
                 function initializeDataTable(){
+                    var userPermissions = @json($userPermissions);
                     try {
                         var table = jQuery('#candidatosTable').DataTable({
                             ajax: {
                                 url: "{{ route('candidatos.datatable')}}",
-                                dataSrc: '',
+                                dataSrc: 'data',
                                 error: function (xhr, error, thrown) {
                                     console.error('Error en la carga de datos:', error, thrown);
                                     if (typeof M !== 'undefined') {
