@@ -11,8 +11,6 @@ class ConfigUser extends Model
     protected $table = 'config_users';
     protected $fillable = [
         'company_id',
-        'is_admin',
-        'is_super_admin',
         'role_id',
         'is_talentina_user',
         'user_id',
@@ -21,31 +19,23 @@ class ConfigUser extends Model
     ];
     public $timestamps = false;
 
-    public function user()
-    {
+    public function user(){
         return $this->belongsTo(User::class);
     }
 
-    public function company()
-    {
+    public function role(){
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function company(){
         return $this->belongsTo(Company::class, 'company_id'); // Relación con el modelo Company
     }
 
-
-    public function isAdmin()
-    {
-        return $this->is_admin;
-    }
-    public function isSuperAdmin()
-    {
-        return $this->is_super_admin;
-    }
-    public function isTalentinaUser()
-    {
+    public function isTalentinaUser(){
         return $this->is_talentina_user;
     }
-    public function isPsicoSer()
-    {
+
+    public function isPsicoSer(){
         return $this->is_psico_ser;
     }
 }

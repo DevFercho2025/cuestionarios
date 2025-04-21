@@ -26,7 +26,7 @@ class IsAdmin
         $config = $user->config;
 
         // Verificar si el usuario tiene configuración y si es administrador o superadmin
-        if (!$config || (!$config->is_admin && !$config->is_super_admin)) {
+        if (!$config || !$config->role || (!$config->role->isAdmin() && !$config->role->isSuperAdmin())) {
             abort(403, 'Acceso no autorizado.');
         }
 

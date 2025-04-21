@@ -45,6 +45,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    
     public $timestamps = false;
     
     public function config()
@@ -63,14 +64,11 @@ class User extends Authenticatable
     }
 
 
-    public function isAdmin()
+    public function role()
     {
-        return $this->config && $this->config->is_admin;
-    }
-
-    public function isSuperAdmin()
-    {
-        return $this->config && $this->config->is_super_admin;
+        return $this->belongsTo(Role::class)->withDefault([
+            'name' => 'Rol no asignado', //Valor por defecto si no hay rol
+        ]);
     }
 
     public function isTalentinaUser()

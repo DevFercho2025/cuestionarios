@@ -122,10 +122,11 @@ Route::group([
     Route::get('/dashboard', [CandidateController::class, 'dashboard'])->name('candidate.dashboard');
     Route::get('/formulario', [FormularioController::class, 'index'])->name('index');
     Route::get('/permisos-preliminares', [FormularioController::class, 'mostrarPermisos'])->name('permisos-preliminares');
+    Route::get('/cargar-formulario', [FormularioController::class, 'cargarFormulario'])->name('candidate.cargar.formulario');
     //Route::post('/permisos-preliminares', [FormularioController::class, 'guardarCandidato'])->name('guardar.candidato');
     Route::post('/formulario', [FormularioController::class, 'guardarRespuestas'])->name('guardar.respuestas');
     Route::post('/guardar-foto', [FormularioController::class, 'guardarFoto'])->name('guardar.foto');
-    Route::get('/cargar-formulario', [FormularioController::class, 'cargarFormulario'])->name('candidate.cargar.formulario');
+    
     Route::get('/gracias', function () {
         return view('gracias');
     })->name('gracias');

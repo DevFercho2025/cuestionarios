@@ -22,11 +22,11 @@ class IsCandidate
         }
 
         $user = $request->user();
-        $user->load('config'); // Si tienes una relación 'config', cargala (similar al middleware IsAdmin)
+        $user->load('config');
         $config = $user->config;
 
-        // Verificar si el usuario tiene configuración y si es un candidato, admin o superadmin es 0
-        if (!$config || $config->is_admin !== 0 || $config->is_super_admin !== 0) {
+
+        if (!$config || !$config->role || !$config->role->isCandidate() ) {
             abort(403, 'Acceso no autorizado.');
         }
 

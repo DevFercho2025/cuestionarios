@@ -34,11 +34,6 @@ class FormularioController extends Controller
 
     public function guardarCandidato(Request $request)
     {
-
-        #limpia la sesión para evitar que use datos previos
-        $request->session()->flush();
-        
-        // $request->session()->put('user_id', auth()->id()); si es un usurio autenticado (cuando tenga lo de perfil de usuarios)
         return view('public.permisos');
     }
     public function cargarFormulario(Request $request)
@@ -46,8 +41,7 @@ class FormularioController extends Controller
         try {
             
             $user = Auth::user();
-            $user = Auth::user();
-
+            
             if (!$user) {
                 return response()->json(['error' => 'Usuario no autenticado'], 401); // Si no está autenticado, retorna un error
             }
@@ -63,7 +57,7 @@ class FormularioController extends Controller
     
             $categoriaIds = $user->categorias->pluck('id');
             $seccionIds = Seccion::whereIn('categoria_id', $categoriaIds)->pluck('id');
-            dd($user, $rango_inicio, $rango_fin, $categoriaIds, $seccionIds);
+            
             $preguntas = Pregunta::with([
                 'respuestas' => function ($query) {
                     $query->select('respuesta_id', 'pregunta_id', 'respuesta', 'opcion');
@@ -90,7 +84,7 @@ class FormularioController extends Controller
                 $pregunta->tiempoRestante = gmdate("i:s", strtotime($pregunta->seccion->time_at) - strtotime('00:00:00'));
             }
     
-            $candidato = $request->session()->get('candidato');
+            $candidato = $user;
             return view('candidate.formulario.parcial', compact('preguntas', 'secciones', 'candidato', 'rango_inicio', 'rango_fin'));
     
         } catch (\Exception $e) {
@@ -101,7 +95,8 @@ class FormularioController extends Controller
 
     public function guardarFoto(Request $request)
     {
-        $user_id = session('user_id');
+        $user = Auth::user();
+        $user_id = $user->id;
 
         #Valida que se recibe una cadena (Base64)
         $request->validate([
@@ -139,7 +134,8 @@ class FormularioController extends Controller
 
     public function guardarRespuestas(Request $request)
     {
-        $user_id = session('user_id');
+        $user = Auth::user();
+        $user_id = $user->id;
         $usuarioIp = \Illuminate\Support\Facades\Request::getClientIp(true);
 
         $tiempoAgotado = $request->input('tiempo_agotado', 0);
@@ -192,7 +188,8 @@ class FormularioController extends Controller
     public function generarToken(Request $request)
     {
         try {
-            $user_id = session('user_id');
+            $user = Auth::user();
+            $user_id = $user->id;
 
             if (!$user_id) {
                 return response()->json(['error' => 'user_id vacío'], 500);

@@ -197,9 +197,8 @@
 
         <!-- Solo si el usuario es superadmin -->
         @auth
-            @if(auth()->user()->config?->is_super_admin)
+            @if(auth()->user()->config?->role?->isSuperAdmin())
                 
-            </div>
                 <!-- Compañías -->
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card h-100">

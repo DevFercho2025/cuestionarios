@@ -21,11 +21,10 @@ class CandidatoController extends Controller
     {
         try {
             // Obtener candidatos con relaciones necesarias
-            $candidatos = User::with(['info', 'config.company'])
-                ->whereHas('config', function ($q) {
-                    $q->where('is_admin', 0)->where('is_super_admin', 0);
-                })
-                ->get();
+            $candidatos = User::with(['info', 'config.company', 'config.role'])
+            ->whereHas('config.role', function ($q) {
+                $q->whereNotIn('id', [1,2]);
+            })->get();
 
             //Formatear datos antes
             $candidatosData = $candidatos->map(function ($user) {
@@ -102,8 +101,7 @@ class CandidatoController extends Controller
         ]);
 
         $user->config()->create([
-            'is_admin' => 0,
-            'is_super_admin' => 0,
+            'active' => 1,
         ]);
 
         $user->info()->create([
@@ -117,19 +115,27 @@ class CandidatoController extends Controller
     }
 
     public function show($id)
-    {
-        $candidato = User::where('is_admin', 0)->where('is_super_admin', 0)->findOrFail($id);
-        return response()->json($candidato);
-    }
+{
+    $candidato = User::whereHas('config.role', function ($query) {
+        $query->where(function ($subQuery) {
+            $subQuery->where('id', '!=', 1) //Excluye admins
+                ->where('id', '!=', 2); //Excluye superadmins
+        });
+    })->findOrFail($id);
+
+    return response()->json($candidato);
+}
 
     public function update(Request $request, $id)
     {
         try {
             // Obtener el candidato (User) por ID
-            $candidato = User::whereHas('config', function ($query) {
-                $query->where('is_admin', 0)->where('is_super_admin', 0);
+            $candidato = User::whereHas('config.role', function ($query) {
+                $query->where(function ($subQuery) {
+                    $subQuery->where('id', '!=', 1) //Excluye admins
+                        ->where('id', '!=', 2); //Excluye superadmins
+                });
             })->findOrFail($id);
-
             // Validación de los datos de User (nombre, email)
             $validatedUser = $request->validate([
                 'name' => 'sometimes|required|string|max:255',
@@ -174,8 +180,11 @@ class CandidatoController extends Controller
     {
         try {
             // Obtener el candidato (User) por ID, asegurándose de que no sea admin
-            $candidato = User::whereHas('config', function ($query) {
-                $query->where('is_admin', 0)->where('is_super_admin', 0);
+            $candidato = User::whereHas('config.role', function ($query) {
+                $query->where(function ($subQuery) {
+                    $subQuery->where('id', '!=', 1) //Excluye admins
+                        ->where('id', '!=', 2); //Excluye superadmins
+                });
             })->findOrFail($id);
     
             // Eliminar la información relacionada en la tabla UserInfo

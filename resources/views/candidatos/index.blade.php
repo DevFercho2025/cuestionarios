@@ -62,8 +62,8 @@
         @php
             $userPermissions = [
                 'isAuthenticated' => auth()->check(),
-                'isAdmin' => auth()->user()?->config?->is_admin ?? false,
-                'isSuperAdmin' => auth()->user()?->config?->is_super_admin ?? false,
+                'isAdmin' => auth()->user()?->config?->role?->isAdmin() ?? false,
+                'isSuperAdmin' => auth()->user()?->config?->role?->isSuperAdmin() ?? false,
             ];
         @endphp
         <script>

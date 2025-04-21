@@ -48,6 +48,9 @@
     #template-customizer .template-customizer-open-btn{
         display: none !important;
     }
+    .layout-page {
+        margin:20px;
+    }
 </style>
 <!-- Layout wrapper -->
 <div class="layout-wrapper layout-content-navbar">

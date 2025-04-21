@@ -20,19 +20,32 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            $user = Auth::user();
-            $config = $user->config->first();
-            
+            /** @var \App\Models\User $user */
+            $user   = Auth::user();
+            $config = $user->config; // hasOne, no ->first()
 
-            if ($config && ($config->is_admin || $config->is_super_admin)) {
+            //Si no hay configuración en config_users
+            if (! $config) {
+                Auth::logout();
+                return back()->withErrors(['email' => 'Su cuenta no está configurada.']);
+            }
+
+            //Si la cuenta existe pero está desactivada
+            if (! $config->active) {
+                Auth::logout();
+                return back()->withErrors(['email' => 'Su cuenta está desactivada.']);
+            }
+
+
+            if ($config && $config->role && ($config->role->isAdmin() || $config->role->isSuperAdmin())) {
                 return redirect()->route('admin.index'); 
             }
         }
 
-        Auth::logout(); // Por si se llegó por error
+        //credenciales inválidas
+        Auth::logout();
         return back()->withErrors([
-            'email' => 'Los candidatos deben ingresar con su código de aplicación.',
+            'email' => 'Credenciales Incorrectas.',
         ]);
     }
 

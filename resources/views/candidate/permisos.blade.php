@@ -22,8 +22,8 @@
     <script src="{{ asset('js/ubicacion.js') }}"></script>
     <script>
         let rangoInicio = {{ $rango_inicio }};
-let rangoFin = {{ $rango_fin }};
-console.log(`Rango inicio: ${rangoInicio}, Rango fin: ${rangoFin}`);
+        let rangoFin = {{ $rango_fin }};
+        console.log(`Rango inicio: ${rangoInicio}, Rango fin: ${rangoFin}`);
     </script>
     
     <script>
@@ -145,7 +145,7 @@ console.log(`Rango inicio: ${rangoInicio}, Rango fin: ${rangoFin}`);
                                 //inserta formulario
                                 document.getElementById("contenedorForm").innerHTML = html;
 
-                                cargarScripts("{{ asset('js/camTemp.js') }}", "Scripts de temporizador, cronómetro y cámara cargados.");
+                                //cargarScripts("{{ asset('js/camTemp.js') }}", "Scripts de temporizador, cronómetro y cámara cargados.");
                                 cargarScripts("{{ asset('js/progresoEv.js') }}", "Script de Circulo de Progreso cargado");
                                 cargarScripts("{{ asset('js/mostrarPreg.js') }}", "Script preguntas cargado");
                             })

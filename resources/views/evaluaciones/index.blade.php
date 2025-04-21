@@ -24,7 +24,8 @@
                         <table id="aplicacionesTable" class="dt-responsive table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>ID de la Aplicación</th>
+                                    <th>ID de Usuario</th>
                                     <th>Nombre</th>
                                     <th>Email</th>
                                     <th>Vacante</th>
@@ -120,6 +121,7 @@
                     },
                     columns: [
                         { data: 'id' },
+                        { data: 'user_id'},
                         { data: 'nombre' },
                         { data: 'email' },
                         { data: 'vacante' },
@@ -130,11 +132,11 @@
                                 return botones = `
                                     <div class="action-buttons">
                                         <button type="button" class="btn btn-success waves-effect waves-light asignar-evaluacion-btn tooltipped"
-                                            data-position="top" data-tooltip="Añadir Evaluación" data-id="${row.id}">
+                                            data-position="top" data-tooltip="Añadir Evaluación" data-id="${row.user_id}">
                                             <i class="ri-add-line"></i>
                                         </button>
                                         <button type="button" class="btn btn-secondary waves-effect waves-light ver-evaluaciones-btn tooltipped"
-                                            data-position="top" data-tooltip="Ver evaluaciones" data-id="${row.id}">
+                                            data-position="top" data-tooltip="Ver evaluaciones" data-id="${row.user_id}">
                                             <i class="ri-eye-fill"></i>
                                         </button>
                                         <button type="button" class="btn btn-danger waves-effect waves-light eliminar-aplicacion-btn tooltipped"
