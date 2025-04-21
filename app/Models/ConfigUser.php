@@ -11,8 +11,6 @@ class ConfigUser extends Model
     protected $table = 'config_users';
     protected $fillable = [
         'company_id',
-        'is_admin',
-        'is_super_admin',
         'role_id',
         'is_talentina_user',
         'user_id',

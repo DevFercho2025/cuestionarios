@@ -14,27 +14,58 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        // 1) Validación de campos
         $credentials = $request->validate([
             'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
 
+        // 2) Intento de autenticación
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            $user = Auth::user();
-            $config = $user->config->first();
-            
 
-            if ($config && ($config->is_admin || $config->is_super_admin)) {
-                return redirect()->route('admin.index'); 
+            /** @var \App\Models\User $user */
+            $user   = Auth::user();
+            $config = $user->config; // hasOne, no ->first()
+
+            // 3) Si no hay configuración en config_users
+            if (! $config) {
+                Auth::logout();
+                return back()->withErrors(['email' => 'Su cuenta no está configurada.']);
             }
+
+            // 4) Si la cuenta existe pero está desactivada
+            if (! $config->active) {
+                Auth::logout();
+                return back()->withErrors(['email' => 'Su cuenta está desactivada.']);
+            }
+
+            // 5) Psico‑user (flag)
+            if ($config->is_psico_user) {
+                return redirect()->route('psico.dashboard');
+            }
+
+            // 6) Super‑admin (role_id = 1 o flag)
+            if ($config->role_id == 1 || $config->is_super_admin) {
+                return redirect()->route('superadmin.index');
+            }
+
+            // 7) Admin (role_id = 2 o flag)
+            if ($config->role_id == 2 || $config->is_admin) {
+                return redirect()->route('admin.index');
+            }
+
+            // 8) Usuario normal (role_id = 0 o cualquier otro caso)
+            return redirect()->route('home');
         }
 
-        Auth::logout(); // Por si se llegó por error
+        // 9) Credenciales inválidas
+        Auth::logout();
         return back()->withErrors([
-            'email' => 'Los candidatos deben ingresar con su código de aplicación.',
+            'email' => 'Credenciales incorrectas.'
         ]);
     }
+
 
     public function logout(Request $request)
     {
