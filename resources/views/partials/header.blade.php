@@ -80,13 +80,8 @@
                         <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item" href="{{route('candidate.perfil')}}">
                             <i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle">Mi Perfil</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="ri-settings-4-line ri-22px me-3"></i><span class="align-middle">Settings</span>
                         </a>
                     </li>
                     <li>

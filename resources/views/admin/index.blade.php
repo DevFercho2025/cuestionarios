@@ -175,9 +175,9 @@
                         <div class="content-left">
                             <span class="fw-medium d-block mb-1">Evaluaciones</span>
                             <div class="d-flex align-items-center my-2">
-                                <h4 class="mb-0 me-2">Códigos, Resultados y Estadísticas</h4>
+                                <h4 class="mb-0 me-2">Códigos de Evaluación</h4>
                             </div>
-                            <p class="mb-0">Gestione los códigos de acceso a evaluaciones para candidatos, y visualice los resultados de cada una</p>
+                            <p class="mb-0">Gestione los códigos de acceso a evaluaciones para candidatos</p>
                         </div>
                         <div class="avatar">
                         <span class="avatar-initial rounded bg-label-secondary">

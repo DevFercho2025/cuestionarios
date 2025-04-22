@@ -12,4 +12,9 @@ class Categoria extends Model
     protected $table = "psico_alobri_categorias";
     protected $fillable = ["titulo_cuestionario","created_at","updated_at","time_at"];
     public $timestamps = true;
+
+    public function secciones()
+    {
+        return $this->hasMany(Seccion::class);
+    }
 }

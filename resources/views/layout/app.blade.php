@@ -102,6 +102,11 @@
 <!-- Page JS -->
 <script src="{{asset('/assets/js/dashboards-analytics.js')}}"></script>
 
+
+<!--Scripts para formulario de evaluación -->
+<script src="{{ asset('js/progresoEv.js') }}"></script>
+<script src="{{ asset('js/mostrarPreg.js') }}"></script>
+<script src="{{ asset('js/Formulario.js') }}"></script>
 <!-- Scripts adicionales de vistas -->
 @stack('scripts')
 

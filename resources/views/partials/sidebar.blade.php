@@ -75,6 +75,15 @@
                 <div data-i18n="Usuarios">Usuarios</div>
             </a>
             <ul class="menu-sub">
+                @if(auth()->user()->config?->role?->type === 'Admin')
+                <li class="menu-item">
+                    <a href="{{route ('candidate.resultados')}}" class="menu-link">
+                        <div data-i18n="Resultados">Resultados</div>
+                    </a>
+                </li>
+                @endif
+
+                @if(auth()->user()->config?->role?->type === 'Super Admin')
                 <li class="menu-item">
                     <a href="#" class="menu-link">
                         <div data-i18n="Roles">Roles</div>
@@ -85,6 +94,14 @@
                         <div data-i18n="Usuarios">Usuarios</div>
                     </a>
                 </li>
+                @endif
+                @if(auth()->user()->config?->role?->type === 'Candidate')
+                <li class="menu-item">
+                    <a href="{{route ('candidate.dashboard')}}" class="menu-link">
+                        <div data-i18n="Evaluaciones">Evaluaciones</div>
+                    </a>
+                </li>
+                @endif
             </ul>
         </li>
 

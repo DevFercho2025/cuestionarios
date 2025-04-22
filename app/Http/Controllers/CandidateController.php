@@ -45,11 +45,20 @@ class CandidateController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
+        //categorias asignadas al usuario
+        $categorias = $user->categorias;
+        //secciones que pertenecen a esa categoría
+        $secciones = $categorias->load('secciones');
+
+        return view('candidate.evaluaciones', compact('user', 'categorias', 'secciones'));
+    }
+
+    public function perfil(){
+        $user = Auth::user();
+        
         $aplicacion = $user->aplicacion ?? null;
+        $aplicacion = Aplicacion::where('user_id', $user->id)->first();
 
-         $aplicacion = Aplicacion::where('user_id', $user->id)->first();
-         $categorias = $user->categorias;
-
-        return view('candidate.dashboard', compact('user', 'aplicacion', 'categorias'));
+        return view('candidate.perfil', compact('user', 'aplicacion'));
     }
 }

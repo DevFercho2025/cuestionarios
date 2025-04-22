@@ -90,6 +90,7 @@ Route::group([
     Route::delete('/aplicaciones/{id}', [AplicacionController::class, 'destroy']);
     Route::post('/evaluaciones/eliminar', [EvaluacionController::class, 'eliminarAsignacion'])->name('admin.evaluaciones.eliminar');
 
+    Route::get('/buscar-Resultados', [EvaluacionController::class, 'buscarResultados'])->name('admin.buscar.resultados');
 
     // Select de usuarios y vacantes
     Route::get('usuarios/all', [AplicacionController::class, 'usuarios'])->name('usuarios.all');
@@ -120,6 +121,8 @@ Route::group([
     'middleware' => ['auth', 'is_candidate']
 ], function (){
     Route::get('/dashboard', [CandidateController::class, 'dashboard'])->name('candidate.dashboard');
+    Route::get('/perfil', [CandidateController::class, 'perfil'])->name('candidate.perfil');
+
     Route::get('/formulario', [FormularioController::class, 'index'])->name('index');
     Route::get('/permisos-preliminares', [FormularioController::class, 'mostrarPermisos'])->name('permisos-preliminares');
     Route::get('/cargar-formulario', [FormularioController::class, 'cargarFormulario'])->name('candidate.cargar.formulario');

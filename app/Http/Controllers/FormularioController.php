@@ -11,7 +11,7 @@ use App\Models\pregunta;
 use App\Models\Seccion;
 use App\Models\TokenEvaluacion;
 use Barryvdh\DomPDF\Facade\Pdf;
-
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -28,14 +28,16 @@ class FormularioController extends Controller
     public function mostrarPermisos(Request $request)
     {
         $categoria_id = $request->query('categoria_id'); 
+        $seccion_id = $request->query('seccion_id'); 
         
-        return view('candidate.permisos', compact('categoria_id'));
+        return view('candidate.permisos', compact('categoria_id', 'seccion_id'));
     }
 
     public function guardarCandidato(Request $request)
     {
         return view('public.permisos');
     }
+
     public function cargarFormulario(Request $request)
     {
         try {
@@ -45,19 +47,21 @@ class FormularioController extends Controller
             if (!$user) {
                 return response()->json(['error' => 'Usuario no autenticado'], 401); // Si no está autenticado, retorna un error
             }
-            $rango_inicio = $request->input('rango_inicio', 1);
+            /*$rango_inicio = $request->input('rango_inicio', 1);
             $rango_fin = $request->input('rango_fin', 35);
-            
-    
+           */ 
+            /*
             // Si ya está todo respondido, pasa al siguiente rango
             if ($request->isMethod('post')) {
                 $rango_inicio += 35;
                 $rango_fin += 35;
             }
-    
+
             $categoriaIds = $user->categorias->pluck('id');
             $seccionIds = Seccion::whereIn('categoria_id', $categoriaIds)->pluck('id');
-            
+            */
+
+             /*
             $preguntas = Pregunta::with([
                 'respuestas' => function ($query) {
                     $query->select('respuesta_id', 'pregunta_id', 'respuesta', 'opcion');
@@ -67,18 +71,28 @@ class FormularioController extends Controller
               ->get()->groupBy('seccion_id')
               ->map(function ($grupo) {
                 return $grupo->shuffle();
-              })->collapse();
+              })->collapse();*/
     
+            $seccion_id = $request->query('seccion_id');
+            if (!$seccion_id) {
+                return response()->json(['error' => 'El parámetro seccion_id es obligatorio'], 400);
+            }
+
+            $preguntas = Pregunta::with([
+                'respuestas' => function ($query) {
+                    $query->select('respuesta_id', 'pregunta_id', 'respuesta', 'opcion');
+                }
+            ])
+            ->where('seccion_id', $seccion_id)
+            ->get()
+            ->shuffle();
+
             $cantidadRepeticiones = intval($preguntas->count() * 0.06);
             $preguntasRepetidas = $preguntas->random($cantidadRepeticiones);
     
             $preguntas = $preguntas->concat($preguntasRepetidas)->shuffle();
     
-            $secciones = Seccion::with([
-                'seccion' => function ($query) {
-                    $query->select('id', 'bloque', 'titulo', 'cuestionario', 'time_at');
-                }
-            ]);
+            $secciones = Seccion::find($seccion_id);
     
             foreach ($preguntas as $pregunta) {
                 $pregunta->tiempoRestante = gmdate("i:s", strtotime($pregunta->seccion->time_at) - strtotime('00:00:00'));
@@ -88,8 +102,12 @@ class FormularioController extends Controller
             return view('candidate.formulario.parcial', compact('preguntas', 'secciones', 'candidato', 'rango_inicio', 'rango_fin'));
     
         } catch (\Exception $e) {
-            // Esto te ayudará a identificar si hay algún error en el código
-            return response()->json(['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()], 500);
+            Log::error("Error en cargarFormulario: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all(),
+            ]);
+        
+            return response()->json(['error' => 'Ocurrió un error inesperado. Intenta nuevamente más tarde.'], 500);
         }
     }
 

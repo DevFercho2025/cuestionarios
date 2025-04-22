@@ -4,7 +4,7 @@
         $rango_inicio = $rango_inicio ?? 1;
         $rango_fin = $rango_fin ?? 35;
     @endphp
-
+    @section('content')
     <!-- Esto es para verificar que los datos del candidato se guardaron
     <p>Nombre: {{ $candidato['nombre'] ?? 'No ingresado' }}</p>
     <p>Correo: {{ $candidato['correo'] ?? 'No ingresado' }}</p>
@@ -12,6 +12,7 @@
     <div id="contenedorForm">
         
     </div>
+    @endsection
     <style>
         .swal2-container {
             z-index: 9999 !important;
@@ -24,6 +25,10 @@
         let rangoInicio = {{ $rango_inicio }};
         let rangoFin = {{ $rango_fin }};
         console.log(`Rango inicio: ${rangoInicio}, Rango fin: ${rangoFin}`);
+
+        let seccionId = @json($seccion_id);
+        console.log("El seccion_id es: ", seccionId);
+
     </script>
     
     <script>
@@ -103,9 +108,8 @@
                         willClose: () => {
                             //esto cambia la url para que ya no sea "permisos-preliminares"
                             history.pushState(null, "", "/formulario-prueba-candidato");
-
                             //Esta es una petición AJAX
-                            cargarForm();
+                            cargarForm(seccionId);
                         }
 
                     });
@@ -122,42 +126,29 @@
             }).then(() => {
                 document.getElementById("contenidoPagina").style.display = "block";
 
-                cargarForm();
+                cargarForm(seccionId);
         });
         </script>
         @endif
 
         <script>
-            function cargarForm(){
-                //vs marca esto como error pero está bien y funciona
-                let rangoInicio = {{ $rango_inicio }};
-                let rangoFin = {{ $rango_fin }};
-                let url = "{{ route('candidate.cargar.formulario') }}?rango_inicio=" + rangoInicio + "&rango_fin=" + rangoFin;
+            function cargarForm(seccionId) {
+                let url = "{{ route('candidate.cargar.formulario') }}?seccion_id=" + seccionId;
                 console.log(url);
+
                 fetch(url)
-                            .then(response => {
-                                if (!response.ok) { //response.ok verifica solicites HTTP en js. da True si da código 200 o similar(respuesta exitosa)
-                                    throw new Error(`Error de HTTP: ${response.status}`); 
-                                }
-                                return response.text();
-                            })
-                            .then(html => {
-                                //inserta formulario
-                                document.getElementById("contenedorForm").innerHTML = html;
-
-                                //cargarScripts("{{ asset('js/camTemp.js') }}", "Scripts de temporizador, cronómetro y cámara cargados.");
-                                cargarScripts("{{ asset('js/progresoEv.js') }}", "Script de Circulo de Progreso cargado");
-                                cargarScripts("{{ asset('js/mostrarPreg.js') }}", "Script preguntas cargado");
-                            })
-                            .catch(error => console.error("Error al cargar el formulario:", error));
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Error de HTTP: ${response.status}`);
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        // Inserta el formulario en el contenedor
+                        document.getElementById("contenedorForm").innerHTML = html;
+                    })
+                    .catch(error => console.error("Error al cargar el formulario:", error));
             }
 
-            function cargarScripts(src, msn) {
-                let script = document.createElement("script");
-                script.src = src;
-                script.defer = true;
-                script.onload = () => console.log(msn);
-                document.body.appendChild(script);
-            }
         </script>
 @endpush

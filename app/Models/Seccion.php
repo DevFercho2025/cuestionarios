@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Seccion extends Model
 {
@@ -12,4 +13,18 @@ class Seccion extends Model
     protected $fillable = ["titulo", "bloque", "cuestionario", "time_at"]; #columnas, 
     public $timestamps = true; #laravel crea automáticamente "created_at, updated_at" pero esta tabla no tiene esos campos.
 
+    public function categoria()
+    {
+        return $this->belongsTo(Categoria::class);
+    }
+
+    public function getTiempoEvaluacionAttribute()
+    {
+        $tiempo = Carbon::parse($this->time_at);
+
+        $minutos = $tiempo->minute;
+        $segundos = $tiempo->second;
+    
+        return "{$minutos} minutos, {$segundos} segundos";
+    }
 }
