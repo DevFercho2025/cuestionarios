@@ -49,7 +49,7 @@ class AuthController extends Controller
                 return back()->withErrors(['email' => 'Su cuenta está desactivada.']);
             }
 
-            // 5) Psico‑user (flag)
+            /*// 5) Psico‑user (flag)
             if ($config->is_psico_user) {
                 return redirect()->route('psico.dashboard');
             }
@@ -65,7 +65,7 @@ class AuthController extends Controller
             }
 
             // 8) Usuario normal (role_id = 0 o cualquier otro caso)
-            return redirect()->route('home');
+            return redirect()->route('home');*/
         }
 
         //credenciales inválidas
