@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use PhpParser\Node\Stmt\TryCatch;
 
 class FormularioController extends Controller
 {
@@ -47,32 +48,7 @@ class FormularioController extends Controller
             if (!$user) {
                 return response()->json(['error' => 'Usuario no autenticado'], 401); // Si no está autenticado, retorna un error
             }
-            /*$rango_inicio = $request->input('rango_inicio', 1);
-            $rango_fin = $request->input('rango_fin', 35);
-           */ 
-            /*
-            // Si ya está todo respondido, pasa al siguiente rango
-            if ($request->isMethod('post')) {
-                $rango_inicio += 35;
-                $rango_fin += 35;
-            }
 
-            $categoriaIds = $user->categorias->pluck('id');
-            $seccionIds = Seccion::whereIn('categoria_id', $categoriaIds)->pluck('id');
-            */
-
-             /*
-            $preguntas = Pregunta::with([
-                'respuestas' => function ($query) {
-                    $query->select('respuesta_id', 'pregunta_id', 'respuesta', 'opcion');
-                }
-            ])->whereIn('seccion_id', $seccionIds)
-              ->whereBetween('pregunta_id', [$rango_inicio, $rango_fin])
-              ->get()->groupBy('seccion_id')
-              ->map(function ($grupo) {
-                return $grupo->shuffle();
-              })->collapse();*/
-    
             $seccion_id = $request->query('seccion_id');
             if (!$seccion_id) {
                 return response()->json(['error' => 'El parámetro seccion_id es obligatorio'], 400);
@@ -99,7 +75,7 @@ class FormularioController extends Controller
             }
     
             $candidato = $user;
-            return view('candidate.formulario.parcial', compact('preguntas', 'secciones', 'candidato', 'rango_inicio', 'rango_fin'));
+            return view('candidate.formulario.parcial', compact('preguntas', 'secciones', 'candidato'));
     
         } catch (\Exception $e) {
             Log::error("Error en cargarFormulario: " . $e->getMessage(), [
@@ -113,41 +89,48 @@ class FormularioController extends Controller
 
     public function guardarFoto(Request $request)
     {
-        $user = Auth::user();
-        $user_id = $user->id;
+        try{
+            $user = Auth::user();
+            $user_id = $user->id;
 
-        #Valida que se recibe una cadena (Base64)
-        $request->validate([
-            'image' => 'required|string'
-        ]);
+            #Valida que se recibe una cadena (Base64)
+            $request->validate([
+                'image' => 'required|string'
+            ]);
 
-        #Recibe la imagen
-        $img = $request->image;
+            #Recibe la imagen
+            $img = $request->image;
 
-        #Extraer los datos Base64
-        $image_parts = explode(";base64,", $img);
-        $image_type_aux = explode("image/", $image_parts[0]);
-        $image_type = $image_type_aux[1];
+            #Extraer los datos Base64
+            $image_parts = explode(";base64,", $img);
+            $image_type_aux = explode("image/", $image_parts[0]);
+            $image_type = $image_type_aux[1];
 
-        $image_base64 = base64_decode($image_parts[1]);
-        $fileName = uniqid() . '.' . $image_type;
+            $image_base64 = base64_decode($image_parts[1]);
+            $fileName = uniqid() . '.' . $image_type;
 
-        #Guarda en `storage/app/private/`
-        $pathImg = "private/uploads/" . $fileName;
-        Storage::put($pathImg, $image_base64);
+            #Guarda en `storage/app/private/`
+            $pathImg = "private/uploads/" . $fileName;
+            Storage::put($pathImg, $image_base64);
 
-        #crea un nuevo registro para la BD que referencia la imagen creada
-        $imagenUsuario = new ImagenUsuario();
-        $imagenUsuario->id_usuario = $user_id;
-        $imagenUsuario->file_name = $fileName;
-        $imagenUsuario->file_path = $pathImg;
-        $imagenUsuario->created_at = Carbon::now();
-        $imagenUsuario->save();
+            #crea un nuevo registro para la BD que referencia la imagen creada
+            $imagenUsuario = new ImagenUsuario();
+            $imagenUsuario->id_usuario = $user_id;
+            $imagenUsuario->file_name = $fileName;
+            $imagenUsuario->file_path = $pathImg;
+            $imagenUsuario->created_at = Carbon::now();
+            $imagenUsuario->save();
 
-        return response()->json([
-            'message' => 'Imagen guardada correctamente',
-            'file_name' => $fileName //solo devuelve el nombre de la img y no la url para que no sea accesible desde el navegador.
-        ]);
+            return response()->json([
+                'message' => 'Imagen guardada correctamente',
+                'file_name' => $fileName //solo devuelve el nombre de la img y no la url para que no sea accesible desde el navegador.
+            ]);
+        }catch (\Exception $e) {
+            // En caso de error, registrar y devolver un error JSON
+            Log::error('Error al guardar la foto: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al procesar la imagen'], 500);
+        }
+        
     }
 
     public function guardarRespuestas(Request $request)

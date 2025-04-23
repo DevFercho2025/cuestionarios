@@ -38,8 +38,6 @@ inicializarMostrarPreguntas();*/
 console.log("Script de mostrar preguntas inicializado.");
 
 function inicializarMostrarPreguntas() {
-    console.log("`inicializarMostrarPreguntas()` ejecutado.");
-
     document.body.removeEventListener("change", manejarCambioRespuesta); // Evita duplicar eventos
     document.body.addEventListener("change", manejarCambioRespuesta);
 }

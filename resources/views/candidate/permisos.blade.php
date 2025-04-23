@@ -116,7 +116,7 @@
             }
             </script>
     @elseif(isset($rango_inicio) && $rango_inicio > 35)
-    <script>
+        <script>
             Swal.fire({
                 title: 'Nueva Sección',
                 text: 'Estás en la siguiente sección.',
@@ -129,12 +129,11 @@
                 cargarForm(seccionId);
         });
         </script>
-        @endif
+    @endif
 
         <script>
             function cargarForm(seccionId) {
                 let url = "{{ route('candidate.cargar.formulario') }}?seccion_id=" + seccionId;
-                console.log(url);
 
                 fetch(url)
                     .then(response => {
@@ -146,9 +145,28 @@
                     .then(html => {
                         // Inserta el formulario en el contenedor
                         document.getElementById("contenedorForm").innerHTML = html;
+                        cargarScriptsForm();
                     })
                     .catch(error => console.error("Error al cargar el formulario:", error));
             }
+        </script>
 
+        <script>
+            
+            function cargarScriptsForm() {
+                const scripts = [
+                    "{{ asset('js/Formulario.js') }}",
+                    "{{ asset('js/mostrarPreg.js') }}",
+                    "{{ asset('js/camTemp.js') }}",
+                    "{{ asset('js/progresoEv.js') }}"
+                ];
+
+                scripts.forEach(src => {
+                    const s = document.createElement('script');
+                    s.src = src;
+                    s.async = false;
+                    document.body.appendChild(s);
+                });
+            }
         </script>
 @endpush

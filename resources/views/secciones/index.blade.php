@@ -123,11 +123,11 @@
                                 <div class="action-buttons">
                                     <button type="button" class="btn btn-info waves-effect waves-light edit-btn tooltipped"
                                             data-position="top" data-tooltip="Editar" data-id="${row.id}">
-                                        <i class="material-icons">edit</i>
+                                        <i class="ri-pencil-line"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
                                             data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
-                                        <i class="material-icons">delete</i>
+                                        <i class="ri-delete-bin-6-line"></i>
                                     </button>
                                 </div>
                             `;
@@ -263,102 +263,115 @@
                 }, 100);
             });
 
-            // Editar Sección
-            jQuery('#seccionesTable').on('click', '.edit-btn', function () {
+            // Editar Pregunta
+            jQuery('#preguntasTable').on('click', '.edit-btn', function () {
                 if (typeof Swal === 'undefined') {
                     alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
                     return;
                 }
-                var id = jQuery(this).data('id');
-                let row = table.row(jQuery(this).parents('tr')).data();
 
-                Swal.fire({
-                    title: '',
-                    html: `
-                 <div class="col-md mb-6 mb-md-0">
-                  <div class="card">
-                    <h2 class="card-header">Editar Sección</h2>
-                    <div class="card-body">
-                        <div class="form-floating form-floating-outline mb-6">
-                          <input id="swal-titulo" type="text" class="form-control" placeholder="Titulo" required="" value="${row.titulo}">
-                          <label for="swal-titulo">Título</label>
-                        </div>
-                        <div class="form-floating form-floating-outline mb-6">
-                          <input type="text" id="swal-bloque" class="form-control" placeholder="Bloque" required="" value="${row.bloque}">
-                          <label for="swal-bloque">Bloque</label>
-                        </div>
-                        <div class="form-floating form-floating-outline mb-6">
-                          <input type="text" id="swal-cuestionario" class="form-control" placeholder="Bloque" required="" value="${row.cuestionario}">
-                          <label for="swal-cuestionario">Cuestionario</label>
-                        </div>
-                        <div class="form-floating form-floating-outline mb-6">
-                          <input type="text" id="swal-time_at" class="form-control" placeholder="Bloque" required="" value="${row.time_at}">
-                          <label for="swal-time_at">Tiempo</label>
-                        </div>
-                    </div>
-                  </div>
-                </div>
-                `,
-                    showClass: { popup: 'animate__animated animate__fadeInDown' },
-                    hideClass: { popup: 'animate__animated animate__fadeOutUp' },
-                    focusConfirm: false,
-                    confirmButtonText: 'Actualizar',
-                    confirmButtonColor: '#3d4e81',
-                    cancelButtonText: 'Cancelar',
-                    cancelButtonColor: '#d32f2f',
-                    showCancelButton: true,
-                    background: '#262b3c',
-                    preConfirm: () => {
-                        return {
-                            titulo: document.getElementById('swal-titulo').value,
-                            bloque: document.getElementById('swal-bloque').value,
-                            cuestionario: document.getElementById('swal-cuestionario').value,
-                            time_at: document.getElementById('swal-time_at').value,
-                            _token: '{{ csrf_token() }}'
-                        }
-                    },
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        jQuery.ajax({
-                            url: "/admin/secciones/" + id,
-                            type: "PUT",
-                            data: result.value,
-                            dataType: "json",
-                            success: function (response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: '¡Actualizado!',
-                                    text: response.message,
-                                    confirmButtonColor: '#3d4e81',
-                                    timer: 2000,
-                                    timerProgressBar: true,
-                                    background: '#262b3c',
-                                });
-                                reloadTable();
-                            },
-                            error: function (xhr) {
-                                let errorMsg = 'No se pudo actualizar la sección.';
-                                if (xhr.responseJSON && xhr.responseJSON.message) {
-                                    errorMsg = xhr.responseJSON.message;
-                                }
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: errorMsg,
-                                    confirmButtonColor: '#d32f2f',
-                                    background: '#262b3c',
+                var id = jQuery(this).data('id');
+                let row = jQuery('#preguntasTable').DataTable().row(jQuery(this).parents('tr')).data();
+
+                // Primero obtenemos las secciones para el select
+                jQuery.ajax({
+                    url: "{{ route('secciones.all') }}",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (secciones) {
+                        let options = '';
+                        secciones.forEach(sec => {
+                            const selected = row.seccion && row.seccion.id === sec.id ? 'selected' : '';
+                            options += `<option value="${sec.id}" ${selected}>${sec.titulo}</option>`;
+                        });
+
+                        Swal.fire({
+                            title: '',
+                            html: `
+                            <div class="col-md mb-6 mb-md-0">
+                                <div class="card">
+                                    <h2 class="card-header">Editar Pregunta</h2>
+                                    <div class="card-body">
+                                        <div class="form-floating form-floating-outline mb-6">
+                                            <input id="swal-pregunta" type="text" class="form-control" placeholder="Pregunta" required value="${row.pregunta}">
+                                            <label for="swal-pregunta">Pregunta</label>
+                                        </div>
+                                        <div class="form-floating form-floating-outline mb-6">
+                                            <input type="text" id="swal-cuestionario" class="form-control" placeholder="Cuestionario" required value="${row.cuestionario}">
+                                            <label for="swal-cuestionario">Cuestionario</label>
+                                        </div>
+                                        <div class="form-floating form-floating-outline mb-6">
+                                            <label for="swal-seccion">Sección</label>
+                                            <select id="swal-seccion" class="form-control browser-default">
+                                                ${options}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            `,
+                            showClass: { popup: 'animate__animated animate__fadeInDown' },
+                            hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+                            focusConfirm: false,
+                            confirmButtonText: 'Actualizar',
+                            confirmButtonColor: '#3d4e81',
+                            cancelButtonText: 'Cancelar',
+                            cancelButtonColor: '#d32f2f',
+                            showCancelButton: true,
+                            background: '#262b3c',
+                            preConfirm: () => {
+                                return {
+                                    pregunta: document.getElementById('swal-pregunta').value,
+                                    cuestionario: document.getElementById('swal-cuestionario').value,
+                                    seccion_id: document.getElementById('swal-seccion').value,
+                                    _token: '{{ csrf_token() }}'
+                                };
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                jQuery.ajax({
+                                    url: "/preguntas/" + id,
+                                    type: "PUT",
+                                    data: result.value,
+                                    dataType: "json",
+                                    success: function (response) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: '¡Actualizado!',
+                                            text: response.message,
+                                            confirmButtonColor: '#3d4e81',
+                                            timer: 2000,
+                                            timerProgressBar: true,
+                                            background: '#262b3c',
+                                        });
+                                        reloadTable();
+                                    },
+                                    error: function (xhr) {
+                                        let errorMsg = 'No se pudo actualizar la pregunta.';
+                                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                                            errorMsg = xhr.responseJSON.message;
+                                        }
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: errorMsg,
+                                            confirmButtonColor: '#d32f2f',
+                                            background: '#262b3c',
+                                        });
+                                    }
                                 });
                             }
                         });
+                    },
+                    error: function () {
+                        M.toast({
+                            html: '<i class="material-icons left">error</i> No se pudieron cargar las secciones',
+                            classes: 'red rounded'
+                        });
                     }
                 });
-
-                setTimeout(function () {
-                    if (jQuery('input.validate').length && typeof M !== 'undefined') {
-                        M.CharacterCounter.init(document.querySelectorAll('input.validate'));
-                    }
-                }, 100);
             });
+
 
             // Eliminar Sección
             jQuery('#seccionesTable').on('click', '.delete-btn', function () {

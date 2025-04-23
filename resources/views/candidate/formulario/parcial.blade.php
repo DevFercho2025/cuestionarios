@@ -5,8 +5,6 @@
         $conTitulo = false;
     @endphp
 
-    <h1 visibility: hidden>Valor de Rango Inicio: {{ $rango_inicio }}</h1>
-
     <style>
 
         .progreso-Seccion {
@@ -237,8 +235,6 @@
                     @php $numPregunta++; @endphp
                 @endforeach
 
-                <input type="hidden" name="rango_inicio" value="{{ request('rango_inicio', 1) }}">
-                <input type="hidden" name="rango_fin" value="{{ request('rango_fin', 35) }}">
                 <input type="hidden" name="tiempo_agotado" id="tiempo_agotado" value="0">
 
 
@@ -281,5 +277,3 @@
 
     </div>
 </div>
-    
-

@@ -263,7 +263,7 @@
 
                                     if (newValue !== original) {
                                         $.ajax({
-                                            url: `/admin/candidatos/${id}`,  // Corregí la interpolación de la URL
+                                            url: `/admin/candidatos/${id}`,
                                             method: 'PUT',
                                             data: {
                                                 _token: "{{ csrf_token() }}",

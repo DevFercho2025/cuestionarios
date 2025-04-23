@@ -77,9 +77,9 @@
             <ul class="menu-sub">
                 @if(auth()->user()->config?->role?->type === 'Admin')
                 <li class="menu-item">
-                    <a href="{{route ('candidate.resultados')}}" class="menu-link">
+                    <!--<a href="{//{route ('candidate.resultados')}}" class="menu-link">
                         <div data-i18n="Resultados">Resultados</div>
-                    </a>
+                    </a>-->
                 </li>
                 @endif
 

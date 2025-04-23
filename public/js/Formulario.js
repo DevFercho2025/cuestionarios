@@ -1,8 +1,4 @@
 
-        // Este script debe ir al final de tu archivo o en @section('scripts')
-        document.addEventListener('DOMContentLoaded', function() {
-
-            M.AutoInit();
             // 1. Variables iniciales
             const preguntas = document.querySelectorAll('.pregunta');
             const totalPreguntas = preguntas.length;
@@ -229,4 +225,4 @@
                     mostrarPregunta(preguntaActual - 1);
                 }
             };
-        });
+

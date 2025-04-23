@@ -12,7 +12,7 @@
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-
+    <meta name="base-url" content="{{ url('/') }}">
     <title>Psicometrias</title>
 
     <meta name="description" content="" />
@@ -103,10 +103,7 @@
 <script src="{{asset('/assets/js/dashboards-analytics.js')}}"></script>
 
 
-<!--Scripts para formulario de evaluación -->
-<script src="{{ asset('js/progresoEv.js') }}"></script>
-<script src="{{ asset('js/mostrarPreg.js') }}"></script>
-<script src="{{ asset('js/Formulario.js') }}"></script>
+
 <!-- Scripts adicionales de vistas -->
 @stack('scripts')
 

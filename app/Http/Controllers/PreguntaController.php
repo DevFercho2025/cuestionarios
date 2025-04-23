@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pregunta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PreguntaController extends Controller
 {
@@ -43,19 +44,37 @@ class PreguntaController extends Controller
 
     public function update(Request $request, $id)
     {
-        $pregunta = Pregunta::findOrFail($id);
-        $data = $request->validate([
-            'pregunta'     => 'required|string',
-            'cuestionario' => 'required|string',
-            'seccion_id'   => 'required|exists:secciones,id'
-        ]);
-        $pregunta->update($data);
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Pregunta actualizada exitosamente.',
-            'pregunta' => $pregunta
-        ]);
+        try {
+            $pregunta = Pregunta::findOrFail($id);
+
+            $data = $request->validate([
+                'pregunta'     => 'required|string',
+                'cuestionario' => 'required|string',
+                'seccion_id'   => 'required|exists:psico_alobri_secciones,id'
+            ]);
+
+            //Verifica si los valores son diferentes y los actualiza si es necesario
+            $pregunta->pregunta = $data['pregunta'] !== $pregunta->pregunta ? $data['pregunta'] : $pregunta->pregunta;
+            $pregunta->cuestionario = $data['cuestionario'] !== $pregunta->cuestionario ? $data['cuestionario'] : $pregunta->cuestionario;
+            $pregunta->seccion_id = $data['seccion_id'] !== $pregunta->seccion_id ? $data['seccion_id'] : $pregunta->seccion_id;
+
+            $pregunta->save();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Pregunta actualizada exitosamente.',
+                'pregunta' => $pregunta
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar pregunta: ' . $e->getMessage());
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Hubo un problema al actualizar la pregunta.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
+
 
     public function destroy(Request $request, $id)
     {
