@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pregunta;
+use App\Models\Categoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -24,16 +25,22 @@ class PreguntaController extends Controller
         $data = $request->validate([
             'pregunta'     => 'required|string',
             'cuestionario' => 'required|string',
-            'seccion_id'   => 'required|exists:secciones,id'
+            'seccion_id'   => 'required|exists:psico_alobri_secciones,id',
+            'required'     => 'nullable|boolean', 
         ]);
 
+
+        $data['required'] = $data['required'] ?? 0;
+
         $pregunta = Pregunta::create($data);
+
         return response()->json([
-            'status'  => 'success',
-            'message' => 'Pregunta creada exitosamente.',
+            'status'   => 'success',
+            'message'  => 'Pregunta creada exitosamente.',
             'pregunta' => $pregunta
         ]);
     }
+
 
     public function show($id)
     {
@@ -84,5 +91,20 @@ class PreguntaController extends Controller
             'status' => 'success',
             'message' => 'Pregunta eliminada exitosamente.'
         ]);
+    }
+
+    public function categorias()
+    {
+        try {
+            $categorias = Categoria::all();
+            Log::info('Categorías obtenidas con éxito', ['categorias' => $categorias]);
+            return response()->json($categorias);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener categorías', [
+                'error_message' => $e->getMessage(),
+                'stack_trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['message' => 'Error al obtener categorías'], 500);
+        }
     }
 }

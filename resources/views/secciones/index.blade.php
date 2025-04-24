@@ -43,6 +43,8 @@
 
     <!-- jQuery y Scripts adicionales -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.8/inputmask.min.js"></script>
+
 
 
 <script>
@@ -165,124 +167,174 @@
                 swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
                 document.body.appendChild(swalScript);
             }
-
             // Crear Sección
             jQuery("#createSeccionBtn").click(function () {
                 if (typeof Swal === 'undefined') {
                     alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
                     return;
                 }
-                Swal.fire({
-                    html: `
-                 <div class="col-md mb-6 mb-md-0">
-                  <div class="card">
-                    <h2 class="card-header">Crear Sección</h2>
-                    <div class="card-body">
-                        <div class="form-floating form-floating-outline mb-6">
-                          <input id="swal-titulo" type="text" class="form-control" placeholder="Titulo" required="">
-                          <label for="swal-titulo">Título</label>
-                        </div>
-                        <div class="form-floating form-floating-outline mb-6">
-                          <input type="text" id="swal-bloque" class="form-control" placeholder="Bloque" required="">
-                          <label for="swal-bloque">Bloque</label>
-                        </div>
-                        <div class="form-floating form-floating-outline mb-6">
-                          <input type="text" id="swal-cuestionario" class="form-control" placeholder="Bloque" required="">
-                          <label for="swal-cuestionario">Cuestionario</label>
-                        </div>
-                        <div class="form-floating form-floating-outline mb-6">
-                          <input type="text" id="swal-time_at" class="form-control" placeholder="Bloque" required="">
-                          <label for="swal-time_at">Tiempo</label>
-                        </div>
-                    </div>
-                  </div>
-                </div>
-                `,
-                    showClass: { popup: 'animate__animated animate__fadeInDown' },
-                    hideClass: { popup: 'animate__animated animate__fadeOutUp' },
-                    focusConfirm: false,
-                    confirmButtonText: 'Crear',
-                    confirmButtonColor: '#3d4e81',
-                    cancelButtonText: 'Cancelar',
-                    cancelButtonColor: '#d32f2f',
-                    showCancelButton: true,
-                    buttonsStyling: true,
-                    preConfirm: () => {
-                        return {
-                            titulo: document.getElementById('swal-titulo').value,
-                            bloque: document.getElementById('swal-bloque').value,
-                            cuestionario: document.getElementById('swal-cuestionario').value,
-                            time_at: document.getElementById('swal-time_at').value,
-                            _token: '{{ csrf_token() }}'
-                        }
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        jQuery.ajax({
-                            url: "{{ route('secciones.store') }}",
-                            type: "POST",
-                            data: result.value,
-                            dataType: "json",
-                            success: function (response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: '¡Éxito!',
-                                    text: response.message,
-                                    confirmButtonColor: '#3d4e81',
-                                    timer: 2000,
-                                    timerProgressBar: true,
-                                    background: '#262b3c',
-                                });
-                                reloadTable();
-                            },
-                            error: function (xhr) {
-                                let errorMsg = 'No se pudo crear la sección.';
-                                if (xhr.responseJSON && xhr.responseJSON.message) {
-                                    errorMsg = xhr.responseJSON.message;
+
+                // Primero obtenemos las categorías
+                jQuery.ajax({
+                    url: "{{ route('categorias.all') }}",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (categorias) {
+                        let options = '<option disabled selected>Selecciona una categoría</option>';
+                        categorias.forEach(categoria => {
+                            options += `<option value="${categoria.id}">${categoria.titulo_cuestionario}</option>`;
+                        });
+
+                        Swal.fire({
+                            html: `
+                            <div class="col-md mb-6 mb-md-0">
+                                <div class="card">
+                                    <h2 class="card-header">Crear Sección</h2>
+                                    <div class="card-body">
+                                        <div class="form-floating form-floating-outline mb-6">
+                                            <input id="swal-titulo" type="text" class="form-control" placeholder="Título" required>
+                                            <label for="swal-titulo">Título</label>
+                                        </div>
+                                        <div class="form-floating form-floating-outline mb-6">
+                                            <input type="text" id="swal-bloque" class="form-control" placeholder="Bloque" required>
+                                            <label for="swal-bloque">Bloque</label>
+                                        </div>
+                                        <div class="form-floating form-floating-outline mb-6">
+                                            <select id="swal-categoria" class="form-control browser-default">
+                                                ${options}
+                                            </select>
+                                            <label for="swal-categoria">Categoría</label>
+                                        </div>
+                                        <div class="form-floating form-floating-outline mb-6">
+                                            <input type="text" id="swal-time_at" class="form-control" placeholder="Tiempo (hh:mm:ss)" value="00:00:00" required>
+                                            <label for="swal-time_at">Tiempo (hh:mm:ss)</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            `,
+                            showClass: { popup: 'animate__animated animate__fadeInDown' },
+                            hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+                            focusConfirm: false,
+                            confirmButtonText: 'Crear',
+                            confirmButtonColor: '#3d4e81',
+                            cancelButtonText: 'Cancelar',
+                            cancelButtonColor: '#d32f2f',
+                            showCancelButton: true,
+                            buttonsStyling: true,
+                            background: '#262b3c',
+                            preConfirm: () => {
+                                return {
+                                    titulo: document.getElementById('swal-titulo').value,
+                                    bloque: document.getElementById('swal-bloque').value,
+                                    categoria_id: document.getElementById('swal-categoria').value,
+                                    time_at: document.getElementById('swal-time_at').value,
+                                    _token: '{{ csrf_token() }}'
                                 }
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: errorMsg,
-                                    confirmButtonColor: '#d32f2f',
-                                    background: '#262b3c',
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                jQuery.ajax({
+                                    url: "{{ route('secciones.store') }}",
+                                    type: "POST",
+                                    data: result.value,
+                                    dataType: "json",
+                                    success: function (response) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: '¡Sección creada!',
+                                            text: response.message,
+                                            confirmButtonColor: '#3d4e81',
+                                            timer: 2000,
+                                            timerProgressBar: true,
+                                            background: '#262b3c',
+                                        });
+                                        reloadTable();
+                                    },
+                                    error: function (xhr) {
+                                        let errorMsg = 'No se pudo crear la sección.';
+                                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                                            errorMsg = xhr.responseJSON.message;
+                                        }
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: errorMsg,
+                                            confirmButtonColor: '#d32f2f',
+                                            background: '#262b3c',
+                                        });
+                                    }
                                 });
                             }
                         });
-                    }
-                });
 
-                // Inicializar componentes Materialize dentro de SweetAlert
-                setTimeout(function () {
-                    if (jQuery('input.validate').length && typeof M !== 'undefined') {
-                        M.CharacterCounter.init(document.querySelectorAll('input.validate'));
-                        document.querySelectorAll('label').forEach(function (label) {
-                            label.classList.add('active');
+                        $(document).on('input', '#swal-time_at', function (e) {
+                            const input = $(this);
+                            let value = input.val();
+                            let cursorPosition = input.prop("selectionStart"); //Posición actual del cursor
+
+                            //Filtra caracteres no válidos y mantiene sólo números y dos puntos
+                            value = value.replace(/[^0-9:]/g, "");
+
+                            //Divide el valor en partes (horas, minutos, segundos)
+                            const partes = value.split(":");
+                            const horas = partes[0]?.slice(0, 2) || "00";
+                            const minutos = partes[1]?.slice(0, 2) || "00";
+                            const segundos = partes[2]?.slice(0, 2) || "00";
+
+                            //Reconstruye el valor con el formato correcto
+                            const nuevoValor = `${horas}:${minutos}:${segundos}`;
+                            input.val(nuevoValor);
+
+                            //Ajuste de la posición del cursor según la cantidad de dígitos ingresados
+                            if (cursorPosition <= 2) {
+                                if (horas.length === 2 && cursorPosition === 2) {
+                                    cursorPosition = 3; // Mueve el cursor después del primer ":"
+                                }
+                            } else if (cursorPosition <= 5) {
+                                if (minutos.length === 2 && cursorPosition === 5) {
+                                    cursorPosition = 6; // Mueve el cursor después del segundo ":"
+                                }
+                            } else if (cursorPosition <= 8) {
+                                cursorPosition = Math.min(cursorPosition, 8);
+                            }
+
+                            // Ajusta el cursor para que se posicione correctamente
+                            input.prop("selectionStart", cursorPosition);
+                            input.prop("selectionEnd", cursorPosition);
+                        });
+
+
+                    },
+                    error: function () {
+                        M.toast({
+                            html: '<i class="material-icons left">error</i> No se pudieron cargar las categorías',
+                            classes: 'red rounded'
                         });
                     }
-                }, 100);
+                });
             });
 
-            // Editar Pregunta
-            jQuery('#preguntasTable').on('click', '.edit-btn', function () {
+
+            // Editar Sección
+            jQuery('#seccionesTable').on('click', '.edit-btn', function () {
                 if (typeof Swal === 'undefined') {
                     alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
                     return;
                 }
 
                 var id = jQuery(this).data('id');
-                let row = jQuery('#preguntasTable').DataTable().row(jQuery(this).parents('tr')).data();
+                let row = jQuery('#seccionesTable').DataTable().row(jQuery(this).parents('tr')).data();
 
-                // Primero obtenemos las secciones para el select
                 jQuery.ajax({
-                    url: "{{ route('secciones.all') }}",
+                    url: "{{ route('categorias.all') }}",
                     type: "GET",
                     dataType: "json",
-                    success: function (secciones) {
+                    success: function (categorias) {
                         let options = '';
-                        secciones.forEach(sec => {
-                            const selected = row.seccion && row.seccion.id === sec.id ? 'selected' : '';
-                            options += `<option value="${sec.id}" ${selected}>${sec.titulo}</option>`;
+                        categorias.forEach(categoria => {
+                            const selected = row.categoria_id && row.categoria_id === categoria.id ? 'selected' : '';
+                            options += `<option value="${categoria.id}" ${selected}>${categoria.titulo_cuestionario}</option>`;
                         });
 
                         Swal.fire({
@@ -290,21 +342,25 @@
                             html: `
                             <div class="col-md mb-6 mb-md-0">
                                 <div class="card">
-                                    <h2 class="card-header">Editar Pregunta</h2>
+                                    <h2 class="card-header">Editar Sección</h2>
                                     <div class="card-body">
                                         <div class="form-floating form-floating-outline mb-6">
-                                            <input id="swal-pregunta" type="text" class="form-control" placeholder="Pregunta" required value="${row.pregunta}">
-                                            <label for="swal-pregunta">Pregunta</label>
+                                            <input id="swal-titulo" type="text" class="form-control" placeholder="Título" required value="${row.titulo}">
+                                            <label for="swal-titulo">Título</label>
                                         </div>
                                         <div class="form-floating form-floating-outline mb-6">
-                                            <input type="text" id="swal-cuestionario" class="form-control" placeholder="Cuestionario" required value="${row.cuestionario}">
-                                            <label for="swal-cuestionario">Cuestionario</label>
+                                            <input id="swal-bloque" type="text" class="form-control" placeholder="Bloque" required value="${row.bloque}">
+                                            <label for="swal-bloque">Bloque</label>
                                         </div>
                                         <div class="form-floating form-floating-outline mb-6">
-                                            <label for="swal-seccion">Sección</label>
-                                            <select id="swal-seccion" class="form-control browser-default">
+                                            <select id="swal-categoria" class="form-control browser-default">
                                                 ${options}
                                             </select>
+                                            <label for="swal-categoria">Categoría/Cuestionario</label>
+                                        </div>
+                                        <div class="form-floating form-floating-outline mb-6">
+                                            <input id="swal-time_at" type="text" class="form-control" placeholder="Tiempo" required value="${row.time_at}">
+                                            <label for="swal-time_at">Tiempo</label>
                                         </div>
                                     </div>
                                 </div>
@@ -321,16 +377,17 @@
                             background: '#262b3c',
                             preConfirm: () => {
                                 return {
-                                    pregunta: document.getElementById('swal-pregunta').value,
-                                    cuestionario: document.getElementById('swal-cuestionario').value,
-                                    seccion_id: document.getElementById('swal-seccion').value,
+                                    titulo: document.getElementById('swal-titulo').value,
+                                    bloque: document.getElementById('swal-bloque').value,
+                                    categoria_id: document.getElementById('swal-categoria').value,
+                                    time_at: document.getElementById('swal-time_at').value,
                                     _token: '{{ csrf_token() }}'
                                 };
                             }
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 jQuery.ajax({
-                                    url: "/preguntas/" + id,
+                                    url: `/admin/secciones/${id}`,  // Actualiza la URL para el modelo Sección
                                     type: "PUT",
                                     data: result.value,
                                     dataType: "json",
@@ -347,7 +404,7 @@
                                         reloadTable();
                                     },
                                     error: function (xhr) {
-                                        let errorMsg = 'No se pudo actualizar la pregunta.';
+                                        let errorMsg = 'No se pudo actualizar la sección.';
                                         if (xhr.responseJSON && xhr.responseJSON.message) {
                                             errorMsg = xhr.responseJSON.message;
                                         }
@@ -365,12 +422,13 @@
                     },
                     error: function () {
                         M.toast({
-                            html: '<i class="material-icons left">error</i> No se pudieron cargar las secciones',
+                            html: '<i class="material-icons left">error</i> No se pudieron cargar las categorías',
                             classes: 'red rounded'
                         });
                     }
                 });
             });
+
 
 
             // Eliminar Sección

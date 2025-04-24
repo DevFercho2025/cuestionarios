@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Respuesta_Correcta; // O RespCorrecta, según convención
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class RespuestaCorrectaController extends Controller
 {
@@ -22,8 +23,8 @@ class RespuestaCorrectaController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'pregunta_id'   => 'required|exists:preguntas,pregunta_id',
-            'respuestas_id' => 'required|exists:respuestas,respuesta_id'
+            'pregunta_id'   => 'required|exists:psico_alobri_preguntas,pregunta_id',
+            'respuesta_id' => 'required|exists:psico_alobri_respuestas,respuesta_id'
         ]);
 
         $relacion = Respuesta_Correcta::create($data);
@@ -44,8 +45,8 @@ class RespuestaCorrectaController extends Controller
     {
         $relacion = Respuesta_Correcta::findOrFail($id);
         $data = $request->validate([
-            'pregunta_id'   => 'required|exists:preguntas,pregunta_id',
-            'respuestas_id' => 'required|exists:respuestas,respuesta_id'
+            'pregunta_id'   => 'required|exists:psico_alobri_preguntas,pregunta_id',
+            'respuesta_id' => 'required|exists:psico_alobri_respuestas,respuesta_id'
         ]);
         $relacion->update($data);
         return response()->json([

@@ -23,7 +23,7 @@ class RespuestaController extends Controller
         $data = $request->validate([
             'respuesta'   => 'required|string',
             'opcion'      => 'required|string',
-            'pregunta_id' => 'required|exists:preguntas,pregunta_id'
+            'pregunta_id' => 'required|exists:psico_alobri_preguntas,pregunta_id'
         ]);
 
         $respuesta = Respuesta::create($data);
@@ -46,7 +46,7 @@ class RespuestaController extends Controller
         $data = $request->validate([
             'respuesta'   => 'required|string',
             'opcion'      => 'required|string',
-            'pregunta_id' => 'required|exists:preguntas,pregunta_id'
+            'pregunta_id' => 'required|exists:psico_alobri_preguntas,pregunta_id'
         ]);
         $respuesta->update($data);
         return response()->json([

@@ -11,7 +11,7 @@ class pregunta extends Model
 
     #define qué tabla es preguntas
     protected $table = "psico_alobri_preguntas"; #título tabla
-    protected $fillable = ["pregunta", "cuestionario", "bloque"]; #columnas, 
+    protected $fillable = ["pregunta", "cuestionario", "required","seccion_id"]; #columnas, 
     protected $primaryKey = "pregunta_id"; #se especifica si la llave primaria no se llama solo "id" en la bd.
 
     public $timestamps = false; #laravel crea automáticamente "created_at, updated_at" pero esta tabla no tiene esos campos.

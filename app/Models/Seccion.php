@@ -10,12 +10,12 @@ class Seccion extends Model
 {
     use HasFactory;
     protected $table = "psico_alobri_secciones"; #título tabla
-    protected $fillable = ["titulo", "bloque", "cuestionario", "time_at"]; #columnas, 
+    protected $fillable = ["titulo", "bloque", "categoria_id", "time_at"]; #columnas, 
     public $timestamps = true; #laravel crea automáticamente "created_at, updated_at" pero esta tabla no tiene esos campos.
 
     public function categoria()
     {
-        return $this->belongsTo(Categoria::class);
+        return $this->belongsTo(Categoria::class, 'categoria_id', 'id');
     }
 
     public function getTiempoEvaluacionAttribute()

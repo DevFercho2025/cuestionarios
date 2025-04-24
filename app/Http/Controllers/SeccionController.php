@@ -16,7 +16,15 @@ class SeccionController extends Controller
     // Retorna los datos en JSON para DataTables
     public function datatable(Request $request)
     {
-        $secciones = Seccion::all();
+        // Cargar secciones con la relación 'categoria'
+        $secciones = Seccion::with('categoria')->get(); 
+        
+        $secciones = $secciones->map(function ($seccion) {
+            // Agregar el título del cuestionario (categoría)
+            $seccion->cuestionario = $seccion->categoria ? $seccion->categoria->titulo_cuestionario : 'No disponible';
+            return $seccion;
+        });
+    
         return response()->json($secciones);
     }
 
@@ -26,7 +34,7 @@ class SeccionController extends Controller
         $data = $request->validate([
             'titulo'       => 'required|string|max:255',
             'bloque'       => 'required|string',
-            'cuestionario' => 'required|string',
+            'categoria_id' => 'required|exists:psico_alobri_categorias,id',
             'time_at'      => 'nullable|date_format:H:i:s'
         ]);
 
@@ -50,7 +58,7 @@ class SeccionController extends Controller
         $data = $request->validate([
             'titulo'       => 'required|string|max:255',
             'bloque'       => 'required|string',
-            'cuestionario' => 'required|string',
+            'categoria_id' => 'required|string',
             'time_at'      => 'nullable|date_format:H:i:s'
         ]);
 

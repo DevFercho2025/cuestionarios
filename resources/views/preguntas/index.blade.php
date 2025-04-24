@@ -11,7 +11,7 @@
                             <h4 class="white-text">Gestión de Preguntas</h4>
                         </div>
                         <div class="col s4 right-align">
-                            <a id="registrarCandidatoBtn" class="btn btn-large gradient-btn pulse">
+                            <a id="crearPreguntaBtn" class="btn btn-large gradient-btn pulse">
                                 Nueva pregunta
                             </a>
                         </div>
@@ -166,51 +166,54 @@
                     document.body.appendChild(swalScript);
                 }
 
-                // Crear Pregunta
-                $("#createPreguntaBtn").click(function(){
-                    showLoader();
-                    // Cargar secciones para el dropdown
+                jQuery("#crearPreguntaBtn").click(function () {
+                    if (typeof Swal === 'undefined') {
+                        alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
+                        return;
+                    }
+
+                    // Primero cargamos las secciones antes de mostrar el formulario
                     $.ajax({
                         url: "{{ route('secciones.all') }}",
                         type: "GET",
                         dataType: "json",
-                        success: function(secciones){
-                            hideLoader();
+                        success: function (secciones) {
                             let options = '<option value="" disabled selected>Seleccione una sección</option>';
-                            $.each(secciones, function(i, sec){
+                            $.each(secciones, function (i, sec) {
                                 options += `<option value="${sec.id}">${sec.titulo}</option>`;
                             });
 
-                            // Usar SweetAlert2 con estilos de Materialize
                             Swal.fire({
-                                title: '<i class="material-icons">add_circle_outline</i> Crear Pregunta',
                                 html: `
-                                    <div class="input-field">
-                                        <i class="material-icons prefix">help</i>
-                                        <input id="swal-pregunta" type="text" class="validate">
+                                <div class="col-md mb-6 mb-md-0">
+                                <div class="card">
+                                    <h2 class="card-header">Crear Pregunta</h2>
+                                    <div class="card-body">
+                                        <div class="form-floating form-floating-outline mb-6">
+                                        <input id="swal-pregunta" type="text" class="form-control" placeholder="Pregunta" required="">
                                         <label for="swal-pregunta">Pregunta</label>
-                                    </div>
-                                    <div class="input-field">
-                                        <i class="material-icons prefix">assignment</i>
-                                        <input id="swal-cuestionario" type="text" class="validate">
+                                        </div>
+                                        <div class="form-floating form-floating-outline mb-6">
+                                        <input type="text" id="swal-cuestionario" class="form-control" placeholder="Cuestionario" required="">
                                         <label for="swal-cuestionario">Cuestionario</label>
+                                        </div>
+                                        <div class="form-floating form-floating-outline mb-6">
+                                        <select id="swal-seccion" class="form-select">
+                                            ${options}
+                                        </select>
+                                        <label for="swal-seccion">Sección</label>
+                                        </div>
                                     </div>
-                                    <div class="input-field">
-                                        <i class="material-icons prefix">category</i>
-                                        <select id="swal-seccion" class="browser-default">${options}</select>
-                                    </div>
+                                </div>
+                                </div>
                                 `,
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                },
+                                showClass: { popup: 'animate__animated animate__fadeInDown' },
+                                hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                                 focusConfirm: false,
-                                confirmButtonText: '<i class="material-icons left">check</i> Crear',
-                                confirmButtonColor: '#26a69a',
-                                cancelButtonText: '<i class="material-icons left">close</i> Cancelar',
-                                cancelButtonColor: '#ef5350',
+                                confirmButtonText: 'Crear',
+                                confirmButtonColor: '#3d4e81',
+                                cancelButtonText: 'Cancelar',
+                                cancelButtonColor: '#d32f2f',
                                 showCancelButton: true,
                                 buttonsStyling: true,
                                 preConfirm: () => {
@@ -218,59 +221,59 @@
                                         pregunta: document.getElementById('swal-pregunta').value,
                                         cuestionario: document.getElementById('swal-cuestionario').value,
                                         seccion_id: document.getElementById('swal-seccion').value,
-                                    }
+                                        _token: '{{ csrf_token() }}'
+                                    };
                                 }
                             }).then((result) => {
-                                if(result.isConfirmed){
-                                    showLoader();
-                                    $.ajax({
+                                if (result.isConfirmed) {
+                                    jQuery.ajax({
                                         url: "{{ route('preguntas.store') }}",
                                         type: "POST",
                                         data: result.value,
                                         dataType: "json",
-                                        success: function(response){
-                                            hideLoader();
+                                        success: function (response) {
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: '¡Éxito!',
-                                                text: response.message,
-                                                confirmButtonColor: '#26a69a',
+                                                text: response.message || 'Pregunta creada exitosamente.',
+                                                confirmButtonColor: '#3d4e81',
                                                 timer: 2000,
-                                                timerProgressBar: true
+                                                timerProgressBar: true,
+                                                background: '#262b3c',
                                             });
-                                            reloadTable();
+
+                                            // Recargar tabla
+                                            jQuery('#preguntasTable').DataTable().ajax.reload(null, false);
                                         },
-                                        error: function(xhr){
-                                            hideLoader();
+                                        error: function (xhr) {
                                             let errorMsg = 'No se pudo crear la pregunta.';
-                                            if(xhr.responseJSON && xhr.responseJSON.message) {
+                                            if (xhr.responseJSON && xhr.responseJSON.message) {
                                                 errorMsg = xhr.responseJSON.message;
                                             }
                                             Swal.fire({
                                                 icon: 'error',
                                                 title: 'Error',
                                                 text: errorMsg,
-                                                confirmButtonColor: '#ef5350'
+                                                confirmButtonColor: '#d32f2f',
+                                                background: '#262b3c',
                                             });
                                         }
                                     });
                                 }
                             });
-
-                            // Activar etiquetas de Materialize dentro de SweetAlert
-                            setTimeout(function(){
-                                $('input.validate').characterCounter();
-                                $('select.browser-default').formSelect();
-                                $('label').addClass('active');
-                            }, 100);
                         },
-                        error: function(){
-                            hideLoader();
-                            M.toast({html: '<i class="material-icons left">error</i> No se pudieron cargar las secciones', classes: 'red rounded'});
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'No se pudieron cargar las secciones.',
+                                confirmButtonColor: '#d32f2f',
+                            });
                         }
                     });
                 });
-                
+
+
                 //editar pregunta
                 $('#preguntasTable').on('click', '.edit-btn', function() {
                     const id = $(this).data('id');  //ID de la fila seleccionada
@@ -357,98 +360,6 @@
                         }
                     });
                 });
-
-
-
-                /*
-                $('#preguntasTable').on('click', '.edit-btn', function() {
-                    const id = $(this).data('id');  // Obtener el ID de la fila
-                    var rowData = table.row($(this).closest('tr')).data();
-
-                    $.ajax({
-                        url: "{{ route('secciones.all') }}",
-                        type: "GET",
-                        dataType: "json",
-                        success: function(secciones){
-
-                            let options = '<option value="" disabled>Seleccione una sección</option>';
-                            $.each(secciones, function(i, sec){
-                                const selected = rowData.seccion && sec.id === rowData.seccion.id ? 'selected' : '';
-                                options += `<option value="${sec.id}" ${selected}>${sec.titulo}</option>`;
-                            });
-
-                            Swal.fire({
-                                title: 'Editar Pregunta',
-                                html: `
-                                    <style>
-                                        .custom-input {
-                                            width: 100%;
-                                            padding: 0.625em 1em;
-                                            font-size: 1rem;
-                                            border: 1px solid #d9d9d9;
-                                            border-radius: 0.25em;
-                                            box-sizing: border-box;
-                                            margin-top: 0.25em;
-                                            margin-bottom: 1em;
-                                        }
-                                    </style>
-                                    <form id="editForm">
-                                        <div class="form-group">
-                                            <label for="pregunta">Pregunta:</label>
-                                            <input type="text" id="pregunta" class="custom-input" value="${rowData.pregunta}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="cuestionario">Cuestionario:</label>
-                                            <input type="text" id="cuestionario" class="custom-input" value="${rowData.cuestionario}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="swal-seccion">Sección:</label>
-                                            <select id="swal-seccion" class="custom-input">
-                                                ${options}
-                                            </select>
-                                        </div>
-                                    </form>
-                                `,
-                                focusConfirm: false,
-                                preConfirm: () => {
-                                    const pregunta = $('#pregunta').val();
-                                    const cuestionario = $('#cuestionario').val();
-                                    const seccion_id = $('#swal-seccion').val();
-
-                                    // Enviar la solicitud AJAX para actualizar la pregunta
-                                    $.ajax({
-                                        url: `/admin/preguntas/${id}`,
-                                        type: 'PUT',
-                                        headers: {
-                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                        },
-                                        data: {
-                                            pregunta: pregunta,
-                                            cuestionario: cuestionario,
-                                            seccion_id: rowData.seccion_id
-                                        },
-                                        success: function(response) {
-                                            Swal.fire('¡Actualizado!', 'Los datos se han actualizado correctamente.', 'success');
-                                            table.ajax.reload();
-                                        },
-                                        error: function(xhr) {
-                                            Swal.fire('Error', 'Hubo un problema al actualizar los datos.', 'error');
-                                        }
-                                    });
-                                }
-                            });
-                        },
-                        error: function(xhr){
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'No se pudieron cargar las secciones.',
-                                confirmButtonColor: '#ef5350'
-                            });
-                        }
-                    });
-                });*/
-
 
                 // Eliminar Pregunta
                 $('#preguntasTable').on('click', '.eliminar-pregunta-btn', function() {

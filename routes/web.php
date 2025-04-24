@@ -6,6 +6,7 @@ use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\RespuestaController;
 use App\Http\Controllers\RespuestaCorrectaController;
 use App\Http\Controllers\SeccionController;
+use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\CandidatoController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\UsuarioController;
@@ -44,6 +45,7 @@ Route::group([
     Route::delete('secciones/{id}', [SeccionController::class, 'destroy'])->name('secciones.destroy');
     Route::get('secciones/datatable', [SeccionController::class, 'datatable'])->name('secciones.datatable');
     Route::get('secciones/all', [SeccionController::class, 'all'])->name('secciones.all');
+    Route::get('categorias/all', [CategoriaController::class, 'all'])->name('categorias.all');
 
     // Rutas para Preguntas
     Route::get('preguntas', [PreguntaController::class, 'index'])->name('preguntas.index');
@@ -52,6 +54,7 @@ Route::group([
     Route::get('preguntas/{id}', [PreguntaController::class, 'show'])->name('preguntas.show');
     Route::put('preguntas/{id}', [PreguntaController::class, 'update'])->name('preguntas.update');
     Route::delete('preguntas/{id}', [PreguntaController::class, 'destroy'])->name('preguntas.destroy');
+    Route::get('preguntas/categorias', [PreguntaController::class, 'categorias'])->name('admin.preguntas.categorias');
 
     // Rutas para Respuestas
     Route::get('respuestas', [RespuestaController::class, 'index'])->name('respuestas.index');

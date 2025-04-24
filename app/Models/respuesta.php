@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class respuesta extends Model
+class Respuesta extends Model
 {
     use HasFactory;
 
     protected $table = "psico_alobri_respuestas"; 
-    protected $fillable = ["respuesta", "opcion"];
+    protected $fillable = ["respuesta", "opcion", "pregunta_id"];
     protected $primaryKey = "respuesta_id";
 
     public $timestamps = false; 

@@ -11,7 +11,7 @@
                             <h4 class="white-text">Gestión de Respuestas</h4>
                         </div>
                         <div class="col s4 right-align">
-                            <a id="createSeccionBtn" class="btn btn-large gradient-btn pulse">
+                            <a id="createRespuestaBtn" class="btn btn-large gradient-btn pulse">
                                Nueva Respuesta
                             </a>
                         </div>
@@ -127,11 +127,11 @@
                                 return `
                                         <div class="action-buttons">
                                             <button type="button" class="btn btn-info waves-effect waves-light edit-btn tooltipped"
-                                                    data-position="top" data-tooltip="Editar" data-id="${row.id}">
+                                                    data-position="top" data-tooltip="Editar" data-id="${row.respuesta_id}">
                                                 <i class="ri-pencil-line"></i>
                                             </button>
                                             <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
-                                                    data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
+                                                    data-position="top" data-tooltip="Eliminar" data-id="${row.respuesta_id}">
                                                 <i class="ri-delete-bin-6-line"></i>
                                             </button>
                                         </div>
@@ -153,54 +153,58 @@
 
                 // Función para recargar la tabla
                 function reloadTable() {
-                        table.ajax.reload(function () {
-                            if (typeof M !== 'undefined') {
-                                M.toast({
-                                    html: '<i class="material-icons left">refresh</i> Tabla actualizada',
-                                    classes: 'rounded'
-                                });
-                            }
-                        }, false);
-                    }
+                    table.ajax.reload(function () {
+                        if (typeof M !== 'undefined') {
+                            M.toast({
+                                html: '<i class="material-icons left">refresh</i> Tabla actualizada',
+                                classes: 'rounded'
+                            });
+                        }
+                    }, false);
+                }
 
-                    // Comprobar disponibilidad de SweetAlert2
-                    if (typeof Swal === 'undefined') {
-                        console.error('SweetAlert2 no está disponible.');
-                        var swalScript = document.createElement('script');
-                        swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
-                        document.body.appendChild(swalScript);
-                    }
+                // Comprobar disponibilidad de SweetAlert2
+                if (typeof Swal === 'undefined') {
+                    console.error('SweetAlert2 no está disponible.');
+                    var swalScript = document.createElement('script');
+                    swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+                    document.body.appendChild(swalScript);
+                }
 
-
-                    // Crear Respuesta
-                $("#createRespuestaBtn").click(function(){
+                $("#createRespuestaBtn").click(function() {
                     // Para crear una respuesta, se requiere seleccionar la pregunta.
                     $.ajax({
                         url: "{{ route('preguntas.datatable') }}",
                         type: "GET",
                         dataType: "json",
-                        success: function(preguntas){
+                        success: function(preguntas) {
                             let options = '<option value="" disabled selected>Seleccione una pregunta</option>';
-                            $.each(preguntas, function(i, pregunta){
+                            $.each(preguntas, function(i, pregunta) {
                                 options += `<option value="${pregunta.pregunta_id}">${pregunta.pregunta}</option>`;
                             });
 
                             Swal.fire({
-                                title: '<i class="material-icons">add_circle_outline</i> Crear Respuesta',
                                 html: `
-                                    <div class="input-field">
-                                        <i class="material-icons prefix">comment</i>
-                                        <input id="swal-respuesta" type="text" class="validate">
-                                        <label for="swal-respuesta">Respuesta</label>
-                                    </div>
-                                    <div class="input-field">
-                                        <i class="material-icons prefix">label</i>
-                                        <input id="swal-opcion" type="text" class="validate" placeholder="A, B, C...">
-                                        <label for="swal-opcion">Opción</label>
-                                    </div>
-                                    <div class="input-field">
-                                        <i class="material-icons prefix">help</i>
-                                        <select id="swal-pregunta" class="browser-default">${options}</select>
+                                    <div class="col-md mb-6 mb-md-0">
+                                        <div class="card">
+                                            <h2 class="card-header">Crear Respuesta</h2>
+                                            <div class="card-body">
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <input id="swal-respuesta" type="text" class="form-control" placeholder="Respuesta" required="">
+                                                    <label for="swal-respuesta">Respuesta</label>
+                                                </div>
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <input type="text" id="swal-opcion" class="form-control" placeholder="Opción" required="">
+                                                    <label for="swal-opcion">Opción</label>
+                                                </div>
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <select id="swal-pregunta" class="form-select">
+                                                        ${options}
+                                                    </select>
+                                                    <label for="swal-pregunta">Pregunta</label>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 `,
                                 showClass: {
@@ -222,16 +226,16 @@
                                         opcion: document.getElementById('swal-opcion').value,
                                         pregunta_id: document.getElementById('swal-pregunta').value,
                                         _token: '{{ csrf_token() }}'
-                                    }
+                                    };
                                 }
                             }).then((result) => {
-                                if(result.isConfirmed){
+                                if (result.isConfirmed) {
                                     $.ajax({
                                         url: "{{ route('respuestas.store') }}",
                                         type: "POST",
                                         data: result.value,
                                         dataType: "json",
-                                        success: function(response){
+                                        success: function(response) {
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: '¡Éxito!',
@@ -242,9 +246,9 @@
                                             });
                                             reloadTable();
                                         },
-                                        error: function(xhr){
+                                        error: function(xhr) {
                                             let errorMsg = 'No se pudo crear la respuesta.';
-                                            if(xhr.responseJSON && xhr.responseJSON.message) {
+                                            if (xhr.responseJSON && xhr.responseJSON.message) {
                                                 errorMsg = xhr.responseJSON.message;
                                             }
                                             Swal.fire({
@@ -259,23 +263,24 @@
                             });
 
                             // Activar etiquetas de Materialize dentro de SweetAlert
-                            setTimeout(function(){
+                            setTimeout(function() {
                                 $('input.validate').characterCounter();
                                 $('select.browser-default').formSelect();
                                 $('label').addClass('active');
                             }, 100);
                         },
-                        error: function(){
-                            M.toast({html: '<i class="material-icons left">error</i> No se pudieron cargar las preguntas', classes: 'red rounded'});
+                        error: function() {
+                            M.toast({ html: '<i class="material-icons left">error</i> No se pudieron cargar las preguntas', classes: 'red rounded' });
                         }
                     });
                 });
 
-                // Editar Respuesta
+
+                //editar respuesta
                 $('#respuestasTable').on('click', '.edit-btn', function(){
                     var id = $(this).data('id');
                     $.ajax({
-                        url: "/admin/respuestas/" + id,
+                        url: `/admin/respuestas/${id}`,
                         type: "GET",
                         dataType: "json",
                         success: function(respuesta){
@@ -285,28 +290,34 @@
                                 type: "GET",
                                 dataType: "json",
                                 success: function(preguntas){
-                                    let options = '';
+                                    let options = '<option value="" disabled selected>Seleccione una pregunta</option>';
                                     $.each(preguntas, function(i, pregunta){
                                         let selected = pregunta.pregunta_id == respuesta.pregunta_id ? 'selected' : '';
                                         options += `<option value="${pregunta.pregunta_id}" ${selected}>${pregunta.pregunta}</option>`;
                                     });
 
                                     Swal.fire({
-                                        title: '<i class="material-icons">edit</i> Editar Respuesta',
+                                        title: 'Editar Respuesta',
                                         html: `
-                                            <div class="input-field">
-                                                <i class="material-icons prefix">comment</i>
-                                                <input id="swal-respuesta" type="text" class="validate" value="${respuesta.respuesta}">
-                                                <label for="swal-respuesta" class="active">Respuesta</label>
+                                            <div class="col-md mb-6 mb-md-0">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="form-floating form-floating-outline mb-6">
+                                                        <input id="swal-respuesta" type="text" class="form-control" placeholder="Respuesta" value="${respuesta.respuesta}" required="">
+                                                        <label for="swal-respuesta">Respuesta</label>
+                                                    </div>
+                                                    <div class="form-floating form-floating-outline mb-6">
+                                                        <input id="swal-opcion" type="text" class="form-control" placeholder="Opción" value="${respuesta.opcion}" required="">
+                                                        <label for="swal-opcion">Opción</label>
+                                                    </div>
+                                                    <div class="form-floating form-floating-outline mb-6">
+                                                        <select id="swal-pregunta" class="form-select">
+                                                            ${options}
+                                                        </select>
+                                                        <label for="swal-pregunta">Pregunta</label>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="input-field">
-                                                <i class="material-icons prefix">label</i>
-                                                <input id="swal-opcion" type="text" class="validate" value="${respuesta.opcion}">
-                                                <label for="swal-opcion" class="active">Opción</label>
-                                            </div>
-                                            <div class="input-field">
-                                                <i class="material-icons prefix">help</i>
-                                                <select id="swal-pregunta" class="browser-default">${options}</select>
                                             </div>
                                         `,
                                         showClass: {
@@ -316,10 +327,10 @@
                                             popup: 'animate__animated animate__fadeOutUp'
                                         },
                                         focusConfirm: false,
-                                        confirmButtonText: '<i class="material-icons left">save</i> Actualizar',
-                                        confirmButtonColor: '#26a69a',
-                                        cancelButtonText: '<i class="material-icons left">close</i> Cancelar',
-                                        cancelButtonColor: '#ef5350',
+                                        confirmButtonText: 'Actualizar',
+                                        confirmButtonColor: '#3d4e81',
+                                        cancelButtonText: 'Cancelar',
+                                        cancelButtonColor: '#d32f2f',
                                         showCancelButton: true,
                                         preConfirm: () => {
                                             return {
@@ -365,8 +376,8 @@
 
                                     // Activar etiquetas de Materialize dentro de SweetAlert
                                     setTimeout(function(){
-                                        $('input.validate').characterCounter();
-                                        $('select.browser-default').formSelect();
+                                        $('input.form-control').characterCounter();
+                                        $('select.form-select').formSelect();
                                     }, 100);
                                 },
                                 error: function(){
@@ -384,6 +395,7 @@
                         }
                     });
                 });
+
 
                 // Eliminar Respuesta
                 $('#respuestasTable').on('click', '.delete-btn', function(){
@@ -434,219 +446,6 @@
                                         confirmButtonColor: '#ef5350'
                                     });
                                 }
-                            });
-                        }
-                    });
-                });
-
-                // Crear Respuesta
-                $("#createRespuestaBtn").click(function(){
-                    // Para crear una respuesta, se requiere seleccionar la pregunta.
-                    $.ajax({
-                        url: "{{ route('preguntas.datatable') }}",
-                        type: "GET",
-                        dataType: "json",
-                        success: function(preguntas){
-                            let options = '<option value="" disabled selected>Seleccione una pregunta</option>';
-                            $.each(preguntas, function(i, pregunta){
-                                options += `<option value="${pregunta.pregunta_id}">${pregunta.pregunta}</option>`;
-                            });
-
-                            Swal.fire({
-                                title: '<i class="material-icons">add_circle_outline</i> Crear Respuesta',
-                                html: `
-                                    <div class="input-field">
-                                        <i class="material-icons prefix">comment</i>
-                                        <input id="swal-respuesta" type="text" class="validate">
-                                        <label for="swal-respuesta">Respuesta</label>
-                                    </div>
-                                    <div class="input-field">
-                                        <i class="material-icons prefix">label</i>
-                                        <input id="swal-opcion" type="text" class="validate" placeholder="A, B, C...">
-                                        <label for="swal-opcion">Opción</label>
-                                    </div>
-                                    <div class="input-field">
-                                        <i class="material-icons prefix">help</i>
-                                        <select id="swal-pregunta" class="browser-default">${options}</select>
-                                    </div>
-                                `,
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                },
-                                focusConfirm: false,
-                                confirmButtonText: '<i class="material-icons left">check</i> Crear',
-                                confirmButtonColor: '#26a69a',
-                                cancelButtonText: '<i class="material-icons left">close</i> Cancelar',
-                                cancelButtonColor: '#ef5350',
-                                showCancelButton: true,
-                                buttonsStyling: true,
-                                preConfirm: () => {
-                                    return {
-                                        respuesta: document.getElementById('swal-respuesta').value,
-                                        opcion: document.getElementById('swal-opcion').value,
-                                        pregunta_id: document.getElementById('swal-pregunta').value,
-                                        _token: '{{ csrf_token() }}'
-                                    }
-                                }
-                            }).then((result) => {
-                                if(result.isConfirmed){
-                                    $.ajax({
-                                        url: "{{ route('respuestas.store') }}",
-                                        type: "POST",
-                                        data: result.value,
-                                        dataType: "json",
-                                        success: function(response){
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: '¡Éxito!',
-                                                text: response.message,
-                                                confirmButtonColor: '#26a69a',
-                                                timer: 2000,
-                                                timerProgressBar: true
-                                            });
-                                            reloadTable();
-                                        },
-                                        error: function(xhr){
-                                            let errorMsg = 'No se pudo crear la respuesta.';
-                                            if(xhr.responseJSON && xhr.responseJSON.message) {
-                                                errorMsg = xhr.responseJSON.message;
-                                            }
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Error',
-                                                text: errorMsg,
-                                                confirmButtonColor: '#ef5350'
-                                            });
-                                        }
-                                    });
-                                }
-                            });
-
-                            // Activar etiquetas de Materialize dentro de SweetAlert
-                            setTimeout(function(){
-                                $('input.validate').characterCounter();
-                                $('select.browser-default').formSelect();
-                                $('label').addClass('active');
-                            }, 100);
-                        },
-                        error: function(){
-                            M.toast({html: '<i class="material-icons left">error</i> No se pudieron cargar las preguntas', classes: 'red rounded'});
-                        }
-                    });
-                });
-
-                // Editar Respuesta
-                $('#respuestasTable').on('click', '.edit-btn', function(){
-                    var id = $(this).data('id');
-                    $.ajax({
-                        url: "/admin/respuestas/" + id,
-                        type: "GET",
-                        dataType: "json",
-                        success: function(respuesta){
-                            // Cargar las preguntas para el select
-                            $.ajax({
-                                url: "{{ route('preguntas.datatable') }}",
-                                type: "GET",
-                                dataType: "json",
-                                success: function(preguntas){
-                                    let options = '';
-                                    $.each(preguntas, function(i, pregunta){
-                                        let selected = pregunta.pregunta_id == respuesta.pregunta_id ? 'selected' : '';
-                                        options += `<option value="${pregunta.pregunta_id}" ${selected}>${pregunta.pregunta}</option>`;
-                                    });
-
-                                    Swal.fire({
-                                        title: '<i class="material-icons">edit</i> Editar Respuesta',
-                                        html: `
-                                            <div class="input-field">
-                                                <i class="material-icons prefix">comment</i>
-                                                <input id="swal-respuesta" type="text" class="validate" value="${respuesta.respuesta}">
-                                                <label for="swal-respuesta" class="active">Respuesta</label>
-                                            </div>
-                                            <div class="input-field">
-                                                <i class="material-icons prefix">label</i>
-                                                <input id="swal-opcion" type="text" class="validate" value="${respuesta.opcion}">
-                                                <label for="swal-opcion" class="active">Opción</label>
-                                            </div>
-                                            <div class="input-field">
-                                                <i class="material-icons prefix">help</i>
-                                                <select id="swal-pregunta" class="browser-default">${options}</select>
-                                            </div>
-                                        `,
-                                        showClass: {
-                                            popup: 'animate__animated animate__fadeInDown'
-                                        },
-                                        hideClass: {
-                                            popup: 'animate__animated animate__fadeOutUp'
-                                        },
-                                        focusConfirm: false,
-                                        confirmButtonText: '<i class="material-icons left">save</i> Actualizar',
-                                        confirmButtonColor: '#26a69a',
-                                        cancelButtonText: '<i class="material-icons left">close</i> Cancelar',
-                                        cancelButtonColor: '#ef5350',
-                                        showCancelButton: true,
-                                        preConfirm: () => {
-                                            return {
-                                                respuesta: document.getElementById('swal-respuesta').value,
-                                                opcion: document.getElementById('swal-opcion').value,
-                                                pregunta_id: document.getElementById('swal-pregunta').value,
-                                                _token: '{{ csrf_token() }}'
-                                            }
-                                        },
-                                    }).then((result) => {
-                                        if(result.isConfirmed){
-                                            $.ajax({
-                                                url: "/admin/respuestas/" + id,
-                                                type: "PUT",
-                                                data: result.value,
-                                                dataType: "json",
-                                                success: function(response){
-                                                    Swal.fire({
-                                                        icon: 'success',
-                                                        title: '¡Actualizado!',
-                                                        text: response.message,
-                                                        confirmButtonColor: '#26a69a',
-                                                        timer: 2000,
-                                                        timerProgressBar: true
-                                                    });
-                                                    reloadTable();
-                                                },
-                                                error: function(xhr){
-                                                    let errorMsg = 'No se pudo actualizar la respuesta.';
-                                                    if(xhr.responseJSON && xhr.responseJSON.message) {
-                                                        errorMsg = xhr.responseJSON.message;
-                                                    }
-                                                    Swal.fire({
-                                                        icon: 'error',
-                                                        title: 'Error',
-                                                        text: errorMsg,
-                                                        confirmButtonColor: '#ef5350'
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    });
-
-                                    // Activar etiquetas de Materialize dentro de SweetAlert
-                                    setTimeout(function(){
-                                        $('input.validate').characterCounter();
-                                        $('select.browser-default').formSelect();
-                                    }, 100);
-                                },
-                                error: function(){
-                                    M.toast({html: '<i class="material-icons left">error</i> No se pudieron cargar las preguntas', classes: 'red rounded'});
-                                }
-                            });
-                        },
-                        error: function(){
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'No se pudieron obtener los datos de la respuesta.',
-                                confirmButtonColor: '#ef5350'
                             });
                         }
                     });

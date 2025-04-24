@@ -172,103 +172,112 @@
             document.body.appendChild(swalScript);
         }
         
-        // Crear Relación Respuesta Correcta
-        $("#createRCBtn").click(function(){
-            // Añadir meta CSRF para todas las solicitudes AJAX
+        //Crear relación entre una pregunta y una respuesta.
+        $("#createRCBtn").click(function () {
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
 
-            // Se requiere cargar preguntas y respuestas para crear la relación
             $.when(
                 $.ajax({ url: "{{ route('preguntas.datatable') }}", type: "GET", dataType: "json" }),
                 $.ajax({ url: "{{ route('respuestas.datatable') }}", type: "GET", dataType: "json" })
-            ).done(function(preguntasData, respuestasData) {
+            ).done(function (preguntasData, respuestasData) {
                 let preguntas = preguntasData[0];
                 let respuestas = respuestasData[0];
                 let opcionesPreguntas = '<option value="" disabled selected>Seleccione una pregunta</option>';
-                let opcionesRespuestas = '<option value="" disabled selected>Seleccione la respuesta correcta</option>';
+                let opcionesRespuestas = '<option value="" disabled selected>Seleccione una respuesta</option>';
 
-                $.each(preguntas, function(i, p){
+                $.each(preguntas, function (i, p) {
                     opcionesPreguntas += `<option value="${p.pregunta_id}">${p.pregunta}</option>`;
                 });
-                $.each(respuestas, function(i, r){
+
+                $.each(respuestas, function (i, r) {
                     opcionesRespuestas += `<option value="${r.respuesta_id}">${r.respuesta} (Opción: ${r.opcion})</option>`;
                 });
 
                 Swal.fire({
-                    title: '<i class="material-icons">add_circle_outline</i> Crear Relación',
                     html: `
-                        <div class="input-field">
-                            <i class="material-icons prefix">help</i>
-                            <select id="swal-pregunta" class="browser-default">${opcionesPreguntas}</select>
+                    <div class="col-md mb-6 mb-md-0">
+                    <div class="card">
+                        <h2 class="card-header">Crear Relación</h2>
+                        <div class="card-body">
+                            <div class="form-floating form-floating-outline mb-6">
+                                <select id="swal-pregunta" class="form-select">
+                                    ${opcionesPreguntas}
+                                </select>
+                                <label for="swal-pregunta">Pregunta</label>
+                            </div>
+                            <div class="form-floating form-floating-outline mb-6">
+                                <select id="swal-respuesta" class="form-select">
+                                    ${opcionesRespuestas}
+                                </select>
+                                <label for="swal-respuesta">Respuesta Correcta</label>
+                            </div>
                         </div>
-                        <div class="input-field" style="margin-top: 20px;">
-                            <i class="material-icons prefix">verified</i>
-                            <select id="swal-respuesta" class="browser-default">${opcionesRespuestas}</select>
-                        </div>
+                    </div>
+                    </div>
                     `,
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown'
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp'
-                    },
+                    showClass: { popup: 'animate__animated animate__fadeInDown' },
+                    hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                     focusConfirm: false,
-                    confirmButtonText: '<i class="material-icons left">check</i> Crear',
-                    confirmButtonColor: '#26a69a',
-                    cancelButtonText: '<i class="material-icons left">close</i> Cancelar',
-                    cancelButtonColor: '#ef5350',
+                    confirmButtonText: 'Crear',
+                    confirmButtonColor: '#3d4e81',
+                    cancelButtonText: 'Cancelar',
+                    cancelButtonColor: '#d32f2f',
                     showCancelButton: true,
                     buttonsStyling: true,
                     preConfirm: () => {
+                        const respuestaId = document.getElementById('swal-respuesta').value;
+                        const preguntaId = document.getElementById('swal-pregunta').value;
                         return {
-                            pregunta_id: document.getElementById('swal-pregunta').value,
-                            respuestas_id: document.getElementById('swal-respuesta').value,
-                        }
+                            pregunta_id: preguntaId,
+                            respuesta_id: respuestaId
+                        };
                     }
                 }).then((result) => {
-                    if(result.isConfirmed){
+                    if (result.isConfirmed) {
                         $.ajax({
                             url: "{{ route('respuestas_correctas.store') }}",
                             type: "POST",
                             data: result.value,
                             dataType: "json",
-                            success: function(response){
+                            success: function (response) {
                                 Swal.fire({
                                     icon: 'success',
                                     title: '¡Éxito!',
                                     text: response.message,
-                                    confirmButtonColor: '#26a69a',
+                                    confirmButtonColor: '#3d4e81',
                                     timer: 2000,
-                                    timerProgressBar: true
+                                    timerProgressBar: true,
+                                    background: '#262b3c',
                                 });
                                 reloadTable();
                             },
-                            error: function(xhr){
+                            error: function (xhr) {
                                 let errorMsg = 'No se pudo crear la relación.';
-                                if(xhr.responseJSON && xhr.responseJSON.message) {
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
                                     errorMsg = xhr.responseJSON.message;
                                 }
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Error',
                                     text: errorMsg,
-                                    confirmButtonColor: '#ef5350'
+                                    confirmButtonColor: '#d32f2f',
+                                    background: '#262b3c',
                                 });
                             }
                         });
                     }
                 });
 
-                // Activar componentes de Materialize dentro de SweetAlert
-                setTimeout(function(){
-                    $('select.browser-default').formSelect();
+                setTimeout(function () {
+                    $('select.form-select').formSelect();
                 }, 100);
             });
         });
+
 
         // Editar Relación Respuesta Correcta
         $('#rcTable').on('click', '.edit-btn', function(){
@@ -298,14 +307,12 @@
                         });
 
                         Swal.fire({
-                            title: '<i class="material-icons">edit</i> Editar Relación',
+                            title: ' Editar Relación',
                             html: `
                                 <div class="input-field">
-                                    <i class="material-icons prefix">help</i>
                                     <select id="swal-pregunta" class="browser-default">${opcionesPreguntas}</select>
                                 </div>
                                 <div class="input-field" style="margin-top: 20px;">
-                                    <i class="material-icons prefix">verified</i>
                                     <select id="swal-respuesta" class="browser-default">${opcionesRespuestas}</select>
                                 </div>
                             `,
@@ -316,21 +323,21 @@
                                 popup: 'animate__animated animate__fadeOutUp'
                             },
                             focusConfirm: false,
-                            confirmButtonText: '<i class="material-icons left">save</i> Actualizar',
+                            confirmButtonText: 'Actualizar',
                             confirmButtonColor: '#26a69a',
-                            cancelButtonText: '<i class="material-icons left">close</i> Cancelar',
+                            cancelButtonText: 'Cancelar',
                             cancelButtonColor: '#ef5350',
                             showCancelButton: true,
                             preConfirm: () => {
                                 return {
                                     pregunta_id: document.getElementById('swal-pregunta').value,
-                                    respuestas_id: document.getElementById('swal-respuesta').value,
+                                    respuesta_id: document.getElementById('swal-respuesta').value,
                                 }
                             },
                         }).then((result) => {
                             if(result.isConfirmed){
                                 $.ajax({
-                                    url: "/admin/respuestas_correctas/" + id,
+                                    url: `/admin/respuestas_correctas/${id}`,
                                     type: "PUT",
                                     data: {
                                         ...result.value,
@@ -392,8 +399,8 @@
                 showCancelButton: true,
                 confirmButtonColor: '#f44336',
                 cancelButtonColor: '#9e9e9e',
-                confirmButtonText: '<i class="material-icons left">delete</i> Sí, eliminar',
-                cancelButtonText: '<i class="material-icons left">cancel</i> Cancelar',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
                 showClass: {
                     popup: 'animate__animated animate__fadeIn'
                 },
