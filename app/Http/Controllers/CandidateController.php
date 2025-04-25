@@ -50,7 +50,10 @@ class CandidateController extends Controller
         //secciones que pertenecen a esa categoría
         $secciones = $categorias->load('secciones');
 
-        return view('candidate.evaluaciones', compact('user', 'categorias', 'secciones'));
+        //id de la seccion completada.
+        $seccion_completada = session('seccion_completada', null);
+
+        return view('candidate.evaluaciones', compact('user', 'categorias', 'secciones','seccion_completada'));
     }
 
     public function perfil(){

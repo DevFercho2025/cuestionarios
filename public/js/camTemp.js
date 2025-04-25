@@ -143,7 +143,13 @@ function iniciarCamara() {
         let data = canvas.toDataURL('image/png')
         foto.setAttribute('src', data)
 
-        fetch(`${document.querySelector('meta[name="base-url"]').getAttribute('content')}/candidate/guardar-foto`, {
+        const baseUrl = document.querySelector('meta[name="base-url"]').getAttribute('content');
+        const url = `${baseUrl}/candidate/guardar-foto`;
+
+        // Imprimir la URL en la consola para verificar
+        console.log("URL de la solicitud fetch:", url);
+
+        fetch(url, {
 
             method: 'POST',
             headers: {

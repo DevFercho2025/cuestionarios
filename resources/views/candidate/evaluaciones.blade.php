@@ -47,7 +47,11 @@
                                                 <span class="text-heading">{{ $seccion->tiempo_evaluacion }}</span>
                                             </td>
                                             <td class="text-truncate">
-                                                Pendiente
+                                                @if (session('seccion_completada') == $seccion->id)
+                                                    <span class="badge bg-success">Completada</span>
+                                                @else
+                                                    <span class="badge bg-warning">Pendiente</span>
+                                                @endif
                                             </td>
                                             <td class="text-truncate">
                                                 <a href="{{ route('permisos-preliminares') }}?categoria_id={{ $categoria->id }}&seccion_id={{ $seccion->id }}" class="btn btn-sm btn-primary">

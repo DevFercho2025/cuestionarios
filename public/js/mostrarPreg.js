@@ -40,6 +40,12 @@ console.log("Script de mostrar preguntas inicializado.");
 function inicializarMostrarPreguntas() {
     document.body.removeEventListener("change", manejarCambioRespuesta); // Evita duplicar eventos
     document.body.addEventListener("change", manejarCambioRespuesta);
+
+    document.querySelectorAll('.respuesta').forEach(r => {
+        r.style.opacity = '1';
+        r.style.pointerEvents = 'auto'; // Habilita interacción con radios de respuestas
+        r.disabled = false; 
+    });
 }
 
 let respuestasEnGrupo = 0; // Contador de respuestas dentro del bloque de 3

@@ -155,7 +155,7 @@
             
             function cargarScriptsForm() {
                 const scripts = [
-                    "{{ asset('js/Formulario.js') }}",
+                    /*"{{ asset('js/Formulario.js') }}",*/
                     "{{ asset('js/mostrarPreg.js') }}",
                     "{{ asset('js/camTemp.js') }}",
                     "{{ asset('js/progresoEv.js') }}"

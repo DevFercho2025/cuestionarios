@@ -14,16 +14,16 @@
             padding: 50px 0;
             border-radius: 8px;
             align-items: center;
-            justify-content: center; /* <-- asegurá que esté esto */
+            justify-content: center;  /*<-- asegurá que esté esto */
             text-align: center;
-            margin: 0 auto; /* <-- esto lo centra horizontalmente */
+            margin: 0 auto;  /*<-- esto lo centra horizontalmente */
         }
         .circulo-Progreso{
             position: relative;
             height: 200px;
             width: 200px;
             border-radius: 50%;
-            background-image: conic-gradient(blue 4.6deg, #ededed 0deg);
+            background-image: conic-gradient(blue 0deg, #ededed 0deg);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -117,8 +117,9 @@
             flex-grow: 1; /* Temporizador y grabación ocupan menos espacio */
             text-align: center;
         }
+        
 
-        .separador {
+       .separador {
             width: 2px;
             height: 50px;
             background-color: #ccc;
@@ -140,6 +141,12 @@
             margin-right: auto;
         }
 
+        input[type="radio"].form-check-input {
+            appearance: auto;
+            width: 1em;
+            height: 1em;
+            margin-top: 0.3em;
+        }
     </style>
 
 
@@ -236,7 +243,7 @@
                 @endforeach
 
                 <input type="hidden" name="tiempo_agotado" id="tiempo_agotado" value="0">
-
+                <input type="hidden" name="seccion_id" value="{{ $seccion_id }}">
 
                 <div id="respuestas-hidden-container"></div>
                 <button type="submit" id="enviar" style="display: none;">Enviar</button>

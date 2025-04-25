@@ -75,7 +75,7 @@ class FormularioController extends Controller
             }
     
             $candidato = $user;
-            return view('candidate.formulario.parcial', compact('preguntas', 'secciones', 'candidato'));
+            return view('candidate.formulario.parcial', compact('preguntas', 'secciones', 'candidato', 'seccion_id'));
     
         } catch (\Exception $e) {
             Log::error("Error en cargarFormulario: " . $e->getMessage(), [
@@ -140,10 +140,11 @@ class FormularioController extends Controller
         $usuarioIp = \Illuminate\Support\Facades\Request::getClientIp(true);
 
         $tiempoAgotado = $request->input('tiempo_agotado', 0);
+        $seccion_id = $request->input('seccion_id');
 
         if ($tiempoAgotado != 1) {
             #Obtener las preguntas requeridas dentro del rango actual
-            $preguntasRequeridas = Pregunta::whereBetween('pregunta_id', [$request->input('rango_inicio', 1), $request->input('rango_fin', 35)])
+            $preguntasRequeridas = Pregunta::where('seccion_id', $seccion_id)
                 ->where('required', true)
                 ->pluck('pregunta_id')
                 ->toArray();
@@ -168,22 +169,8 @@ class FormularioController extends Controller
 
             $respuesta->save();
         }
-
-        #Avanzar al siguiente conjunto de preguntas
-        $rango_inicio = $request->input('rango_inicio', 1) + 35;
-        $rango_fin = $request->input('rango_fin', 35) + 35;
-
-        if ($rango_fin > 265) {
-            $rango_fin = 265;
-        }
-        if ($rango_inicio > 265) {
-            return redirect()->route('gracias');
-        }
-
-        if ($rango_inicio > 35) {
-        }
-
-        return view('public.permisos', ['rango_inicio' => $rango_inicio, 'rango_fin' => $rango_fin]);
+        session(['seccion_completada' => $seccion_id]);
+        return redirect()->route('candidate.dashboard');
     }
 
     public function generarToken(Request $request)
