@@ -142,6 +142,11 @@ class FormularioController extends Controller
         $tiempoAgotado = $request->input('tiempo_agotado', 0);
         $seccion_id = $request->input('seccion_id');
 
+        $seccionesCompletadas = session('secciones_completadas', []);
+        if (!in_array($seccion_id, $seccionesCompletadas)) {
+            $seccionesCompletadas[] = $seccion_id;
+        }
+
         if ($tiempoAgotado != 1) {
             #Obtener las preguntas requeridas dentro del rango actual
             $preguntasRequeridas = Pregunta::where('seccion_id', $seccion_id)
@@ -161,36 +166,62 @@ class FormularioController extends Controller
         $respuestas = $request->input('respuestas', []) ?? []; //Toma el valor del campo respuestas del request. Si no existe, usa un array vacío como valor predeterminado. Si por alguna razón sigue siendo null, entonces lo reemplazará con otro array vacío.
 
         foreach ($respuestas as $pregunta_id => $respuesta_id) {
-            $respuesta = new Respuesta_Usuario();
-            $respuesta->user_id = $user_id;
-            $respuesta->pregunta_id = $pregunta_id;
-            $respuesta->respuesta_id = $respuesta_id;
-            $respuesta->ip_usuario = $usuarioIp;
-
+            // Buscar respuesta existente
+            $respuesta = Respuesta_Usuario::where('user_id', $user_id)
+                ->where('pregunta_id', $pregunta_id)
+                ->first();
+        
+            if ($respuesta) {
+                // Si existe, actualiza la respuesta_id y la IP
+                $respuesta->respuesta_id = $respuesta_id;
+                $respuesta->ip_usuario = $usuarioIp;
+            } else {
+                // Si no existe, crea una nueva
+                $respuesta = new Respuesta_Usuario();
+                $respuesta->user_id = $user_id;
+                $respuesta->pregunta_id = $pregunta_id;
+                $respuesta->respuesta_id = $respuesta_id;
+                $respuesta->ip_usuario = $usuarioIp;
+            }
+        
             $respuesta->save();
         }
-        session(['seccion_completada' => $seccion_id]);
+
+        $this->generarToken($user_id);
+
+        
+        $seccionesRespondidas = Respuesta_Usuario::where('user_id', $user_id) //respuestas con el id del usuario
+        ->join('preguntas', 'respuestas_usuario.pregunta_id', '=', 'preguntas.pregunta_id')
+        ->pluck('preguntas.seccion_id')  //Muestra solo el seccion_id de las preguntas del join.
+        ->unique() //Elimina duplicados
+        ->toArray();
+
+        session(['secciones_completadas' => $seccionesRespondidas]);
+
         return redirect()->route('candidate.dashboard');
     }
 
-    public function generarToken(Request $request)
+    public function generarToken($user_id)
     {
         try {
-            $user = Auth::user();
-            $user_id = $user->id;
-
+            /*$user = Auth::user();
+            $user_id = $user->id;*/
             if (!$user_id) {
                 return response()->json(['error' => 'user_id vacío'], 500);
             }
 
-            $token = bcrypt(Str::random(64));
+            $tokenEv = TokenEvaluacion::where('user_id', $user_id)->first();
 
-            $tokenEv = TokenEvaluacion::create([
-                'token' => $token,
-                'user_id' => $user_id,
-                'created_at' => now(),
-            ]);
+            if(!$tokenEv){
+                $token = bcrypt(Str::random(64));
 
+                $tokenEv = TokenEvaluacion::create([
+                    'token' => $token,
+                    'user_id' => $user_id,
+                    'created_at' => now(),
+                ]);
+            }
+            
             #Obtener respuestas del usuario que no tienen un token asociado
             Respuesta_Usuario::where('user_id', $user_id)
                 ->whereNull('token_id')

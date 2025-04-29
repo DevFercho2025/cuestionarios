@@ -67,8 +67,91 @@
 
     <div class="menu-inner-shadow"></div>
 
+
     <ul class="menu-inner py-1">
         <!-- Dashboards -->
+        @if(auth()->user()->config?->role?->type === 'Admin')
+        <li class="menu-item active open">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons ri-user-line"></i>
+                <div data-i18n="Candidatos">Candidatos</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item">
+                    <a href="{{ route('candidatos.index') }}" class="menu-link">
+                        <div data-i18n="+ Candidato con vacante">Candidato con vacante</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ route('candidatos.index') }}" class="menu-link">
+                        <div data-i18n="+ Candidato sin vacante">Candidato sin vacante</div>
+                    </a>
+                </li>
+
+                <li class="menu-item">
+                    <a href="{{ route('evaluaciones.index') }}" class="menu-link">
+                        <div data-i18n="Códigos de acceso">Códigos de acceso</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <div data-i18n="Resultados">Resultados</div>
+                    </a>
+                </li>
+            </ul>
+            
+        </li>
+
+        <li class="menu-item active open">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons ri-survey-line"></i>
+                <div data-i18n="Evaluaciones">Evaluaciones</div>
+            </a>
+            <ul class="menu-sub">
+                <!--<li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <div data-i18n="Categorías">Cuestionarios</div>
+                    </a>
+                </li>-->
+                <li class="menu-item">
+                    <a href="{{ route('secciones.index') }}" class="menu-link">
+                        <div data-i18n="Secciones">Secciones</div>
+                    </a>
+                </li>
+                <li class="menu-item active open">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons ri-questionnaire-line"></i> 
+                        <div data-i18n="Preguntas">Preguntas</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item">
+                            <a href="{{ route('preguntas.index') }}" class="menu-link">
+                                <div data-i18n="Preguntas que existen">Preguntas que existen</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('respuestas.index') }}" class="menu-link">
+                                <div data-i18n="Respuestas que existen">Respuestas que existen</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('respuestas_correctas.index') }}" class="menu-link">
+                                <div data-i18n="Solucionarios">Solucionarios</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            
+
+        </li>
+        @endif
+    </ul>
+
+
+<!--
+    <ul class="menu-inner py-1">
+        Dashboards
         <li class="menu-item active open">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons ri-home-smile-line"></i>
@@ -77,9 +160,9 @@
             <ul class="menu-sub">
                 @if(auth()->user()->config?->role?->type === 'Admin')
                 <li class="menu-item">
-                    <!--<a href="{//{route ('candidate.resultados')}}" class="menu-link">
+                    <a href="{//{route ('candidate.resultados')}}" class="menu-link">
                         <div data-i18n="Resultados">Resultados</div>
-                    </a>-->
+                    </a>
                 </li>
                 @endif
 
@@ -97,7 +180,7 @@
                 @endif
                 @if(auth()->user()->config?->role?->type === 'Candidate')
                 <li class="menu-item">
-                    <a href="{{route ('candidate.dashboard')}}" class="menu-link">
+                    <a href="{//{route ('candidate.dashboard')}}" class="menu-link">
                         <div data-i18n="Evaluaciones">Evaluaciones</div>
                     </a>
                 </li>
@@ -106,5 +189,6 @@
         </li>
 
     </ul>
+-->
 </aside>
 <!-- / Menu -->

@@ -143,7 +143,8 @@ function iniciarCamara() {
         let data = canvas.toDataURL('image/png')
         foto.setAttribute('src', data)
 
-        const baseUrl = document.querySelector('meta[name="base-url"]').getAttribute('content');
+        //const baseUrl = document.querySelector('meta[name="base-url"]').getAttribute('content');
+        const baseUrl = '{{ url("/") }}';
         const url = `${baseUrl}/candidate/guardar-foto`;
 
         // Imprimir la URL en la consola para verificar

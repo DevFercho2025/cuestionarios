@@ -47,16 +47,24 @@
                                                 <span class="text-heading">{{ $seccion->tiempo_evaluacion }}</span>
                                             </td>
                                             <td class="text-truncate">
-                                                @if (session('seccion_completada') == $seccion->id)
+                                                @if (in_array($seccion->id, $seccionesCompletadas))
                                                     <span class="badge bg-success">Completada</span>
                                                 @else
                                                     <span class="badge bg-warning">Pendiente</span>
                                                 @endif
                                             </td>
                                             <td class="text-truncate">
-                                                <a href="{{ route('permisos-preliminares') }}?categoria_id={{ $categoria->id }}&seccion_id={{ $seccion->id }}" class="btn btn-sm btn-primary">
-                                                    Iniciar Evaluación
-                                                </a>
+                                                @if (in_array($seccion->id, $seccionesCompletadas))
+                                                    <!-- Botón deshabilitado -->
+                                                    <a href="" class="btn btn-sm btn-secondary" tabindex="-1" aria-disabled="true" style="pointer-events: none; cursor: not-allowed;">
+                                                        Evaluación Completada
+                                                    </a>
+                                                @else
+                                                    <!-- Botón activo -->
+                                                    <a href="{{ route('permisos-preliminares') }}?categoria_id={{ $categoria->id }}&seccion_id={{ $seccion->id }}" class="btn btn-sm btn-primary">
+                                                        Iniciar Evaluación
+                                                    </a>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -88,12 +96,6 @@
         #EvaluacionesTable th:nth-child(5) {
             width: auto !important;  /* Ajusta automáticamente el ancho de las columnas 'Estado' y 'Acciones' */
             white-space: nowrap;     /* Evita que el texto de esas celdas se divida en múltiples líneas */
-        }
-
-        table.dt-responsive th, table.dt-responsive td {
-            text-overflow: unset; /* Elimina los puntos suspensivos */
-            overflow: unset; /* Evita que el texto se oculte */
-            white-space: normal; /* Permite que el texto se ajuste automáticamente */
         }
 
         table.dt-responsive th, table.dt-responsive td {

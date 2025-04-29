@@ -141,7 +141,7 @@ Route::group([
     Route::get('/gracias', function () {
         return view('gracias');
     })->name('gracias');
-    Route::post('/generar-token', [FormularioController::class, 'generarToken'])->name('generar.token');
+    //Route::post('/generar-token', [FormularioController::class, 'generarToken'])->name('generar.token');
     Route::get('/buscador-resultados', [FormularioController::class, 'verResultados'])->name('ver.resultados');
     Route::get('/buscar-resultados', [FormularioController::class, 'buscarResultados'])->name('buscar.resultados');
     Route::get('/exportar-pdf/token-id/{id}', [FormularioController::class, 'exportarPDF'])->name('exportar.pdf');
