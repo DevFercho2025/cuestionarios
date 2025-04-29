@@ -20,11 +20,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('login.post');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/php-info', function () {
+/*Route::get('/php-info', function () {
     return view('phpinfo');
-});
+});*/
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
 
+
+Route::get('register',  [AuthController::class, 'showRegisterForm'])->name('register.wizard');
+Route::post('register/wizard', [AuthController::class, 'registerFormStore'])->name('register.wizard.store');
 
 // Endpoints públicos
 Route::get('/candidate', [CandidateController::class, 'index'])->name('candidate.index');
@@ -134,7 +137,7 @@ Route::group([
     //Route::post('/permisos-preliminares', [FormularioController::class, 'guardarCandidato'])->name('guardar.candidato');
     Route::post('/formulario', [FormularioController::class, 'guardarRespuestas'])->name('guardar.respuestas');
     Route::post('/guardar-foto', [FormularioController::class, 'guardarFoto'])->name('guardar.foto');
-    
+
     Route::get('/gracias', function () {
         return view('gracias');
     })->name('gracias');

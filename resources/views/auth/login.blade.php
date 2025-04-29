@@ -1,5 +1,4 @@
 @extends('layout.app')
-
 @section('content')
     <div class="container">
         <div class="authentication-wrapper authentication-basic container-p-y">
