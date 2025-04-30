@@ -2,21 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ImagenUsuario;
-use App\Models\Aplicacion;
 use App\Models\Respuesta_Usuario;
 use App\Models\pregunta;
 use App\Models\Seccion;
 use App\Models\TokenEvaluacion;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use PhpParser\Node\Stmt\TryCatch;
+
 
 class FormularioController extends Controller
 {
@@ -243,73 +240,4 @@ class FormularioController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
-    public function verResultados(Request $request)
-    {
-        return view('buscador.index');
-    }
-
-    public function buscarResultados(Request $request)
-    {
-        $tokenStr = $request->input('token');
-
-        $token = TokenEvaluacion::where('token', $tokenStr)->first();
-        if (!$token) {
-            // Retorno en JSON con error
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Token no encontrado.'
-            ], 404);
-        }
-
-        $usuario = User::find($token->user_id);
-        if (!$usuario) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Usuario no encontrado.'
-            ], 404);
-        }
-
-        $aplicacion = Aplicacion::where('user_id', $usuario->id)->first();
-
-        $respuestas = Respuesta_Usuario::with([
-            'pregunta',
-            'respuesta',
-            'respuestaCorrecta.respuesta'
-        ])
-            ->where('user_id', $usuario->id)
-            ->where('token_id', $token->id)
-            ->get();
-
-        return response()->json([
-            'status'      => 'success',
-            'usuario'     => $usuario,
-            'aplicacion'  => $aplicacion,
-            'respuestas'  => $respuestas,
-            'tokenStr'    => $tokenStr,
-            'token'       => $token
-        ]);
-    }
-
-
-
-    public function exportarPDF($id)
-    {
-        $token = TokenEvaluacion::findOrFail($id);
-        $usuario = User::findOrFail($token->user_id);
-        $aplicacion = Aplicacion::where('user_id', $usuario->id)->first();
-
-        $respuestas = Respuesta_Usuario::with([
-            'pregunta',
-            'respuesta',
-            'respuestaCorrecta.respuesta'
-        ])
-            ->where('user_id', $usuario->id)
-            ->where('token_id', $token->id)
-            ->get();
-
-        $pdf = Pdf::loadView('pdf.resultados', compact('usuario', 'aplicacion', 'respuestas'));
-        return $pdf->download("resultados_token_{$token->id}.pdf");
-    }
-
 }

@@ -160,7 +160,7 @@
                         </div>
                     </div>
                     <div class="d-grid mt-3">
-                        <a href="{{ route('candidatos.index') }}" class="btn btn-danger waves-effect waves-light">
+                        <a href="{//{ route('candidatos.index') }}" class="btn btn-danger waves-effect waves-light">
                             <i class="ri-arrow-right-line me-1"></i> Gestionar
                         </a>
                     </div>

@@ -14,6 +14,7 @@ use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\AplicacionController;
 use App\Http\Controllers\FormularioController;
+use App\Http\Controllers\ResultadosController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -78,9 +79,9 @@ Route::group([
     Route::delete('respuestas_correctas/{id}', [RespuestaCorrectaController::class, 'destroy'])->name('respuestas_correctas.destroy');
 
     // Rutas para candidatos
-    Route::get('candidatos', [CandidatoController::class, 'index'])->name('candidatos.index');
+    Route::post('candidatos', [CandidatoController::class, 'index'])->name('candidatos.index');
     Route::get('candidatos/registrar-candidato', [CandidatoController::class, 'crearCandidato'])->name('candidatos.crear');
-    Route::post('/candidatos', [CandidatoController::class, 'store'])->name('candidatos.store');
+    Route::post('/candidatos/store', [CandidatoController::class, 'store'])->name('candidatos.store');
     Route::get('/candidatos/datatable', [CandidatoController::class, 'datatable'])->name('candidatos.datatable');
     Route::get('candidatos/{id}', [CandidatoController::class, 'show'])->name('candidatos.show');
     Route::put('candidatos/{id}', [CandidatoController::class, 'update'])->name('candidatos.update');
@@ -88,6 +89,7 @@ Route::group([
     Route::post('/generar-codigo', [CandidatoController::class, 'generarCodigo'])->name('generar.codigo');
     Route::post('candidatos/codigo', [CandidatoController::class, 'guardarCodigo'])->name('guardar.codigo');
     Route::get('candidatos/lista', [CandidatoController::class, 'listaUsuarios'])->name('candidatos.lista');
+    Route::get('candidatos/perfil/{id}', [CandidatoController::class, 'verPerfil'])->name('candidatos.perfil');
 
     // Rutas para evaluaciones
     Route::get('/evaluaciones', [EvaluacionController::class, 'index'])->name('evaluaciones.index');
@@ -98,7 +100,10 @@ Route::group([
     Route::delete('/aplicaciones/{id}', [AplicacionController::class, 'destroy']);
     Route::post('/evaluaciones/eliminar', [EvaluacionController::class, 'eliminarAsignacion'])->name('admin.evaluaciones.eliminar');
 
-    Route::get('/buscar-Resultados', [EvaluacionController::class, 'buscarResultados'])->name('admin.buscar.resultados');
+    Route::get('resultados', [ResultadosController::class, 'index'])->name('resultados.index');
+    Route::get('/buscar-Resultados', [ResultadosController::class, 'buscarResultados'])->name('admin.buscar.resultados');
+    Route::get('/resultados/{id}', [ResultadosController::class, 'verResultados'])->name('admin.ver.resultados');
+    Route::get('/exportar-pdf/token-id/{id}', [ResultadosController::class, 'exportarPDF'])->name('admin.exportar.pdf');
 
     // Select de usuarios y vacantes
     Route::get('usuarios/all', [AplicacionController::class, 'usuarios'])->name('usuarios.all');
@@ -137,12 +142,4 @@ Route::group([
     //Route::post('/permisos-preliminares', [FormularioController::class, 'guardarCandidato'])->name('guardar.candidato');
     Route::post('/formulario', [FormularioController::class, 'guardarRespuestas'])->name('guardar.respuestas');
     Route::post('/guardar-foto', [FormularioController::class, 'guardarFoto'])->name('guardar.foto');
-
-    Route::get('/gracias', function () {
-        return view('gracias');
-    })->name('gracias');
-    //Route::post('/generar-token', [FormularioController::class, 'generarToken'])->name('generar.token');
-    Route::get('/buscador-resultados', [FormularioController::class, 'verResultados'])->name('ver.resultados');
-    Route::get('/buscar-resultados', [FormularioController::class, 'buscarResultados'])->name('buscar.resultados');
-    Route::get('/exportar-pdf/token-id/{id}', [FormularioController::class, 'exportarPDF'])->name('exportar.pdf');
 });

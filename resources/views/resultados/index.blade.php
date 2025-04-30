@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('layout.admin')
 
 @section('content')
     <div class="container my-4">
@@ -12,6 +12,7 @@
                         <button type="submit" class="btn btn-primary">Buscar</button>
                     </div>
                 </form>
+                
 
                 <!-- Contenedor para mostrar los resultados (encabezado + tabla) -->
                 <div id="resultadosContainer"></div>
@@ -19,8 +20,7 @@
                 <!-- Contenedor para las gráficas por sección (opcional) -->
                 <div id="graficasContainer" class="mt-5"></div>
 
-                <!-- Opción para exportar PDF -->
-                <div id="pdfContainer" class="mt-3"></div>
+                
             </div>
         </div>
     </div>
@@ -47,7 +47,7 @@
                 let tokenInput = $(this).find("input[name='token']").val();
 
                 $.ajax({
-                    url: "{{ route('buscar.resultados') }}",
+                    url: "{{ route('admin.buscar.resultados') }}",
                     type: "GET",
                     data: { token: tokenInput },
                     dataType: "json",
@@ -59,21 +59,24 @@
 
                             // 1. Mostrar datos del usuario y su aplicación
                             let infoHtml = `<div class="mb-4">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label class="fw-bold">Nombre:</label>
-                                <p>${usuario.name}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="fw-bold">Vacante:</label>
-                                <p>${aplicacion ? aplicacion.cargo_aplicado : '--'}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="fw-bold">Correo:</label>
-                                <p>${usuario.email}</p>
-                            </div>
-                        </div>
-                    </div>`;
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div id="pdfContainer" class="mt-3"></div>
+                                                    </div> 
+                                                    <div class="col-md-3">
+                                                        <label class="fw-bold">Nombre:</label>
+                                                        <p>${usuario.name}</p>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="fw-bold">Vacante:</label>
+                                                        <p>${aplicacion ? aplicacion.cargo_aplicado : '--'}</p>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="fw-bold">Correo:</label>
+                                                        <p>${usuario.email}</p>
+                                                    </div>
+                                                </div>
+                                            </div>`;
 
                             $("#resultadosContainer").append(infoHtml);
 
@@ -132,30 +135,30 @@
 
                                 // Construir la fila de la tabla
                                 tablaHtml += `
-        <tr>
-            <td>${preguntaTexto}</td>
-            <td>${respuestaUsuarioHTML}</td>
-            <td>${respuestaCorrectaHTML}</td>
-            <td>${resultadoValor}</td>
-        </tr>
-    `;
-                            });
+                                            <tr>
+                                                <td>${preguntaTexto}</td>
+                                                <td>${respuestaUsuarioHTML}</td>
+                                                <td>${respuestaCorrectaHTML}</td>
+                                                <td>${resultadoValor}</td>
+                                            </tr>
+                                        `;
+                                    });
 
 
-                            tablaHtml += `
-                            </tbody>
-                        </table>
-                    </div>
-                    `;
+                                    tablaHtml += `
+                                    </tbody>
+                                </table>
+                            </div>
+                            `;
 
                             $("#resultadosContainer").append(tablaHtml);
 
                             // 3. Botón para exportar PDF (si existe el ID del token)
                             if(response.token && response.token.id){
-                                let pdfHtml = `<a href="/admin/exportar/pdf/${response.token.id}"
-                                         class="btn btn-danger" target="_blank">
-                                            Exportar PDF
-                                       </a>`;
+                                let pdfHtml = `<a href="{{ url('/admin/exportar-pdf/token-id') }}/${response.token.id}"
+                                                    class="btn btn-danger" target="_blank">
+                                                        Exportar PDF
+                                                </a>`;
                                 $("#pdfContainer").append(pdfHtml);
                             }
 

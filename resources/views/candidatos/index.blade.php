@@ -2,13 +2,20 @@
 @section('title', 'Gestión de Candidatos')
 @section('content')
     <div class="container">
+        <input type="hidden" id="conVacante" value="{{ $conVacante }}">
         <!-- emcabezado-->
         <div class="row">
             <div class="col s12">
                 <div class="card-panel dark-gradient">
                     <div class="row valign-wrapper mb-0">
                         <div class="col s8">
-                            <h4 class="white-text">Gestión de Candidatos</h4>
+                            <h4 class="white-text">
+                                @if ($conVacante == 1)
+                                    Gestión de Candidatos con Vacante
+                                @else
+                                    Gestión de Candidatos sin Vacante
+                                @endif
+                            </h4>
                         </div>
                         <div class="col s4 right-align">
                             <a id="registrarCandidatoBtn" class="btn btn-large gradient-btn pulse">
@@ -36,7 +43,6 @@
                                 <th>Código Postal</th>
                                 <th>Celular</th>
                                 <th>Fecha Registro</th>
-                                <th>Compañía</th>
                                 <th>Acciones</th>
                             </tr>
                             </thead>
@@ -55,6 +61,7 @@
         </div>
     </div>
 
+    
     <!-- jQuery y Scripts adicionales -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -122,6 +129,9 @@
                         var table = jQuery('#candidatosTable').DataTable({
                             ajax: {
                                 url: "{{ route('candidatos.datatable')}}",
+                                data: function(d) {
+                                d.conVacante = jQuery('#conVacante').val();
+                            },
                                 dataSrc: 'data',
                                 error: function (xhr, error, thrown) {
                                     console.error('Error en la carga de datos:', error, thrown);
@@ -179,12 +189,6 @@
                                         return new Date(data).toLocaleString();
                                     }
                                 },
-                                { 
-                                    data: 'company_name',
-                                    render: function (data) {
-                                        return data ?? '-';
-                                    }
-                                },
                                 {
                                     data: null,
                                     render: function(data, type, row){
@@ -193,6 +197,10 @@
                                                 <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
                                                         data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
                                                     <i class="ri-delete-bin-6-line"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-info waves-effect waves-light ver-perfil-btn tooltipped"
+                                                        data-position="top" data-tooltip="Ver perfil" data-id="${row.id}">
+                                                    <i class="ri-eye-line"></i>
                                                 </button>
                                         `;
 
@@ -347,6 +355,13 @@
                                     });
                                 }
                             });
+                        });
+
+                        //Ver perfil del candidato
+                        jQuery('#candidatosTable').on('click', '.ver-perfil-btn', function () {
+                            var id = jQuery(this).data('id');
+
+                            window.location.href = `/admin/candidatos/perfil/${id}`;
                         });
                         
                         //Ir a formulario de registro de candidato

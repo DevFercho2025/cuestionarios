@@ -12,19 +12,36 @@ use function Ramsey\Uuid\v1;
 
 class CandidatoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     { 
-        return view('candidatos.index');
+        $conVacante = filter_var($request->input('conVacante', 0), FILTER_VALIDATE_BOOLEAN);
+
+        return view('candidatos.index', compact('conVacante'));
     }
 
     public function datatable(Request $request)
     {
         try {
+            $conVacante = filter_var($request->input('conVacante', 0), FILTER_VALIDATE_BOOLEAN);
+
             // Obtener candidatos con relaciones necesarias
-            $candidatos = User::with(['info', 'config.company', 'config.role'])
+            $candidatos = User::with(['info', 'config.role'])
             ->whereHas('config.role', function ($q) {
                 $q->whereNotIn('id', [1,2]);
             })->get();
+
+
+            $candidatos = User::with(['info', 'config.role'])
+            ->whereHas('config.role', function ($q) {
+                $q->whereNotIn('id', [1, 2]);
+            })
+            ->when($conVacante, function ($query) {
+                $query->whereHas('aplicaciones');
+            }, function ($query) {
+                $query->whereDoesntHave('aplicaciones');
+            })
+            ->get();
+
 
             //Formatear datos antes
             $candidatosData = $candidatos->map(function ($user) {
@@ -37,7 +54,7 @@ class CandidatoController extends Controller
                     'codigo_postal' => optional($user->info)->codigo_postal,
                     'celular' => optional($user->info)->celular,
                     'created_at' => $user->created_at ? $user->created_at->toDateTimeString() : null,
-                    'company_name' => optional($user->config->company)->nombre,
+                    //'company_name' => optional($user->config->company)->nombre,
                 ];
             });
 
@@ -54,8 +71,6 @@ class CandidatoController extends Controller
             ], 500);
         }
     }
-
-
 
     public function crearCandidato()
     {
@@ -174,8 +189,6 @@ class CandidatoController extends Controller
         }
     }
 
-
-
     public function destroy($id)
     {
         try {
@@ -209,7 +222,6 @@ class CandidatoController extends Controller
         }
     }
     
-
     public function generarCodigo()
     {
         //código alfanumérico de 10 caracteres
@@ -242,5 +254,16 @@ class CandidatoController extends Controller
                 'file' => $e->getFile()
             ], 500);
         }
+    }
+
+    public function verPerfil($id){
+
+        $candidato = User::with(['info', 'config.company', 'config.role', 'aplicaciones']) // Agrega aquí todas las relaciones que necesites
+        ->whereHas('config.role', function ($query) {
+            $query->whereNotIn('id', [1, 2]); // Excluye admins y superadmins
+        })
+        ->findOrFail($id);
+
+    return view('candidatos.perfil', compact('candidato'));
     }
 }
