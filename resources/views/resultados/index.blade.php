@@ -13,11 +13,7 @@
                     </div>
                 </form>
                 
-
-                <!-- Contenedor para mostrar los resultados (encabezado + tabla) -->
                 <div id="resultadosContainer"></div>
-
-                <!-- Contenedor para las gráficas por sección (opcional) -->
                 <div id="graficasContainer" class="mt-5"></div>
 
                 
@@ -32,14 +28,14 @@
 
     <script>
         $(document).ready(function(){
-            // Función para limpiar contenedores
+            //limpiar contenedores
             function clearDisplay() {
                 $("#resultadosContainer").empty();
                 $("#graficasContainer").empty();
                 $("#pdfContainer").empty();
             }
 
-            // Interceptar el submit del formulario
+            //Interceptar el submit del formulario
             $("#buscarResultadosForm").submit(function(e){
                 e.preventDefault();
                 clearDisplay();
