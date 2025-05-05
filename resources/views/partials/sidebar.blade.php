@@ -78,89 +78,89 @@
 </style>
     <ul class="menu-inner py-1">
         <!-- Dashboards -->
-        @if(auth()->user()->config?->role?->type === 'Admin')
-        <li class="menu-item">
-            <a href="{{ route('admin.index') }}" class="menu-link">
-                <div data-i18n="Inicio">Inicio</div>
-            </a>
-        </li>
-        <li class="menu-item active open">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons ri-user-line"></i>
-                <div data-i18n="Candidatos">Candidatos</div>
-            </a>
-            <ul class="menu-sub">
-                <form action="{{ route('candidatos.index') }}" method="POST">
-                    @csrf
+        @if((auth()->user()->config?->role?->type === 'Admin') || (auth()->user()->config?->role?->type === 'Super Admin'))
+            <li class="menu-item">
+                <a href="{{ route('admin.index') }}" class="menu-link">
+                    <div data-i18n="Inicio">Inicio</div>
+                </a>
+            </li>
+            <li class="menu-item active open">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons ri-user-line"></i>
+                    <div data-i18n="Candidatos">Candidatos</div>
+                </a>
+                <ul class="menu-sub">
+                    <form action="{{ route('candidatos.index') }}" method="POST">
+                        @csrf
+                        <li class="menu-item">
+                            <button type="submit" name="conVacante" value="1" class="menu-link" style="border: none; background-color: transparent;">
+                                <div data-i18n="+ Candidato con vacante">Candidato con vacante</div>
+                            </button>
+                        </li>
+                        <li class="menu-item">
+                            <button type="submit" name="conVacante" value="0" class="menu-link" style="border: none; background-color: transparent;">
+                                <div data-i18n="+ Candidato sin vacante">Candidato sin vacante</div>
+                            </button>
+                        </li>
+                    </form>
+                    
                     <li class="menu-item">
-                        <button type="submit" name="conVacante" value="1" class="menu-link" style="border: none; background-color: transparent;">
-                            <div data-i18n="+ Candidato con vacante">Candidato con vacante</div>
-                        </button>
+                        <a href="{{ route('evaluaciones.index') }}" class="menu-link">
+                            <div data-i18n="Códigos de acceso">Códigos de acceso</div>
+                        </a>
                     </li>
                     <li class="menu-item">
-                        <button type="submit" name="conVacante" value="0" class="menu-link" style="border: none; background-color: transparent;">
-                            <div data-i18n="+ Candidato sin vacante">Candidato sin vacante</div>
-                        </button>
+                        <a href="{{ route('resultados.index') }}" class="menu-link">
+                            <div data-i18n="Resultados">Ver resultados</div>
+                        </a>
                     </li>
-                </form>
+                </ul>
                 
-                <li class="menu-item">
-                    <a href="{{ route('evaluaciones.index') }}" class="menu-link">
-                        <div data-i18n="Códigos de acceso">Códigos de acceso</div>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="{{ route('resultados.index') }}" class="menu-link">
-                        <div data-i18n="Resultados">Ver resultados</div>
-                    </a>
-                </li>
-            </ul>
-            
-        </li>
+            </li>
 
-        <li class="menu-item active open">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons ri-survey-line"></i>
-                <div data-i18n="Evaluaciones">Evaluaciones</div>
-            </a>
-            <ul class="menu-sub">
-                <!--<li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <div data-i18n="Categorías">Cuestionarios</div>
-                    </a>
-                </li>-->
-                <li class="menu-item">
-                    <a href="{{ route('secciones.index') }}" class="menu-link">
-                        <div data-i18n="Secciones">Secciones</div>
-                    </a>
-                </li>
-                <li class="menu-item active open">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <i class="menu-icon tf-icons ri-questionnaire-line"></i> 
-                        <div data-i18n="Preguntas">Preguntas</div>
-                    </a>
-                    <ul class="menu-sub">
-                        <li class="menu-item">
-                            <a href="{{ route('preguntas.index') }}" class="menu-link">
-                                <div data-i18n="Preguntas que existen">Preguntas que existen</div>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="{{ route('respuestas.index') }}" class="menu-link">
-                                <div data-i18n="Respuestas que existen">Respuestas que existen</div>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="{{ route('respuestas_correctas.index') }}" class="menu-link">
-                                <div data-i18n="Solucionarios">Solucionarios</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-            
+            <li class="menu-item active open">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons ri-survey-line"></i>
+                    <div data-i18n="Evaluaciones">Evaluaciones</div>
+                </a>
+                <ul class="menu-sub">
+                    <!--<li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <div data-i18n="Categorías">Cuestionarios</div>
+                        </a>
+                    </li>-->
+                    <li class="menu-item">
+                        <a href="{{ route('secciones.index') }}" class="menu-link">
+                            <div data-i18n="Secciones">Secciones</div>
+                        </a>
+                    </li>
+                    <li class="menu-item active open">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="menu-icon tf-icons ri-questionnaire-line"></i> 
+                            <div data-i18n="Preguntas">Preguntas</div>
+                        </a>
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                <a href="{{ route('preguntas.index') }}" class="menu-link">
+                                    <div data-i18n="Preguntas que existen">Preguntas que existen</div>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{{ route('respuestas.index') }}" class="menu-link">
+                                    <div data-i18n="Respuestas que existen">Respuestas que existen</div>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{{ route('respuestas_correctas.index') }}" class="menu-link">
+                                    <div data-i18n="Solucionarios">Solucionarios</div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                
 
-        </li>
+            </li>
         @endif
     </ul>
 

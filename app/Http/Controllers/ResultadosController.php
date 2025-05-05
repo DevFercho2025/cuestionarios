@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Respuesta_Usuario;
 use App\Models\TokenEvaluacion;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Dompdf\Options;
 use App\Models\Aplicacion;
 use Dompdf\Dompdf;
@@ -117,18 +117,12 @@ class ResultadosController extends Controller
         ];
 
         $html = view('pdf.resultados', compact('usuario', 'aplicacion', 'respuestas', 'metricas'));
-        //agregar tras lo último de la vista
         $dompdf = PDF::loadHtml($html);
         $dompdf->setPaper('A4','portrait');
         $dompdf->render();
 
-        return $dompdf->download("Resultados_token_{$token->token}.pdf");
-
-        //$pdf = Pdf::loadView('pdf.resultados', compact('usuario', 'aplicacion', 'respuestas'));
-        //$pdf = PDF::loadHTML($html);
-        //$pdf->render();
-        //return $pdf->download("resultados_token_{$token->id}.pdf");
-        //return view('pdf.resultados', compact('usuario', 'aplicacion', 'respuestas', 'metricas'));
+        return $dompdf->stream(); //ver en el navegador
+        //return $dompdf->download("Resultados_token_{$token->token}.pdf");
     }
 
     function obtenerDescripcion($titulo, $puntuacion){

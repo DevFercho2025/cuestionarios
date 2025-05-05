@@ -4,63 +4,117 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Resultados</title>
         <link rel="stylesheet" href="{{ public_path('assets/css/pdf.css') }}">
+        <link rel="stylesheet" href="{{ asset('assets/css/pdf.css') }}">
         <!--Para dompdf, cambiar asset en los src por public_path-->
+        <!--<style>
+            .page-break {
+                page-break-after: always;
+            }
+        </style>-->
 </head>
 <body>
-    <div class="header">
-        <img  class="logo-empresa" src="{{ asset('storage/logos/logoAlobri.jpeg') }}">
-        <div class="slogan"><span>Ensuring Personnel Integrity</span></div>
+    <div id="header">
+        <div class="header-izq">
+            <img class="logo-empresa" src="{{ public_path('storage/logos/logoAlobri.jpeg') }}">
+        </div>
+        <div class="header-der">
+            <span>Ensuring Personnel Integrity</span>
+        </div>
+    </div>
+
+    <div id="footer">
+        <div class="footer-izq">
+            <span class="fecha">{{ now()->format('d/m/Y') }}</span>
+        </div>
+        <div class="footer-der">
+            <span class="paginado">página 1 de 5</span>
+        </div>        
     </div>
 
     <div class="content">
-        <div class="fondo">
             <section class="pagina-uno">
-                <div class="titulo-test">IntegriTest</div>
+
+                <div class="ti">
+                    <table>
+                        <tr>
+                            <td class="deco-td">
+                                <div class="titulo-test">IntegriTEST</div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
                 <div class="contenedor-seccion seccion-1">
-                    <div>
-                        <img class="foto-candidato" src="{{ asset('storage/logos/logoAlobri.jpeg') }}">
-                    </div>
-                    
-                    <div>
-                        <p><strong>Nombre:</strong> {{ $usuario->name }}</p>
-                        <p><strong>RFC:</strong> {{ $usuario->rfc ?? '---' }}</p>
-                        <p><strong>Fecha:</strong> {{ now()->format('d/m/Y') }}</p>
-                    </div>
-                    <div>
-                        <p><strong>Cuenta:</strong> <!--{//{ $aplicacion->cuenta ?? '---' }}--></p>
-                        <p><strong>Cargo:</strong> {{ $aplicacion->cargo_aplicado ?? '---' }}</p>
-                        <p><strong>Idioma:</strong> Español</p>
-                    </div>
+                    <table class="tabla-datos-candidato">
+                        <tr>
+                            <td class="columna-candidato">
+                                <img class="foto-candidato" src="{{ public_path('storage/logos/logoAlobri.jpeg') }}">
+                            </td>
+                            
+                            <td class="columna-candidato">
+                                <div>
+                                    <p><strong>Nombre</strong> <br>{{ $usuario->name }}</p>
+                                    <p><strong>RFC:</strong> {{ $usuario->rfc ?? '---' }}</p>
+                                    <p><strong>Fecha:</strong> {{ now()->format('d/m/Y') }}</p>
+                                </div>
+                            </td>
+                            <td class="columna-divisor">
+                                <div class="divisor-vertical-info-candidato"></div>
+                            </td>
+                            <td class="columna-candidato">
+                                <div>
+                                    <p><strong>Cuenta:</strong> <!-- {{ $aplicacion->cuenta ?? '---' }} --></p>
+                                    <p><strong>Cargo:</strong> {{ $aplicacion->cargo_aplicado ?? '---' }}</p>
+                                    <p><strong>Idioma:</strong> Español</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
-    
+                
                 <div class="contenedor-seccion seccion-2">
-                    <div class="puntuacion-general">
-                        <div>
-                            <img  class="icono-puntuacion" src="{{ asset('storage/logos/logoAlobri.jpeg') }}">
-                            <span>Puntuación general</span>
-                        </div>
-                        <div class="calificadores">
-                            <ul style="list-style: none; padding: 0;">
-                                <li><span style="color: green;">■</span> Recomendado</li>
-                                <li><span style="color: #a6d96a;">■</span> Se requiere aclaración</li>
-                                <li><span style="color: orange;">■</span> Marginal</li>
-                                <li><span style="color: red;">■</span> No recomendado</li>
-                                <li><span style="color: black;">■</span> Sin resultados</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="grafico">
-                        <img  class="icono-puntuacion" src="{{ asset('storage/logos/logoAlobri.jpeg') }}">
-                        <span>Comparación</span>
-                        <img  class="grafica-comparacin" src="{{ asset('storage/logos/logoAlobri.jpeg') }}">
-                    </div>
-                    <div class="resumen">
-                        <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                        </p>
-                    </div>
-                </div>
-    
+
+                    <table style="width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 10px; margin: 10px; padding: 10px; font-family: sans-serif;">
+                        <tr>
+                          <!-- Columna: Puntuación general -->
+                          <td style="width: 50%; vertical-align: top; padding: 10px;">
+                            <div class="puntuacion-general">
+                              <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px; vertical-align: middle;">
+                              <strong>Puntuación general</strong>
+                            </div>
+                            <div class="calificadores">
+                                <ul style="list-style: none; padding: 0;">
+                                    <li><span style="color: green;">■</span> Recomendado</li>
+                                    <li><span style="color: #a6d96a;">■</span> Se requiere aclaración</li>
+                                    <li><span style="color: orange;">■</span> Marginal</li>
+                                    <li><span style="color: red;">■</span> No recomendado</li>
+                                    <li><span style="color: black;">■</span> Sin resultados</li>
+                                </ul>
+                            </div>
+                          </td>
+                      
+                          <!-- Columna: Gráfico -->
+                          <td style="width: 50%; vertical-align: top; text-align: center; padding: 10px;">
+                            <div>
+                              <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                              <div style="font-weight: bold; margin: 5px 0;">Comparación</div>
+                              <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 100%; max-width: 200px;">
+                            </div>
+                          </td>
+                        </tr>
+                      
+                        <!-- Fila completa: Resumen -->
+                        <tr>
+                          <td colspan="2" style="padding: 10px; font-size: 14px; text-align: justify;">
+                            <p>
+                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                      
                 <div class="contenedor-seccion seccion-3">
                     <div>
                         <img  class="icono-puntuacion" src="{{ asset('storage/logos/logoAlobri.jpeg') }}">
@@ -95,7 +149,6 @@
                 </div>
     
             </section>
-            
             <section class="pagina-dos">
                 <div class="contenedor-seccion">
                     <img  class="icono-seccion-metrica" src="{{ asset('storage/logos/logoAlobri.jpeg') }}">
@@ -138,7 +191,7 @@
                     @endforeach
                 </div>
             </section>
-    
+            <!--<div class="page-break"></div>-->
             <section class="pagina-tres">
                     <div class="contenedor-s experiencia">
                         <img  class="icono-informe" src="{{ asset('storage/logos/logoAlobri.jpeg') }}">
@@ -191,7 +244,6 @@
                         <div class="circulo rojo"></div>
                     </div>-->
             </section>
-        </div>
 
         <div class="contenedor-seccion nota">
             <p>La información adjunta es confidencial y solo debe compartirse con las partes autorizadas. <br>
@@ -199,18 +251,20 @@
                 Estos resultados deberían utilizarse como una herramienta de soporte en la toma de decisiones, mas no como la única base para tomar decisiones de selección.
             </p>
         </div>
-        <div class="deco">
-            <div class="circulo azul-oscuro"></div>
-            <div class="circulo azul-claro"></div>
-            <div class="circulo azul"></div>
-            <div class="circulo rojo"></div>
-        </div>'
+        <div class="deco-final"></div>
+        <table class="deco-table">
+            <tr>
+                <td class="deco-td"><div class="circulo azul-oscuro"></div></td>
+                <td class="deco-td"><div class="circulo azul-claro"></div></td>
+                <td class="deco-td"><div class="circulo azul"></div></td>
+                <td class="deco-td"><div class="circulo rojo"></div></td>
+            </tr>
+        </table>
+        
+        
     </div>
 
-    <div class="footer">
-        <span>{{ now()->format('d/m/Y') }}</span>
-        <span>página 1 de 5</span>
-    </div>
+    
     
     <!--
         <h1>Informe de Resultados</h1>
