@@ -19,6 +19,38 @@ class UsuarioController extends Controller
         return view('admin.users.create');
     }
 
+    public function datatable(Request $request)
+    {
+        $usuarios = User::with(['config.role', 'config.company'])
+        ->whereHas('config.role', function ($q) {
+            $q->whereNotIn('id', [0]);
+        })->get();
+
+        $usuariosData = $usuarios->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'rol' => optional(optional($user->config)->role)->name,
+                'company_name' => optional($user->config->company)->nombre,
+                'created_at' => $user->created_at ? $user->created_at->toDateTimeString() : null,
+                'updated_at' => $user->updated_at ? $user->updated_at->toDateTimeString() : null,
+            ];
+        });
+
+        return response()->json(['data' => $usuariosData]);
+    }
+
+    public function show($id)
+    {
+        $usuario = User::with(['config.role', 'config.company'])
+        ->whereHas('config.role', function ($q) {
+            $q->whereNotIn('id', [0]);
+        })->findOrFail($id);
+    
+        return response()->json($usuario);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -44,21 +76,24 @@ class UsuarioController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $id,
-            'password' => 'nullable|string|min:8|confirmed',
+
+        $usuario = User::where('id', $id)
+        ->whereHas('config.role', function ($query) {
+            $query->where('id', '!=', 0); //No candidatos
+        })
+        ->firstOrFail();
+
+        // Validación de los datos de User (nombre, email)
+        $validatedUser = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:users,email,' . $id,
         ]);
 
-        $user = User::findOrFail($id);
-        $user->update($request->all());
-
-        if ($request->password) {
-            $user->password = bcrypt($request->password);
-            $user->save();
+        // Actualizar el modelo User (name, email)
+        if (isset($validatedUser['name']) || isset($validatedUser['email'])) {
+            $usuario->update($validatedUser);
         }
-
-        return redirect()->route('admin.users.index')->with('success', 'Usuario actualizado exitosamente.');
+        return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente.');
     }
 
     public function destroy($id)
