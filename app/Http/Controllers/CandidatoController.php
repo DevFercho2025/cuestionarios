@@ -24,23 +24,18 @@ class CandidatoController extends Controller
         try {
             $conVacante = filter_var($request->input('conVacante', 0), FILTER_VALIDATE_BOOLEAN);
 
-            // Obtener candidatos con relaciones necesarias
             $candidatos = User::with(['info', 'config.role'])
             ->whereHas('config.role', function ($q) {
-                $q->whereNotIn('id', [1,2]);
-            })->get();
-
-
-            $candidatos = User::with(['info', 'config.role'])
-            ->whereHas('config.role', function ($q) {
-                $q->whereNotIn('id', [1, 2]);
+                $q->where('id','=', 0);
             })
-            ->when($conVacante, function ($query) {
+            ->when($conVacante, function ($query) { #Si es true, muestra candidatos con aplicaciones
                 $query->whereHas('aplicaciones');
             }, function ($query) {
                 $query->whereDoesntHave('aplicaciones');
             })
             ->get();
+            //agregar where para filtrar candidatos solamente de la compañía del usuario logueado
+            //generar servicio
 
 
             //Formatear datos antes
@@ -53,8 +48,7 @@ class CandidatoController extends Controller
                     'genero' => optional($user->info)->genero,
                     'codigo_postal' => optional($user->info)->codigo_postal,
                     'celular' => optional($user->info)->celular,
-                    'created_at' => $user->created_at ? $user->created_at->toDateTimeString() : null,
-                    //'company_name' => optional($user->config->company)->nombre,
+                    'created_at' => $user->created_at
                 ];
             });
 

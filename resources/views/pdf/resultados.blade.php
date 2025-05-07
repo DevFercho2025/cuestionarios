@@ -31,7 +31,7 @@
         </div>        
     </div>
 
-    <div class="content">
+    <div class="content" style="font-family: sans-serif;">
             <section class="pagina-uno">
 
                 <div class="ti">
@@ -73,38 +73,61 @@
                 
                 <div class="contenedor-seccion seccion-2">
 
-                    <table style="width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 10px; margin: 10px; padding: 10px; font-family: sans-serif;">
+                    <table style="width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 10px; margin: 10px;">
                         <tr>
                           <!-- Columna: Puntuación general -->
-                          <td style="width: 50%; vertical-align: top; padding: 10px;">
-                            <div class="puntuacion-general">
-                              <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px; vertical-align: middle;">
-                              <strong>Puntuación general</strong>
+                          <td style="width: 50%; vertical-align: top;">
+
+                            <div style="display: inline-block; text-align: left;">
+                                <table style="margin: 0 auto;">
+                                  <tr>
+                                    <td style="vertical-align: middle; padding-right: 10px;">
+                                      <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                                    </td>
+                                    <td style="vertical-align: middle;">
+                                      <div>Puntuación general</div>
+                                    </td>
+                                  </tr>
+                                </table>
                             </div>
                             <div class="calificadores">
-                                <ul style="list-style: none; padding: 0;">
-                                    <li><span style="color: green;">■</span> Recomendado</li>
-                                    <li><span style="color: #a6d96a;">■</span> Se requiere aclaración</li>
-                                    <li><span style="color: orange;">■</span> Marginal</li>
-                                    <li><span style="color: red;">■</span> No recomendado</li>
-                                    <li><span style="color: black;">■</span> Sin resultados</li>
+                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                    <li> <span class="circulo-calificador green"></span> Recomendado</li>
+                                    <li> <span  class="circulo-calificador lightgreen"></span> Se requiere aclaración</li>
+                                    <li> <span  class="circulo-calificador orange"></span> Marginal</li>
+                                    <li> <span  class="circulo-calificador red"></span> No recomendado</li>
+                                    <li> <span  class="circulo-calificador black"></span> Sin resultados</li>
                                 </ul>
                             </div>
                           </td>
                       
                           <!-- Columna: Gráfico -->
-                          <td style="width: 50%; vertical-align: top; text-align: center; padding: 10px;">
-                            <div>
-                              <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
-                              <div style="font-weight: bold; margin: 5px 0;">Comparación</div>
-                              <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 100%; max-width: 200px;">
+                          <td style="width: 50%; vertical-align: top; text-align: center;">
+                            <div style="text-align: center;">
+                                <div style="display: inline-block; text-align: left;">
+                                    <table style="margin: 0 auto;">
+                                      <tr>
+                                        <td style="vertical-align: middle; padding-right: 10px;">
+                                          <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                                        </td>
+                                        <td style="vertical-align: middle;">
+                                          <div>Comparación</div>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                </div>
+
+                                  <!-- Imagen de gráfica debajo -->
+                                <div style="margin-top: 10px;">
+                                    <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 100%; max-width: 200px;">
+                                </div>
                             </div>
                           </td>
                         </tr>
                       
                         <!-- Fila completa: Resumen -->
                         <tr>
-                          <td colspan="2" style="padding: 10px; font-size: 14px; text-align: justify;">
+                          <td colspan="2" style=" font-size: 14px; text-align: justify; padding-right: 20px">
                             <p>
                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                               Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
@@ -113,49 +136,113 @@
                             </p>
                           </td>
                         </tr>
-                      </table>
+                    </table>
+
+                </div>
                       
-                <div class="contenedor-seccion seccion-3">
-                    <div>
-                        <img  class="icono-puntuacion" src="{{ asset('storage/logos/logoAlobri.jpeg') }}">
-                        <span>Información de la prueba</span>
-                    </div>
-    
-                    <div class="informacion-prueba">
-                        <div style="flex: 1;">
-                            <p><strong>Correo electrónico:</strong> {{ $usuario->email }}</p>
-                            <p><strong>Número telefónico:</strong> {{ $usuario->telefono ?? '---' }}</p>
-                            <!--{//{ $token->created_at->format('d/m/Y H:i') }}-->
-                            <p><strong>Fecha de registro:</strong> </p>
-                            <p><strong>Fecha de Inicio de la Prueba:</strong> </p>
-                            <p><strong>Fecha de Finalización de la Prueba:</strong> </p>
-                        </div>
-                        <div style="flex: 1;">
-                            <p><strong>Decisión de contratación:</strong> {{ $aplicacion->nombre_evaluacion }}</p>
-                            <p><strong>Puntuación general:</strong> Se requiere aclaración</p>
-                            <p><strong>Tipo de prueba:</strong> Integridad</p>
-                            <p><strong>Nombre de la evalaución</strong> Integridad</p>
-                            <p><strong>Cuenta Principal</strong> Integridad</p>
-                        </div>
-                        <div style="flex: 1;">
-                            <p><strong>Tipo de registro:</strong> Reclutador</p>
-                            <p><strong>Registrado por:</strong> Web</p>
-                            <!--{//{ $token->created_at->format('d/m/Y H:i') }}-->
-                            <p><strong>Ingresando desde:</strong></p>
-                            <p><strong>Fecha de envío de la liga de pruebas:</strong> </p>
-                        </div>
+                <div class="contenedor-seccion seccion-3" style="padding-bottom: 133px;">
+                    <div style="display: inline-block; text-align: left;">
+                        <table style="margin: 0 auto;">
+                          <tr>
+                            <td style="vertical-align: middle; padding-right: 10px;">
+                              <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                            </td>
+                            <td style="vertical-align: middle;">
+                              <div>Información de la prueba</div>
+                            </td>
+                          </tr>
+                        </table>
                     </div>
                     
+                    <div class="informacion-prueba">
+                        <table class="tabla-info-prueba" style="font-size: 11">
+                            <tr>
+                                <td style="padding-right: 60px; padding-left:10px;">
+                                    <p><div style="color:darkcyan;">Correo electrónico:</div> {{ $usuario->email }}</p>
+                                </td>
+                                <td style="padding-right: 60px;">
+                                    <p><div style="color:darkcyan;">Decisión de contratación:</div> {{ $aplicacion->nombre_evaluacion ?? '---' }}</p></td>
+                                </td>
+                                <td >
+                                    <p><div style="color:darkcyan;">Tipo de registro:</div> Reclutador</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>  
+                                    <p><div style="color:darkcyan; padding-left:10px;">Número telefónico:</div> <span style="padding-left:10px;">{{ $usuario->info->celular ?? '---' }}</span></p>
+                                <td> 
+                                    <p><div style="color:darkcyan;">Puntuación general:</div> Se requiere aclaración</p>
+                                </td>
+                                <td>
+                                    <p><div style="color:darkcyan;">Registrado por:</div> Web</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><div style="color:darkcyan; padding-left:10px;">Fecha de registro:</div><span style="padding-left:10px;">{{ $usuario->created_at}}</span></p>
+                                </td>
+                                <td>
+                                    <p><div style="color:darkcyan;">Tipo de prueba:</div>Integridad</p>
+                                </td>
+                                <td>
+                                    <p><div style="color:darkcyan;">Ingresando desde:</div>Liga Remota</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><div style="color:darkcyan; padding-left:10px;">Fecha de Inicio de la Prueba:</div> <span style="padding-left:10px;">{{ $usuario->created_at}}</span></p>
+                                </td> 
+                                <td>
+                                    <p><div style="color:darkcyan;">Nombre de la evalaución</div> Integridad</p>
+                                </td>
+                                <td >
+                                    <p><div style="color:darkcyan;">Fecha de envío de la liga de pruebas:</div>{{ $usuario->created_at}}</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><div style="color:darkcyan; padding-right: 50px; padding-left:10px;">Fecha de Finalización de la Prueba:</div><span style="padding-left:10px;">{{ $usuario->created_at}}</span></p>
+                                </td>
+                                <td>
+                                    <p><div style="color:darkcyan;">Cuenta Principal</div> Integridad</p>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </div> 
                 </div>
-    
             </section>
+            <div class="page-break"></div>
+
+            
             <section class="pagina-dos">
-                <div class="contenedor-seccion">
-                    <img  class="icono-seccion-metrica" src="{{ asset('storage/logos/logoAlobri.jpeg') }}">
-                    <p>Puntuación por medida. Basado en normas de población relevante</p>
+                <div class="contenedor-seccion" style="margin-top:80px;">
+                    <div style="display: inline-block; text-align: left;">
+                        <table style="margin: 0 auto;">
+                          <tr>
+                            <td style="vertical-align: middle; padding-right: 10px;">
+                              <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                            </td>
+                            <td style="vertical-align: middle;">
+                              <div>Puntuación por medida. Basado en normas de población relevante</div>
+                            </td>
+                          </tr>
+                        </table>
+                    </div>
                     @foreach($metricas as $metrica)
                         <div class="contenedor-metrica">
-                            <h5>{{ $metrica['titulo']}}</h5>
+                            <h5 style="color:darkcyan; font-size:14;">{{ $metrica['titulo']}}</h5>
+
+                            <table class="tabla-seccion-metrica">
+                                <tr>
+                                  <td class="etiqueta-izq">{{ $metrica['etiqueta_izq'] }}</td>
+                                  <td class="separador izquierda"></td>
+                                  <td><img src="{{ url('/storage/logos/gradienteCalificador.jpeg') }} " style="height: 30px;"></td>
+                                  <td class="separador izquierda"></td>
+                                  <td class="etiqueta-der">{{ $metrica['etiqueta_der'] }}</td>
+                                </tr>
+                            </table>
+
                             <div class="seccion-metrica">
                                 <div class="linea-metrica">
                                     <div class="etiqueta-izq">{{ $metrica['etiqueta_izq'] }}</div>
@@ -191,7 +278,7 @@
                     @endforeach
                 </div>
             </section>
-            <!--<div class="page-break"></div>-->
+            
             <section class="pagina-tres">
                     <div class="contenedor-s experiencia">
                         <img  class="icono-informe" src="{{ asset('storage/logos/logoAlobri.jpeg') }}">

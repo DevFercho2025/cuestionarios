@@ -88,24 +88,22 @@
     width: 235px;
     margin: 0 auto;
     position: relative;
-    top: 37px;
+    top: 30px;
 }
 
-.titulo-test {
-    display: inline-block;
-    padding: 10px 60px;
-    background-color: #ffffff;
-    border-radius: 25px;
-    font-size: 24px;
-    font-weight: bold;
-}
+    .titulo-test {
+        display: inline-block;
+        padding: 10px 60px;
+        background-color: #ffffff;
+        border-radius: 25px;
+        font-size: 24px;
+        font-weight: bold;
+    }
 
 .contenedor-seccion {
-    display: flex;
     background-color: white;
-    justify-content: space-between;
-    gap: 20px;
-    margin: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
     border-radius: 10px;
     padding: 10px;
 }
@@ -154,36 +152,61 @@
         margin: 0 auto;
     }
 
+
+/*Segunda sección de puntuacion general*/
 .calificadores{
     padding: 20px; 
 }
 
-.calificadores ul {
-    padding: 0;
-    list-style: none;
-}
+    .calificadores ul {
+        padding: 0;
+        list-style: none;
+    }
 
-.calificadores li {
-    margin-bottom: 15px; 
-    display: flex;
-    align-items: center; 
-}
-.calificadores li span {
-    margin-right: 10px; 
-    font-size: 1.2em;
-}
-.grafica-comparacin {
+    .calificadores li {
+        margin-bottom: 15px; 
+        display: flex;
+        align-items: center; 
+    }
+
+    .circulo-calificador {
+        display: inline-block; 
+        width: 12px; 
+        height: 12px; 
+        border-radius: 50%; 
+        margin-right: 8px;
+    }
+
+    .green {
+        background-color: green;
+    }
+    .lightgreen {
+        background-color:  #a6d96a;
+    }
+    .orange {
+        background-color: orange;
+    }
+    .red {
+        background-color: red;
+    }
+    .black{
+        background-color: black;
+    }
+
+
+.grafica-comparacion {
     max-width: 100%; 
     width: 300px;
     height: auto;
     display: block;
     margin-top: 10px;
 }
+.contenedor-seccion.seccion-2 {
+    margin-top:20px;
+}
 
 .contenedor-seccion.seccion-3 {
-    display: flex;
-    flex-direction: column;
-    gap: 20px; 
+    margin-top:20px;
 }
 .contenedor-seccion.seccion-3 .informacion-prueba {
     display: flex;
@@ -251,8 +274,8 @@
     }
 
     .separador {
-        width: 3px;
-        height: 75px;  
+        width: 1px;
+        height: 65px;  
         background-color: #ccc;
     }
     .izquierda {

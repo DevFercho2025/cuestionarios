@@ -124,7 +124,7 @@ Route::group([
         Route::post('usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
         Route::put('usuarios/{id}', [UsuarioController::class, 'update'])->name('usuarios.update');
         Route::delete('usuarios/{id}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
-        Route::get('admin/usuarios/datatable', [UsuarioController::class, 'datatable'])->name('usuarios.datatable');
+        Route::get('admin/usuarios/datatable', [UsuarioController::class, 'datatable'])->name('admin.usuarios.datatable');
     });
 
 
