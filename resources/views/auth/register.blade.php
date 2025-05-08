@@ -113,6 +113,7 @@
                                   method="POST"
                                   action="{{ route('register.wizard.store') }}">
                                 @csrf
+
                                 <!-- Paso 1: Datos personales -->
                                 <div id="datos-personales" class="content">
                                     <div class="row g-5">
@@ -123,7 +124,7 @@
 
                                         <div class="col-sm-6">
                                             <div class="form-floating form-floating-outline">
-                                                <input type="text" id="input-firstname" name="firstname"
+                                                <input type="text" id="user-firstname" name="firstname"
                                                        class="form-control" placeholder="John"/>
                                                 <label for="user-firstname">Nombre</label>
                                             </div>
@@ -132,7 +133,7 @@
 
                                         <div class="col-sm-6">
                                             <div class="form-floating form-floating-outline">
-                                                <input type="text" id="input-lastname" name="lastname"
+                                                <input type="text" id="user-lastname" name="lastname"
                                                        class="form-control" placeholder="Doe"/>
                                                 <label for="user-lastname">Apellido</label>
                                             </div>
@@ -141,7 +142,7 @@
 
                                         <div class="col-sm-6">
                                             <div class="form-floating form-floating-outline">
-                                                <input type="email" id="input-email" name="email" class="form-control"
+                                                <input type="email" id="user-email" name="email" class="form-control"
                                                        placeholder="john.doe@example.com"/>
                                                 <label for="user-email">Correo electrónico</label>
                                             </div>
@@ -151,7 +152,7 @@
                                         <div class="col-sm-6 form-password-toggle">
                                             <div class="input-group input-group-merge">
                                                 <div class="form-floating form-floating-outline">
-                                                    <input type="password" id="input-password" class="form-control"
+                                                    <input type="password" id="user-password" class="form-control"
                                                            name="password"
                                                            placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                                                            aria-describedby="passwordToggler"/>
@@ -182,7 +183,7 @@
                                                 <i class="ri-arrow-left-line ri-16px me-sm-1"></i>
                                                 <span class="align-middle d-sm-inline-block d-none">Anterior</span>
                                             </button>
-                                            <button class="btn btn-primary btn-next" onclick="validateUserData()">
+                                            <button type="button" class="btn btn-primary btn-next" onclick="validateUserData()">
                                                 <span
                                                     class="align-middle d-sm-inline-block d-none me-sm-1">Siguiente</span>
                                                 <i class="ri-arrow-right-line ri-16px"></i>
@@ -192,8 +193,6 @@
                                 </div>
 
                                 <!-- Paso 2: Experiencia con software de reclutamiento -->
-                                <div id="experiencia-software" class="content">
-                                    <!-- Paso 2: Experiencia previa -->
                                     <div id="experiencia-software" class="content">
                                         <div class="row g-5">
                                             <div class="col-12">
@@ -250,12 +249,14 @@
                                             {{-- Navegación --}}
                                             <div class="col-12 d-flex justify-content-between mt-4">
                                                 <button
+                                                    type="button"
                                                     class="btn btn-outline-secondary btn-prev"
                                                     onclick="goToForm('datos-personales')">
                                                     <i class="ri-arrow-left-line ri-16px me-sm-1"></i>
                                                     <span class="align-middle d-sm-inline-block d-none">Anterior</span>
                                                 </button>
                                                 <button
+                                                    type="button"
                                                     class="btn btn-primary btn-next"
                                                     onclick="saveSelectionAndContinue('experiencia-software','servicios-seleccion')">
                                                     <span class="align-middle d-sm-inline-block d-none me-sm-1">Siguiente</span>
@@ -264,8 +265,6 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                </div>
 
                                 <!-- Paso 3: Selección de servicios -->
                                 <div id="servicios-seleccion" class="content">
@@ -387,12 +386,12 @@
                                         </div>
 
                                         <div class="col-12 d-flex justify-content-between mt-4">
-                                            <button class="btn btn-outline-secondary btn-prev"
+                                            <button type="button" class="btn btn-outline-secondary btn-prev"
                                                     onclick="goToForm('experiencia-software')">
                                                 <i class="ri-arrow-left-line ri-16px me-sm-1"></i>
                                                 <span class="align-middle d-sm-inline-block d-none">Anterior</span>
                                             </button>
-                                            <button class="btn btn-primary btn-next"
+                                            <button type="button" class="btn btn-primary btn-next"
                                                     onclick="checkOptionsAndContinue('servicios-seleccion', 'portales-conexion')">
                                                 <span
                                                     class="align-middle d-sm-inline-block d-none me-sm-1">Siguiente</span>
@@ -504,12 +503,12 @@
                                         </div>
 
                                         <div class="col-12 d-flex justify-content-between mt-4">
-                                            <button class="btn btn-outline-secondary btn-prev"
+                                            <button type="button" class="btn btn-outline-secondary btn-prev"
                                                     onclick="goToForm('servicios-seleccion')">
                                                 <i class="ri-arrow-left-line ri-16px me-sm-1"></i>
                                                 <span class="align-middle d-sm-inline-block d-none">Anterior</span>
                                             </button>
-                                            <button class="btn btn-primary btn-next"
+                                            <button type="button" class="btn btn-primary btn-next"
                                                     onclick="checkOptionsAndContinue('portales-conexion', 'empresa-industria')">
                                                 <span
                                                     class="align-middle d-sm-inline-block d-none me-sm-1">Siguiente</span>
@@ -653,12 +652,12 @@
                                         </div>
 
                                         <div class="col-12 d-flex justify-content-between mt-4">
-                                            <button class="btn btn-outline-secondary btn-prev"
+                                            <button type="button" class="btn btn-outline-secondary btn-prev"
                                                     onclick="goToForm('portales-conexion')">
                                                 <i class="ri-arrow-left-line ri-16px me-sm-1"></i>
                                                 <span class="align-middle d-sm-inline-block d-none">Anterior</span>
                                             </button>
-                                            <button class="btn btn-primary btn-next" id="btn-industry-next"
+                                            <button type="button" class="btn btn-primary btn-next" id="btn-industry-next"
                                                     onclick="validateIndustry()">
                                                 <span
                                                     class="align-middle d-sm-inline-block d-none me-sm-1">Siguiente</span>
@@ -757,12 +756,12 @@
                                         </div>
 
                                         <div class="col-12 d-flex justify-content-between mt-4">
-                                            <button class="btn btn-outline-secondary btn-prev"
+                                            <button type="button" class="btn btn-outline-secondary btn-prev"
                                                     onclick="goToForm('empresa-industria')">
                                                 <i class="ri-arrow-left-line ri-16px me-sm-1"></i>
                                                 <span class="align-middle d-sm-inline-block d-none">Anterior</span>
                                             </button>
-                                            <button class="btn btn-primary btn-next" id="btn-employees-next"
+                                            <button type="button" class="btn btn-primary btn-next" id="btn-employees-next"
                                                     onclick="validateEmployees()">
                                                 <span
                                                     class="align-middle d-sm-inline-block d-none me-sm-1">Siguiente</span>
@@ -854,7 +853,7 @@
                                             {{-- Otro cargo personalizado --}}
                                             <div class="mt-3">
                                                 <button
-
+                                                    type="button"
                                                     class="btn btn-outline-secondary btn-sm"
                                                     onclick="showCustomPositionInput();">
                                                     <i class="ri-add-line me-1"></i> Ninguna describe mi cargo
@@ -881,13 +880,13 @@
                                         {{-- Navegación --}}
                                         <div class="col-12 d-flex justify-content-between mt-5">
                                             <button
-
+                                                type="button"
                                                 class="btn btn-outline-secondary btn-prev"
                                                 onclick="goToForm('empresa-tamano')">
                                                 <i class="ri-arrow-left-line me-1"></i> Anterior
                                             </button>
                                             <button
-
+                                                type="submit"
                                                 class="btn btn-success btn-submit"
                                                 id="btn-company-next"
                                                 onclick="validateCompanyInfo()">
@@ -897,6 +896,19 @@
                                     </div>
                                 </div>
 
+                                <!--Inputs ocultos para guardar datos-->
+                                <input type="hidden" id="input-software_experience" name="software_experience">
+                                <input type="hidden" id="input-servicio" name="servicio">
+                                <input type="hidden" id="input-portal" name="portal">
+                                <input type="hidden" id="input-industry" name="industry">
+                                <input type="hidden" id="input-employees_count" name="employees_count">
+                                <input type="hidden" id="input-firstname" name="firstname">
+                                <input type="hidden" id="input-lastname" name="lastname">
+                                <input type="hidden" id="input-email" name="email">
+                                <input type="hidden" id="input-password" name="password">
+                                <input type="hidden" id="input-company_name" name="company_name">
+                                <input type="hidden" id="input-website" name="website">
+                                <input type="hidden" id="input-position" name="position">
                             </form>
                         </div>
                     </div>
@@ -1022,6 +1034,8 @@
     </div>
     </form>
     <!-- Scripts del wizard -->
+
+
     <script>
         // Variables para almacenar los datos del formulario
         let formData = {
@@ -1096,7 +1110,12 @@
             // Campos ocultos: rellenamos antes de enviar
             const form = document.getElementById('wizard-registro-form');
             form.addEventListener('submit', (e) => {
-                // Antes de enviar, volcamos formData en inputs ocultos
+                e.preventDefault();
+
+                if (!validateCompanyInfo()) {
+                    return; // Si la validación falla, no seguimos adelante
+                }
+
                 document.getElementById('input-software_experience').value = formData.software_experience;
                 document.getElementById('input-servicio').value = JSON.stringify(formData.servicio);
                 document.getElementById('input-portal').value = JSON.stringify(formData.portal);
@@ -1109,7 +1128,20 @@
                 document.getElementById('input-company_name').value = formData.company_name;
                 document.getElementById('input-website').value = formData.website;
                 document.getElementById('input-position').value = formData.position;
-                // Luego el formulario se envía normalmente
+
+                document.getElementById('registration-loader').style.display = 'flex';
+                setTimeout(() => {
+                    document.getElementById('registration-loader').style.display = 'none';
+
+                    form.submit();
+                }, 1000);
+
+                //Mostrar el resumen por 1 minuto
+                showSummaryModal();
+                setTimeout(() => {
+                    closeSummaryModal();
+                }, 60000);
+
             });
 
             // ——————————————————————————————————————————————————————————
@@ -1274,13 +1306,53 @@
             formData.website = wb ? 'https://' + wb : '';
             formData.position = pos;
 
-            // Desplegar loader y luego disparar submit real
-            document.getElementById('registration-loader').style.display = 'flex';
-            setTimeout(() => {
-                document.getElementById('registration-loader').style.display = 'none';
-                // ahora sí enviamos el formulario al servidor
-                document.getElementById('wizard-registro-form').submit();
-            }, 500);
+            //Rellenar datos de resumen antes del submit real
+            document.getElementById('summary-name').innerText = formData.firstname + " " + formData.lastname;
+            document.getElementById('summary-email').innerText = formData.email;
+            document.getElementById('summary-company').innerText = formData.company_name;
+            document.getElementById('summary-website').innerText = formData.website;
+            document.getElementById('summary-industry').innerText = formData.industry;
+            document.getElementById('summary-employees').innerText = formData.employees_count;
+            document.getElementById('summary-position').innerText = formData.position;
+            //No incluye portal, servicio, ni software_experience.* Por verificar
+
+            return true;
+
+        }
+
+        //Mostrar modal de resumen
+        function showSummaryModal() {
+            const modal = document.getElementById('registration-summary-modal');
+
+            // Mostrar modal
+            modal.classList.add('show');
+            modal.style.display = 'block';
+            modal.removeAttribute('aria-hidden');
+            modal.setAttribute('aria-modal', 'true');
+
+            // Crear y agregar backdrop
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'custom-modal-backdrop';
+            document.body.appendChild(backdrop);
+
+            // Evitar scroll
+            document.body.classList.add('modal-open');
+        }
+
+
+        // Función para cerrar el modal de resumen
+        function closeSummaryModal() {
+            const modal = document.getElementById('registration-summary-modal');
+            modal.classList.remove('show');
+            modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+
+            // Eliminar backdrop
+            const backdrop = document.getElementById('custom-modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
         }
     </script>
 

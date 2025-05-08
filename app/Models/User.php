@@ -45,9 +45,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    
-    public $timestamps = false;
-    
+
+    public $timestamps = true;
+
     public function config()
     {
         return $this->hasOne(ConfigUser::class, 'user_id');
@@ -86,7 +86,7 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Categoria::class, 'psico_alobri_usuarios_categorias', 'user_id', 'categorias_id');
     }
-    
 
-    
+
+
 }

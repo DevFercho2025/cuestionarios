@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\User;
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -23,10 +26,10 @@ class AuthController extends Controller
     {
         $data = $request->validate([
             // paso 1
-            'firstname'           => 'required|string|max:50',
-            'lastname'            => 'required|string|max:50',
-            'email'               => 'required|email|unique:users,email',
-            'password'            => 'required|string|min:8',
+            'firstname'           => 'required|string|max:50', #
+            'lastname'            => 'required|string|max:50', #
+            'email'               => 'required|email|unique:users,email', #
+            'password'            => 'required|string|min:8', #
             // paso 2
             'software_experience' => 'required|in:0,1',
             // paso 3
@@ -34,57 +37,64 @@ class AuthController extends Controller
             // paso 4
             'portal'              => 'nullable|string', // JSON
             // paso 5 y 6
-            'industry'            => 'required|string',
-            'employees_count'     => 'required|string',
+            'industry'            => 'required|string', #
+            'employees_count'     => 'required|string', #
             // paso 7
-            'empresa_nombre'      => 'required|string|max:100',
-            'empresa_web'         => 'nullable|url',
-            'cargo'               => 'required|string',
+            'company_name'        => 'required|string|max:100', #
+            'website'             => 'nullable|url', #
+            'position'            => 'required|string', #
         ]);
+        Log::info('Datos recibidos en el formulario:', $request->all());
 
         // 1) Crear la empresa
-        $company = Company::create([
-            'name'            => $data['empresa_nombre'],
+        $company = new Company();
+        $company->fill([
+            'name'            => $data['company_name'],
             'description'     => null,
             'logo'            => null,
             'active'          => 1,
             'is_pisco_alobri' => 0,
+            'slug'            => null,
         ]);
+        $company->save();
 
         // 2) Crear usuario
-        $user = User::create([
+        $user = new User();
+        $user->fill([
             'name'       => "{$data['firstname']} {$data['lastname']}",
             'email'      => $data['email'],
             'password'   => Hash::make($data['password']),
-            'company_id' => $company->id,
         ]);
+        $user->save();
+
 
         // 3) Configuración del usuario
         $user->config()->create([
             'company_id'         => $company->id,
             'role_id'            => 1,
             'is_talentina_user'  => 0,
-            'is_psico_ser'       => 1,
-            'active'             => 1,
             'user_id'            => $user->id,
+            'is_psico_user'       => 1,
+            'active'             => 1,
         ]);
 
         // 4) Registrar el “Client” con los datos del wizard
-        Client::create([
+        $client = new Client();
+        $client->fill([
             'name'               => $user->name,
             'email'              => $user->email,
             'software_experience'=> $data['software_experience'],
-            'industry'           => $data['industry'],
-            'employee_count'     => $data['employees_count'],
-            'website'            => $data['empresa_web'],
+            'employees_count' => $data['employees_count'],
+            'industry'        => $data['industry'],
+            'website'         => $data['website'],
             'company_id'         => $company->id,
-            // … otros campos si quieres…
         ]);
+        $client->save();
 
-        // Finalmente, loguea al usuario o redirígelo
+        // Finalmente, loguea al usuario o rediríge
         auth()->login($user);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('admin.index');
     }
 
     public function login(Request $request)
