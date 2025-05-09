@@ -124,5 +124,12 @@ class CompanyController extends Controller
         return response()->json([
             'message' => 'Compañía eliminada exitosamente.',
             'company' => $company
-        ]);    }
+        ]);
+    }
+
+    public function all()
+    {
+        $companies = Company::all();
+        return response()->json($companies);
+    }
 }

@@ -99,7 +99,7 @@
                 try {
                     var table = jQuery('#usuariosTable').DataTable({
                         ajax: {
-                            url: "{{ route('admin.usuarios.datatable')}}",
+                            url: "{{ route('usuarios.datatable')}}",
                             dataSrc: 'data',
                             error: function (xhr, error, thrown) {
                                 console.error('Error en la carga de datos:', error, thrown);
@@ -130,13 +130,13 @@
                             {
                                 data: 'rol',
                                 render: function (data) {
-                                    return data ?? '-';
+                                    return data;
                                 }
                             },
                             {
                                 data: 'company_name',
                                 render: function (data) {
-                                    return data ?? '-';
+                                    return data;
                                 }
                             },
                             {
@@ -159,6 +159,10 @@
                                             <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
                                                     data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
                                                 <i class="ri-delete-bin-6-line"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-info waves-effect waves-light ver-perfil-btn tooltipped"
+                                                    data-position="top" data-tooltip="Ver perfil" data-id="${row.id}">
+                                                <i class="ri-eye-line"></i>
                                             </button>
                                     `;
 
@@ -200,7 +204,141 @@
                         document.body.appendChild(swalScript);
                     }
 
-                    
+                    // Crear Usuario
+                    jQuery("#crearUsuarioBtn").click(function () {
+                        if (typeof Swal === 'undefined') {
+                            alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
+                            return;
+                        }
+
+                        $.when(
+                            $.ajax({ url: "{{ route('companias.all') }}", type: "GET", dataType: "json" }),
+                            $.ajax({ url: "{{ route('roles.all') }}", type: "GET", dataType: "json" }),
+                        ).done(function (companiasData, rolesData) {
+                            let companias = companiasData[0];
+                            let roles = rolesData[0];
+                            let opcionesCompanias = '<option value="" disabled selected>Seleccione una compañía</option>';
+                            let opcionesRoles = '<option value="" disabled selected>Seleccione un rol</option>';
+
+                            $.each(companias, function (i, comp) {
+                                opcionesCompanias += `<option value="${comp.id}">${comp.name}</option>`;
+                            });
+
+                            $.each(roles, function (i, rol) {
+                                opcionesRoles += `<option value="${rol.id}">${rol.name}</option>`;
+                            });
+
+                            Swal.fire({
+                                html: `
+                                    <div class="col-md mb-6 mb-md-0">
+                                        <div class="card">
+                                            <h2 class="card-header">Crear Usuario</h2>
+                                            <div class="card-body">
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <input id="swal-name" type="text" class="form-control" placeholder="Nombre" required>
+                                                    <label for="swal-name">Nombre</label>
+                                                </div>
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <input id="swal-lastN" type="text" class="form-control" placeholder="Apellidos" required>
+                                                    <label for="swal-lastN">Apellidos</label>
+                                                </div>
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <input id="swal-email" type="email" class="form-control" placeholder="Correo" required>
+                                                    <label for="swal-email">Correo</label>
+                                                </div>
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <input id="swal-pass" type="password" class="form-control" placeholder="Contraseña provisional" required>
+                                                    <label for="swal-pass">Contraseña provisional</label>
+                                                </div>
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <select id="swal-compania" class="form-select">
+                                                        ${opcionesCompanias}
+                                                    </select>
+                                                    <label for="swal-compania">Compañía</label>
+                                                </div>
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <select id="swal-rol" class="form-select">
+                                                        ${opcionesRoles}
+                                                    </select>
+                                                    <label for="swal-rol">Rol</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `,
+                                showClass: { popup: 'animate__animated animate__fadeInDown' },
+                                hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+                                focusConfirm: false,
+                                confirmButtonText: 'Crear',
+                                confirmButtonColor: '#3d4e81',
+                                cancelButtonText: 'Cancelar',
+                                cancelButtonColor: '#d32f2f',
+                                showCancelButton: true,
+                                buttonsStyling: true,
+                                preConfirm: () => {
+                                    const companiaId = document.getElementById('swal-compania').value;
+                                    const rolId = document.getElementById('swal-rol').value;
+                                    const nombre = document.getElementById('swal-name').value;
+                                    const apellido = document.getElementById('swal-lastN').value;
+                                    const name = nombre + " " + apellido;
+                                    const email = document.getElementById('swal-email').value;
+                                    const pass = document.getElementById('swal-pass').value;
+
+                                    return {
+                                        name: name,
+                                        email: email,
+                                        password: pass,
+                                        compania_id: companiaId,
+                                        rol_id: rolId,
+                                        
+                                        _token: '{{ csrf_token() }}'
+                                    };
+                                }
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    jQuery.ajax({
+                                        url: "{{ route('usuarios.store') }}",
+                                        type: "POST",
+                                        data: result.value,
+                                        dataType: "json",
+                                        success: function (response) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: '¡Éxito!',
+                                                text: response.message || 'Usuario creado exitosamente.',
+                                                confirmButtonColor: '#3d4e81',
+                                                timer: 2000,
+                                                timerProgressBar: true,
+                                                background: '#262b3c',
+                                            });
+                                            reloadTable();
+                                        },
+                                        error: function (xhr) {
+                                            let errorMsg = 'No se pudo crear el usuario.';
+                                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                                errorMsg = xhr.responseJSON.message;
+                                            }
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Error',
+                                                text: errorMsg,
+                                                confirmButtonColor: '#d32f2f',
+                                                background: '#262b3c',
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }).fail(function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'No se pudieron cargar los roles o compañías.',
+                                confirmButtonColor: '#d32f2f',
+                            });
+                        });
+                    });
+
                     //hacer editable con doble clic
                     $(document).on('dblclick', '.editable', function () {
                         const span = $(this);
@@ -249,158 +387,8 @@
                         });
                     });
 
-
-                    // Crear Sección
-                    jQuery("#crearUsuarioBtn").click(function () {
-                        if (typeof Swal === 'undefined') {
-                            alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
-                            return;
-                        }
-
-                        // Primero obtenemos las categorías
-                        jQuery.ajax({
-                            url: "{{ route('categorias.all') }}",
-                            type: "GET",
-                            dataType: "json",
-                            success: function (categorias) {
-                                let options = '<option disabled selected>Selecciona una categoría</option>';
-                                categorias.forEach(categoria => {
-                                    options += `<option value="${categoria.id}">${categoria.titulo_cuestionario}</option>`;
-                                });
-
-                                Swal.fire({
-                                    html: `
-                                    <div class="col-md mb-6 mb-md-0">
-                                        <div class="card">
-                                            <h2 class="card-header">Crear Sección</h2>
-                                            <div class="card-body">
-                                                <div class="form-floating form-floating-outline mb-6">
-                                                    <input id="swal-titulo" type="text" class="form-control" placeholder="Título" required>
-                                                    <label for="swal-titulo">Título</label>
-                                                </div>
-                                                <div class="form-floating form-floating-outline mb-6">
-                                                    <input type="text" id="swal-bloque" class="form-control" placeholder="Bloque" required>
-                                                    <label for="swal-bloque">Bloque</label>
-                                                </div>
-                                                <div class="form-floating form-floating-outline mb-6">
-                                                    <select id="swal-categoria" class="form-control browser-default">
-                                                        ${options}
-                                                    </select>
-                                                    <label for="swal-categoria">Categoría</label>
-                                                </div>
-                                                <div class="form-floating form-floating-outline mb-6">
-                                                    <input type="text" id="swal-time_at" class="form-control" placeholder="Tiempo (hh:mm:ss)" value="00:00:00" required>
-                                                    <label for="swal-time_at">Tiempo (hh:mm:ss)</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    `,
-                                    showClass: { popup: 'animate__animated animate__fadeInDown' },
-                                    hideClass: { popup: 'animate__animated animate__fadeOutUp' },
-                                    focusConfirm: false,
-                                    confirmButtonText: 'Crear',
-                                    confirmButtonColor: '#3d4e81',
-                                    cancelButtonText: 'Cancelar',
-                                    cancelButtonColor: '#d32f2f',
-                                    showCancelButton: true,
-                                    buttonsStyling: true,
-                                    background: '#262b3c',
-                                    preConfirm: () => {
-                                        return {
-                                            titulo: document.getElementById('swal-titulo').value,
-                                            bloque: document.getElementById('swal-bloque').value,
-                                            categoria_id: document.getElementById('swal-categoria').value,
-                                            time_at: document.getElementById('swal-time_at').value,
-                                            _token: '{{ csrf_token() }}'
-                                        }
-                                    }
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        jQuery.ajax({
-                                            url: "{{ route('secciones.store') }}",
-                                            type: "POST",
-                                            data: result.value,
-                                            dataType: "json",
-                                            success: function (response) {
-                                                Swal.fire({
-                                                    icon: 'success',
-                                                    title: '¡Sección creada!',
-                                                    text: response.message,
-                                                    confirmButtonColor: '#3d4e81',
-                                                    timer: 2000,
-                                                    timerProgressBar: true,
-                                                    background: '#262b3c',
-                                                });
-                                                reloadTable();
-                                            },
-                                            error: function (xhr) {
-                                                let errorMsg = 'No se pudo crear la sección.';
-                                                if (xhr.responseJSON && xhr.responseJSON.message) {
-                                                    errorMsg = xhr.responseJSON.message;
-                                                }
-                                                Swal.fire({
-                                                    icon: 'error',
-                                                    title: 'Error',
-                                                    text: errorMsg,
-                                                    confirmButtonColor: '#d32f2f',
-                                                    background: '#262b3c',
-                                                });
-                                            }
-                                        });
-                                    }
-                                });
-
-                                $(document).on('input', '#swal-time_at', function (e) {
-                                    const input = $(this);
-                                    let value = input.val();
-                                    let cursorPosition = input.prop("selectionStart"); //Posición actual del cursor
-
-                                    //Filtra caracteres no válidos y mantiene sólo números y dos puntos
-                                    value = value.replace(/[^0-9:]/g, "");
-
-                                    //Divide el valor en partes (horas, minutos, segundos)
-                                    const partes = value.split(":");
-                                    const horas = partes[0]?.slice(0, 2) || "00";
-                                    const minutos = partes[1]?.slice(0, 2) || "00";
-                                    const segundos = partes[2]?.slice(0, 2) || "00";
-
-                                    //Reconstruye el valor con el formato correcto
-                                    const nuevoValor = `${horas}:${minutos}:${segundos}`;
-                                    input.val(nuevoValor);
-
-                                    //Ajuste de la posición del cursor según la cantidad de dígitos ingresados
-                                    if (cursorPosition <= 2) {
-                                        if (horas.length === 2 && cursorPosition === 2) {
-                                            cursorPosition = 3; // Mueve el cursor después del primer ":"
-                                        }
-                                    } else if (cursorPosition <= 5) {
-                                        if (minutos.length === 2 && cursorPosition === 5) {
-                                            cursorPosition = 6; // Mueve el cursor después del segundo ":"
-                                        }
-                                    } else if (cursorPosition <= 8) {
-                                        cursorPosition = Math.min(cursorPosition, 8);
-                                    }
-
-                                    // Ajusta el cursor para que se posicione correctamente
-                                    input.prop("selectionStart", cursorPosition);
-                                    input.prop("selectionEnd", cursorPosition);
-                                });
-
-
-                            },
-                            error: function () {
-                                M.toast({
-                                    html: '<i class="material-icons left">error</i> No se pudieron cargar las categorías',
-                                    classes: 'red rounded'
-                                });
-                            }
-                        });
-                    });
-
-
-                    // Eliminar Sección
-                    jQuery('#seccionesTable').on('click', '.delete-btn', function () {
+                    // Eliminar Candidato
+                    jQuery('#usuariosTable').on('click', '.delete-btn', function () {
                         if (typeof Swal === 'undefined') {
                             alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
                             return;
@@ -408,8 +396,8 @@
                         var id = jQuery(this).data('id');
 
                         Swal.fire({
-                            title: '¿Eliminar Sección?',
-                            text: "Esta acción no se puede deshacer",
+                            title: '¿Eliminar usuario?',
+                            text: "Este usuario dejará de existir y no podrá usar los servicios de Alobri.",
                             icon: 'warning',
                             showCancelButton: true,
                             confirmButtonColor: '#d32f2f',
@@ -422,14 +410,14 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 jQuery.ajax({
-                                    url: "/admin/secciones/" + id,
-                                    type: "DELETE",
+                                    url: `/admin/usuarios/${id}`,
+                                    method: "DELETE",
                                     data: {_token: '{{ csrf_token() }}'},
                                     dataType: "json",
                                     success: function (response) {
                                         Swal.fire({
                                             icon: 'success',
-                                            title: '¡Eliminada!',
+                                            title: '¡Eliminado!',
                                             text: response.message,
                                             confirmButtonColor: '#3d4e81',
                                             timer: 2000,
@@ -439,7 +427,7 @@
                                         reloadTable();
                                     },
                                     error: function (xhr) {
-                                        let errorMsg = 'No se pudo eliminar la sección.';
+                                        let errorMsg = 'No se pudo eliminar al usuario.';
                                         if (xhr.responseJSON && xhr.responseJSON.message) {
                                             errorMsg = xhr.responseJSON.message;
                                         }

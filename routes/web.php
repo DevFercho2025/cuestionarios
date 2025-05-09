@@ -118,13 +118,16 @@ Route::group([
         Route::put('companias/{id}', [CompanyController::class, 'update'])->name('companias.update');
         Route::delete('companias/{id}', [CompanyController::class, 'destroy'])->name('companias.destroy');
         Route::get('admin/companias/datatable', [CompanyController::class, 'datatable'])->name('companias.datatable');
+        Route::get('companias/all', [CompanyController::class, 'all'])->name('companias.all');
 
         //gestionar usuarios
         Route::get('usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
         Route::post('usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
         Route::put('usuarios/{id}', [UsuarioController::class, 'update'])->name('usuarios.update');
         Route::delete('usuarios/{id}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
-        Route::get('admin/usuarios/datatable', [UsuarioController::class, 'datatable'])->name('admin.usuarios.datatable');
+        Route::get('admin/usuarios/datatable', [UsuarioController::class, 'datatable'])->name('usuarios.datatable');
+        Route::get('roles/all', [UsuarioController::class, 'all'])->name('roles.all');
+
     });
 
 

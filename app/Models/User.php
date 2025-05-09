@@ -58,19 +58,6 @@ class User extends Authenticatable
         return $this->hasOne(UserInfo::class, 'user_id');
     }
 
-    public function company()
-    {
-        return $this->belongsTo(Company::class, 'id');
-    }
-
-
-    public function role()
-    {
-        return $this->belongsTo(Role::class)->withDefault([
-            'name' => 'Rol no asignado', //Valor por defecto si no hay rol
-        ]);
-    }
-
     public function isTalentinaUser()
     {
         return $this->config && $this->config->is_talentina_user;

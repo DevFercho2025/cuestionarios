@@ -48,8 +48,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.8/inputmask.min.js"></script>
 
-
-
 <script>
     if (typeof jQuery === 'undefined') {
         document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
@@ -102,7 +100,7 @@
         try {
             var table = $('#companiesTable').DataTable({
             ajax: {
-                url: "{{ route('companias.datatable') }}", // Asegúrate de que la URL sea correcta
+                url: "{{ route('companias.datatable') }}",
                 dataSrc: '',
                 error: function (xhr, error, thrown) {
                     console.error('Error en la carga de datos:', error, thrown);

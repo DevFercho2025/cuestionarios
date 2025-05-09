@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Role;
+use Illuminate\Support\Facades\Log;
 
 class UsuarioController extends Controller
 {
@@ -23,22 +25,22 @@ class UsuarioController extends Controller
     {
         $usuarios = User::with(['config.role', 'config.company'])
         ->whereHas('config.role', function ($q) {
-            $q->whereNotIn('id', [0]);
+            $q->where('id', '!=', 0);
         })->get();
 
-        $usuariosData = $usuarios->map(function ($user) {
+        $usuarios = $usuarios->map(function ($user) {
             return [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'rol' => optional(optional($user->config)->role)->name,
-                'company_name' => optional($user->config->company)->nombre,
-                'created_at' => $user->created_at ? $user->created_at->toDateTimeString() : null,
-                'updated_at' => $user->updated_at ? $user->updated_at->toDateTimeString() : null,
+                'rol' => $user->config->role->name ?? 'Rol no asignado',
+                'company_name' => $user->config->company->name ?? 'Sin empresa',
+                'created_at' => $user->created_at->format('Y-m-d H:i'),
+                'updated_at' => $user->updated_at->format('Y-m-d H:i'),
             ];
         });
-
-        return response()->json(['data' => $usuariosData]);
+        Log::debug('usuarios cargados', ['usuarios' => $usuarios]);
+        return response()->json(['data' => $usuarios]);
     }
 
     public function show($id)
@@ -101,6 +103,15 @@ class UsuarioController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'Usuario eliminado exitosamente.');
+        return response()->json([
+            'message' => 'Usuario eliminado exitosamente.',
+            'user' => $user
+        ]);
+    }
+
+    public function all()
+    {
+        $roles = Role::all();
+        return response()->json($roles);
     }
 }
