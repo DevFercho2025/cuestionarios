@@ -95,10 +95,10 @@
 
     </div>
     
+    
     <div class="row">
+      <!--Elemento pequeño (40%) -->
       <div class="col-md-5 col-xxl-4 mb-4">
-        <!-- Contenido del segundo -->
-        
           <div class="card h-100">
             <div class="card-header d-flex align-items-center justify-content-between">
               <h5 class="card-title m-0 me-2">Estadísticas de Vacantes</h5>
@@ -202,206 +202,226 @@
               </ul>
             </div>
           </div>
-        
-        <!--Termina Estadísticas de pruebas-->
-        
+          <!--Termina Estadísticas de pruebas-->
         <div class="row">
+          <!--Este row es importante-->
+        </div>
       </div>
-      </div>
+
       <!-- Elemento más grande (60%) -->
       <div class="col-md-7 col-xxl-8 mb-4">
         <!-- Contenido del primero -->
         <h4>Añade un candidato</h4>
-      <small class="text-light fw-medium">Validation</small>
-      <div id="wizard-validation" class="bs-stepper mt-2 linear">
-        <div class="bs-stepper-header">
-          <div class="step active" data-target="#account-details-validation">
-            <button type="button" class="step-trigger flex-lg-wrap gap-lg-2 px-lg-0" aria-selected="true">
-              <span class="bs-stepper-circle"><i class="ri-check-line"></i></span>
-              <span class="bs-stepper-label ms-lg-0">
-                <span class="d-flex flex-column gap-1 text-lg-center">
-                  <span class="bs-stepper-title">Account Details</span>
-                  <span class="bs-stepper-subtitle">Setup Account Details</span>
+        <div id="wizard-registro-candidato" class="bs-stepper mt-2 linear">
+          <div class="bs-stepper-header">
+
+            <div class="step" data-target="#identificacion">
+              <button type="button" class="step-trigger flex-lg-wrap gap-lg-2 px-lg-0">
+                <span class="bs-stepper-circle"><i class="ri-check-line"></i></span>
+                <span class="bs-stepper-label ms-lg-0">
+                  <span class="d-flex flex-column gap-1 text-lg-center">
+                    <span class="bs-stepper-title">Identificación</span>
+                    <span class="bs-stepper-subtitle">Nombre del candidato</span>
+                  </span>
                 </span>
-              </span>
-            </button>
+              </button>
+            </div>
+            <!-- aria-selected="false" o true-->
+            <div class="line mt-lg-n4 mb-lg-3"></div>
+            <div class="step" data-target="#detalles-personales">
+              <button type="button" class="step-trigger flex-lg-wrap gap-lg-2 px-lg-0">
+                <span class="bs-stepper-circle"><i class="ri-check-line"></i></span>
+                <span class="bs-stepper-label ms-lg-0">
+                  <span class="d-flex flex-column gap-1 text-lg-center">
+                    <span class="bs-stepper-title">Detalles</span>
+                    <span class="bs-stepper-subtitle">Otra información personal</span>
+                  </span>
+                </span>
+              </button>
+            </div>
+            
+            <div class="line mt-lg-n4 mb-lg-3"></div>
+            <div class="step" data-target="#contexto-adicional">
+              <button type="button" class="step-trigger flex-lg-wrap gap-lg-2 px-lg-0">
+                <span class="bs-stepper-circle"><i class="ri-check-line"></i></span>
+                <span class="bs-stepper-label ms-lg-0">
+                  <span class="d-flex flex-column gap-1 text-lg-center">
+                    <span class="bs-stepper-title">Contexto adicional</span>
+                    <span class="bs-stepper-subtitle">Añade ubicación y contacto</span>
+                  </span>
+                </span>
+              </button>
+            </div>
           </div>
-          <div class="line mt-lg-n4 mb-lg-3"></div>
-          <div class="step" data-target="#personal-info-validation">
-            <button type="button" class="step-trigger flex-lg-wrap gap-lg-2 px-lg-0" aria-selected="false" disabled="disabled">
-              <span class="bs-stepper-circle"><i class="ri-check-line"></i></span>
-              <span class="bs-stepper-label ms-lg-0">
-                <span class="d-flex flex-column gap-1 text-lg-center">
-                  <span class="bs-stepper-title">Personal Info</span>
-                  <span class="bs-stepper-subtitle">Add personal info</span>
-                </span>
-              </span>
-            </button>
-          </div>
-          <div class="line mt-lg-n4 mb-lg-3"></div>
-          <div class="step" data-target="#social-links-validation">
-            <button type="button" class="step-trigger flex-lg-wrap gap-lg-2 px-lg-0" aria-selected="false" disabled="disabled">
-              <span class="bs-stepper-circle"><i class="ri-check-line"></i></span>
-              <span class="bs-stepper-label ms-lg-0">
-                <span class="d-flex flex-column gap-1 text-lg-center">
-                  <span class="bs-stepper-title">Social Links</span>
-                  <span class="bs-stepper-subtitle">Add social links</span>
-                </span>
-              </span>
-            </button>
+
+
+          <div class="bs-stepper-content">
+            <form id="wizard-registro-candidato-form"
+              method="POST"
+              action="#">
+              @csrf
+
+              <!--Paso 1: Nombre del candidato-->
+              <div id="nombre-candidato" class="content dstepper-block fv-plugins-bootstrap5 fv-plugins-framework">
+                <div class="content-header mb-4">
+                  <h6 class="mb-0">Identificación</h6>
+                </div>
+
+                <div class="row g-5">
+                  <div class="col-sm-12 fv-plugins-icon-container">
+                    <div class="form-floating form-floating-outline">
+                      <input type="text" id="candidate-firstName" name="firstname"
+                             class="form-control" placeholder="Ingrese el nombre del candidato">
+                      <label for="candidate-firstName">Nombre</label>
+                    </div>
+                  <div id="firstname-error" class="invalid-feedback"></div></div>
+                  
+                  <div class="col-sm-6">
+                    <div class="input-group input-group-merge">
+                      <div class="form-floating form-floating-outline">
+                        <input type="text" id="candidate-lastname-1" name="lastname-1"
+                               class="form-control" placeholder="Ingrese el apellido paterno">
+                        <label for="candidate-lastname-1">Apellido Paterno</label>
+                      </div>
+                    </div>
+                  <div id="lastname-error" class="invalid-feedback"></div></div>
+                  
+                  <div class="col-sm-6">
+                    <div class="input-group input-group-merge">
+                      <div class="form-floating form-floating-outline">
+                        <input type="text" id="candidate-lastname-2" name="lastname-2"
+                               class="form-control" placeholder="Ingrese el apellido materno">
+                        <label for="candidate-lastname-2">Apellido Materno</label>
+                      </div>
+                      <span class="input-group-text cursor-pointer" id="NoAplica">N/A</span>
+                    </div>
+                  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+
+
+                  <div class="col-12 d-flex justify-content-between">
+                    <button class="btn btn-outline-secondary btn-prev waves-effect" disabled>
+                      <i class="ri-arrow-left-line me-sm-1 me-0"></i>
+                      <span class="align-middle d-sm-inline-block d-none">Anterior</span>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-next waves-effect waves-light" id="next-step-nombre">
+                      <span class="align-middle d-sm-inline-block d-none me-sm-1">Siguiente</span>
+                      <i class="ri-arrow-right-line"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Paso 2: Otros detalles personales -->
+              <div id="detalles-personales" class="content fv-plugins-bootstrap5 fv-plugins-framework">
+                <div class="content-header mb-4">
+                  <h6 class="mb-0">Detalles personales</h6>
+                </div>
+
+                <div class="row g-5">
+                  <div class="col-sm-12">
+                    <div class="form-floating form-floating-outline">
+                      <input type="email" id="user-email" name="email"
+                      class="form-control" placeholder="nombre@ejemplo.com"/>
+                      <label for="user-email">Correo electrónico</label>
+                    </div>
+                  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+
+                  <div class="col-sm-6 fv-plugins-icon-container">
+                    <div class="form-floating form-floating-outline mb-6">
+                        <select class="form-select" id="candidate-genero-legal" name="gen">
+                          <option selected="">Elija una opción</option>
+                          <option value="F">Femenino</option>
+                          <option value="M">Masculino</option>
+                        </select>
+                        <label for="candidate-genero-legal">Género Legal</label>
+                      </div>
+                  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+                  
+                  <div class="col-sm-6 fv-plugins-icon-container">
+                    <div class="form-floating form-floating-outline mb-6">
+                      <input  type="date" id="nacimiento-candidato" name="birthdate" class="form-control">
+                      <label for="nacimiento-candidato">Fecha de Nacimiento</label>
+                    </div>
+                  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+
+                 <div class="col-12 d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary btn-prev waves-effect"
+                      onclick="goToForm('nombre-candidato')">
+                      <i class="ri-arrow-left-line me-sm-1 me-0"></i>
+                      <span class="align-middle d-sm-inline-block d-none">Anterior</span>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-next waves-effect waves-light"
+                      onclick="saveDataAndContinue('detalles-personales','ubicacion-contacto')">
+                        <span class="align-middle d-sm-inline-block d-none me-sm-1">Siguiente</span>
+                        <i class="ri-arrow-right-line"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!--Paso 3: Ubicación y contacto -->
+              <div id="ubicación-contacto" class="content fv-plugins-bootstrap5 fv-plugins-framework">
+                <div class="content-header mb-4">
+                  <h6 class="mb-0">Contexto adicional</h6>
+                  <small>Ubicación y contacto</small>
+                </div>
+                <div class="row g-5">
+                  <div class="col-sm-12">
+                    <div class="form-floating form-floating-outline mb-6">
+                        <select class="form-select" id="pais-candidato" name="pais">
+                          <option selected="">Elija una opción</option>
+                          <option value="MX">México</option>
+                          <option value="US">Estados Unidos</option>
+                          <option value="ES">España</option>
+                          <option value="AR">Argentina</option>
+                          <option value="CO">Colombia</option>
+                          <option value="CL">Chile</option>
+                          <option value="PE">Perú</option>
+                        </select>
+                        <label for="pais-candidato">Pais</label>
+                      </div>
+                  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+                  
+
+                  <div class="col-sm-6">
+                    <div class="form-floating form-floating-outline">
+                      <input type="text" id="candidate-postalcode" name="postalcode"
+                      class="form-control" placeholder="Ingrese el código postal del candidato">
+                      <label for="candidate-postalcode">Código Postal</label>
+                    </div>
+                  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+
+
+                  <div class="col-sm-6">
+                    <div class="form-floating form-floating-outline">
+                      <div class="input-group input-group-merge">
+                        <span id="basic-icon-default-phone2" class="input-group-text"><i class="ri-phone-fill"></i></span>
+                        <input type="tel" id="candidate-cellphone" name="cellphone"
+                          pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '')"
+                          class="form-control" placeholder="Ingrese el celular del candidato">
+                      </div>
+                    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+                  </div>
+
+                 <div class="col-12 d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary btn-prev waves-effect"
+                      onclick="goToForm('detalles-personales')">
+                      <i class="ri-arrow-left-line me-sm-1 me-0"></i>
+                      <span class="align-middle d-sm-inline-block d-none">Anterior</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-next waves-effect waves-light"
+                        onclick="validateInfo()">
+                        <span class="align-middle d-sm-inline-block d-none me-sm-1">Siguiente</span>
+                        <i class="ri-arrow-right-line"></i>
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            </form>
           </div>
         </div>
-        <div class="bs-stepper-content">
-          <form id="wizard-validation-form" onsubmit="return false">
-            <!-- Account Details -->
-            <div id="account-details-validation" class="content active dstepper-block fv-plugins-bootstrap5 fv-plugins-framework">
-              <div class="content-header mb-4">
-                <h6 class="mb-0">Account Details</h6>
-                <small>Enter Your Account Details.</small>
-              </div>
-              <div class="row g-5">
-                <div class="col-sm-6 fv-plugins-icon-container">
-                  <div class="form-floating form-floating-outline">
-                    <input type="text" name="formValidationUsername" id="formValidationUsername" class="form-control" placeholder="johndoe">
-                    <label for="formValidationUsername">Username</label>
-                  </div>
-                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                <div class="col-sm-6 fv-plugins-icon-container">
-                  <div class="form-floating form-floating-outline">
-                    <input type="email" name="formValidationEmail" id="formValidationEmail" class="form-control" placeholder="john.doe@email.com" aria-label="john.doe">
-                    <label for="formValidationEmail">Email</label>
-                  </div>
-                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                <div class="col-sm-6 form-password-toggle fv-plugins-icon-container">
-                  <div class="input-group input-group-merge">
-                    <div class="form-floating form-floating-outline">
-                      <input type="password" id="formValidationPass" name="formValidationPass" class="form-control" placeholder="············" aria-describedby="formValidationPass2">
-                      <label for="formValidationPass">Password</label>
-                    </div>
-                    <span class="input-group-text cursor-pointer" id="formValidationPass2"><i class="ri-eye-off-line"></i></span>
-                  </div>
-                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                <div class="col-sm-6 form-password-toggle fv-plugins-icon-container">
-                  <div class="input-group input-group-merge">
-                    <div class="form-floating form-floating-outline">
-                      <input type="password" id="formValidationConfirmPass" name="formValidationConfirmPass" class="form-control" placeholder="············" aria-describedby="formValidationConfirmPass2">
-                      <label for="formValidationConfirmPass">Confirm Password</label>
-                    </div>
-                    <span class="input-group-text cursor-pointer" id="formValidationConfirmPass2"><i class="ri-eye-off-line"></i></span>
-                  </div>
-                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                <div class="col-12 d-flex justify-content-between">
-                  <button class="btn btn-outline-secondary btn-prev waves-effect" disabled="">
-                    <i class="ri-arrow-left-line me-sm-1 me-0"></i>
-                    <span class="align-middle d-sm-inline-block d-none">Previous</span>
-                  </button>
-                  <button class="btn btn-primary btn-next waves-effect waves-light">
-                    <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
-                    <i class="ri-arrow-right-line"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <!-- Personal Info -->
-            <div id="personal-info-validation" class="content fv-plugins-bootstrap5 fv-plugins-framework">
-              <div class="content-header mb-4">
-                <h6 class="mb-0">Personal Info</h6>
-                <small>Enter Your Personal Info.</small>
-              </div>
-              <div class="row g-5">
-                <div class="col-sm-6 fv-plugins-icon-container">
-                  <div class="form-floating form-floating-outline">
-                    <input type="text" id="formValidationFirstName" name="formValidationFirstName" class="form-control" placeholder="John">
-                    <label for="formValidationFirstName">First Name</label>
-                  </div>
-                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                <div class="col-sm-6 fv-plugins-icon-container">
-                  <div class="form-floating form-floating-outline">
-                    <input type="text" id="formValidationLastName" name="formValidationLastName" class="form-control" placeholder="Doe">
-                    <label for="formValidationLastName">Last Name</label>
-                  </div>
-                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                <div class="col-sm-6 fv-plugins-icon-container">
-                  <div class="form-floating form-floating-outline form-floating-select2">
-                    <div class="position-relative"><div class="position-relative"><select class="select2 select2-hidden-accessible" id="formValidationCountry" name="formValidationCountry" tabindex="-1" aria-hidden="true" data-select2-id="formValidationCountry">
-                      <option label=" " data-select2-id="27"></option>
-                      <option>UK</option>
-                      <option>USA</option>
-                      <option>Spain</option>
-                      <option>France</option>
-                      <option>Italy</option>
-                      <option>Australia</option>
-                    </select><span class="select2 select2-container select2-container--default" dir="ltr" data-select2-id="26" style="width: auto;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-disabled="false" aria-labelledby="select2-formValidationCountry-container"><span class="select2-selection__rendered" id="select2-formValidationCountry-container" role="textbox" aria-readonly="true"><span class="select2-selection__placeholder">Select value</span></span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span></div></div>
-                    <label for="formValidationCountry">Country</label>
-                  </div>
-                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                <div class="col-sm-6 fv-plugins-icon-container">
-                  <div class="form-floating form-floating-outline form-floating-bootstrap-select">
-                    <div class="dropdown bootstrap-select show-tick w-auto"><select class="selectpicker w-auto" id="formValidationLanguage" data-style="btn-transparent" data-tick-icon="ri-check-line text-white" name="formValidationLanguage" multiple="">
-                      <option>English</option>
-                      <option>French</option>
-                      <option>Spanish</option>
-                    </select><button type="button" tabindex="-1" class="btn dropdown-toggle bs-placeholder btn-transparent" data-bs-toggle="dropdown" role="combobox" aria-owns="bs-select-2" aria-haspopup="listbox" aria-expanded="false" title="Nothing selected" data-id="formValidationLanguage"><div class="filter-option"><div class="filter-option-inner"><div class="filter-option-inner-inner">Nothing selected</div></div> </div></button><div class="dropdown-menu "><div class="inner show" role="listbox" id="bs-select-2" tabindex="-1" aria-multiselectable="true"><ul class="dropdown-menu inner show" role="presentation"></ul></div></div></div>
-                    <label for="formValidationLanguage">Language</label>
-                  </div>
-                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                <div class="col-12 d-flex justify-content-between">
-                  <button class="btn btn-outline-secondary btn-prev waves-effect">
-                    <i class="ri-arrow-left-line me-sm-1 me-0"></i>
-                    <span class="align-middle d-sm-inline-block d-none">Previous</span>
-                  </button>
-                  <button class="btn btn-primary btn-next waves-effect waves-light">
-                    <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
-                    <i class="ri-arrow-right-line"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <!-- Social Links -->
-            <div id="social-links-validation" class="content fv-plugins-bootstrap5 fv-plugins-framework">
-              <div class="content-header mb-4">
-                <h6 class="mb-0">Social Links</h6>
-                <small>Enter Your Social Links.</small>
-              </div>
-              <div class="row g-5">
-                <div class="col-sm-6 fv-plugins-icon-container">
-                  <div class="form-floating form-floating-outline">
-                    <input type="text" name="formValidationTwitter" id="formValidationTwitter" class="form-control" placeholder="https://twitter.com/abc">
-                    <label for="formValidationTwitter">Twitter</label>
-                  </div>
-                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                <div class="col-sm-6 fv-plugins-icon-container">
-                  <div class="form-floating form-floating-outline">
-                    <input type="text" name="formValidationFacebook" id="formValidationFacebook" class="form-control" placeholder="https://facebook.com/abc">
-                    <label for="formValidationFacebook">Facebook</label>
-                  </div>
-                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                <div class="col-sm-6 fv-plugins-icon-container">
-                  <div class="form-floating form-floating-outline">
-                    <input type="text" name="formValidationGoogle" id="formValidationGoogle" class="form-control" placeholder="https://plus.google.com/abc">
-                    <label for="formValidationGoogle">Google+</label>
-                  </div>
-                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                <div class="col-sm-6 fv-plugins-icon-container">
-                  <div class="form-floating form-floating-outline">
-                    <input type="text" name="formValidationLinkedIn" id="formValidationLinkedIn" class="form-control" placeholder="https://linkedin.com/abc">
-                    <label for="formValidationLinkedIn">LinkedIn</label>
-                  </div>
-                <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
-                <div class="col-12 d-flex justify-content-between">
-                  <button class="btn btn-outline-secondary btn-prev waves-effect">
-                    <i class="ri-arrow-left-line me-sm-1 me-0"></i>
-                    <span class="align-middle d-sm-inline-block d-none">Previous</span>
-                  </button>
-                  <button class="btn btn-primary btn-next btn-submit waves-effect waves-light">Submit</button>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
       </div>
-      </div>
-    
       <!-- Elemento más pequeño (40%) -->
       
     </div>
@@ -547,272 +567,96 @@
             );
         });
 
-        const select2 = $('.select2'),
-          selectPicker = $('.selectpicker');
+        let formData = {
+            //info adicional candidato
+            genero_legal: null,
+            nacimiento: null,
+            pais: null,
+            codigo_postal: null,
+            telefono: null,
 
-        const wizardValidation = document.querySelector('#wizard-validation');
+            // Datos de usuario
+            firstname: null,
+            lastname: null,
+            email: null,
+            password: null,
+        };
 
-        if (typeof wizardValidation !== undefined && wizardValidation !== null) {
-          // Wizard form
-          const wizardValidationForm = wizardValidation.querySelector('#wizard-validation-form');
-          // Wizard steps
-          const wizardValidationFormStep1 = wizardValidationForm.querySelector('#account-details-validation');
-          const wizardValidationFormStep2 = wizardValidationForm.querySelector('#personal-info-validation');
-          const wizardValidationFormStep3 = wizardValidationForm.querySelector('#social-links-validation');
-          // Wizard next prev button
-          const wizardValidationNext = [].slice.call(wizardValidationForm.querySelectorAll('.btn-next'));
-          const wizardValidationPrev = [].slice.call(wizardValidationForm.querySelectorAll('.btn-prev'));
-
-          let validationStepper = new Stepper(wizardValidation, {
-            linear: true
-          });
-
-          // Account details
-          const FormValidation1 = FormValidation.formValidation(wizardValidationFormStep1, {
-            fields: {
-              formValidationUsername: {
-                validators: {
-                  notEmpty: {
-                    message: 'The name is required'
-                  },
-                  stringLength: {
-                    min: 6,
-                    max: 30,
-                    message: 'The name must be more than 6 and less than 30 characters long'
-                  },
-                  regexp: {
-                    regexp: /^[a-zA-Z0-9 ]+$/,
-                    message: 'The name can only consist of alphabetical, number and space'
-                  }
-                }
-              },
-              formValidationEmail: {
-                validators: {
-                  notEmpty: {
-                    message: 'The Email is required'
-                  },
-                  emailAddress: {
-                    message: 'The value is not a valid email address'
-                  }
-                }
-              },
-              formValidationPass: {
-                validators: {
-                  notEmpty: {
-                    message: 'The password is required'
-                  }
-                }
-              },
-              formValidationConfirmPass: {
-                validators: {
-                  notEmpty: {
-                    message: 'The Confirm Password is required'
-                  },
-                  identical: {
-                    compare: function() {
-                      return wizardValidationFormStep1.querySelector('[name="formValidationPass"]').value;
-                    },
-                    message: 'The password and its confirm are not the same'
-                  }
-                }
-              }
-            },
-            plugins: {
-              trigger: new FormValidation.plugins.Trigger(),
-              bootstrap5: new FormValidation.plugins.Bootstrap5({
-                // Use this for enabling/changing valid/invalid class
-                // eleInvalidClass: '',
-                eleValidClass: ''
-              }),
-              autoFocus: new FormValidation.plugins.AutoFocus(),
-              submitButton: new FormValidation.plugins.SubmitButton()
+      document.addEventListener('DOMContentLoaded', () => {
+        // Inicializar BS-Stepper
+        setTimeout(() => {
+          try {
+            const wizard = document.querySelector('#wizard-registro-candidato');
+            if (wizard) {
+              window.bsStepper = new window.Stepper(wizard, {linear: true});
+              Array.from(wizard.querySelectorAll('.btn-next'))
+              .filter(btn => !btn.hasAttribute('onclick'))
+              .forEach(btn => btn.addEventListener('click', () => window.bsStepper.next()));
+              Array.from(wizard.querySelectorAll('.btn-prev'))
+              .filter(btn => !btn.hasAttribute('onclick'))
+              .forEach(btn => btn.addEventListener('click', () => window.bsStepper.previous()));
             }
-            init: instance => {
-              instance.on('plugins.message.placed', function(e) {
-                //* Move the error message out of the `input-group` element
-                if (e.element.parentElement.classList.contains('input-group')) {
-                  e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
-                }
-              });
-            }
-          }).on('core.form.valid', function() {
-            // Jump to the next step when all fields in the current step are valid
-            validationStepper.next();
-          });
-
-          // Personal info
-          const FormValidation2 = FormValidation.formValidation(wizardValidationFormStep2, {
-            fields: {
-              formValidationFirstName: {
-                validators: {
-                  notEmpty: {
-                    message: 'The first name is required'
-                  }
-                }
-              },
-              formValidationLastName: {
-                validators: {
-                  notEmpty: {
-                    message: 'The last name is required'
-                  }
-                }
-              },
-              formValidationCountry: {
-                validators: {
-                  notEmpty: {
-                    message: 'The Country is required'
-                  }
-                }
-              },
-              formValidationLanguage: {
-                validators: {
-                  notEmpty: {
-                    message: 'The Languages is required'
-                  }
-                }
-              }
-            },
-            plugins: {
-              trigger: new FormValidation.plugins.Trigger(),
-              bootstrap5: new FormValidation.plugins.Bootstrap5({
-                // Use this for enabling/changing valid/invalid class
-                // eleInvalidClass: '',
-                eleValidClass: ''
-              }),
-              autoFocus: new FormValidation.plugins.AutoFocus(),
-              submitButton: new FormValidation.plugins.SubmitButton()
-            }
-          }).on('core.form.valid', function() {
-            // Jump to the next step when all fields in the current step are valid
-            validationStepper.next();
-          });
-
-          // Bootstrap Select (i.e Language select)
-          if (selectPicker.length) {
-            selectPicker.each(function() {
-              var $this = $(this);
-              $this.selectpicker().on('change', function() {
-                FormValidation2.revalidateField('formValidationLanguage');
-              });
-            });
+          } catch (err) {
+            console.error('Error al inicializar el stepper:', err);
           }
+        }, 500);
 
-          // Select 2 (i.e Country select)
-          if (select2.length) {
-            select2
-              .select2({
-                placeholder: 'Select an country'
-              })
-              .on('change.select2', function() {
-                // Revalidate the color field when an option is chosen
-                FormValidation2.revalidateField('formValidationCountry');
-              });
+        // Campos ocultos: rellenar antes de enviar
+        const form = document.getElementById('wizard-registro-form');
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (!validateInfo()) {
+            return; // Si la validación falla, no seguir
           }
+          form.submit();
+        });
+      });
 
-          // Social links
-          const FormValidation3 = FormValidation.formValidation(wizardValidationFormStep3, {
-            fields: {
-              formValidationTwitter: {
-                validators: {
-                  notEmpty: {
-                    message: 'The Twitter URL is required'
-                  },
-                  uri: {
-                    message: 'The URL is not proper'
-                  }
-                }
-              },
-              formValidationFacebook: {
-                validators: {
-                  notEmpty: {
-                    message: 'The Facebook URL is required'
-                  },
-                  uri: {
-                    message: 'The URL is not proper'
-                  }
-                }
-              },
-              formValidationGoogle: {
-                validators: {
-                  notEmpty: {
-                    message: 'The Google URL is required'
-                  },
-                  uri: {
-                    message: 'The URL is not proper'
-                  }
-                }
-              },
-              formValidationLinkedIn: {
-                validators: {
-                  notEmpty: {
-                    message: 'The LinkedIn URL is required'
-                  },
-                  uri: {
-                    message: 'The URL is not proper'
-                  }
-                }
-              }
-            },
-            plugins: {
-              trigger: new FormValidation.plugins.Trigger(),
-              bootstrap5: new FormValidation.plugins.Bootstrap5({
-                // Use this for enabling/changing valid/invalid class
-                // eleInvalidClass: '',
-                eleValidClass: ''
-              }),
-              autoFocus: new FormValidation.plugins.AutoFocus(),
-              submitButton: new FormValidation.plugins.SubmitButton()
-            }
-          }).on('core.form.valid', function() {
-            // You can submit the form
-            // wizardValidationForm.submit()
-            // or send the form data to server via an Ajax request
-            // To make the demo simple, I just placed an alert
-            alert('Submitted..!!');
-          });
-
-          wizardValidationNext.forEach(item => {
-            item.addEventListener('click', event => {
-              // When click the Next button, we will validate the current step
-              switch (validationStepper._currentIndex) {
-                case 0:
-                  FormValidation1.validate();
-                  break;
-
-                case 1:
-                  FormValidation2.validate();
-                  break;
-
-                case 2:
-                  FormValidation3.validate();
-                  break;
-
-                default:
-                  break;
-              }
-            });
-          });
-
-          wizardValidationPrev.forEach(item => {
-            item.addEventListener('click', event => {
-              switch (validationStepper._currentIndex) {
-                case 2:
-                  validationStepper.previous();
-                  break;
-
-                case 1:
-                  validationStepper.previous();
-                  break;
-
-                case 0:
-
-                default:
-                  break;
-              }
-            });
+      document.addEventListener('DOMContentLoaded', () => {
+        const nextButtonNombre = document.getElementById('next-step-nombre');
+        if (nextButtonNombre) {
+          nextButtonNombre.addEventListener('click', () => {
+            saveDataAndContinue('nombre-candidato', 'detalles-personales');
           });
         }
-        
-    </script>
+      });
+
+      function goToForm(formId) {
+        try {
+          if (!window.bsStepper) return;
+            const steps = Array.from(document.querySelectorAll('#wizard-registro-candidato .step'));
+            const idx = steps.findIndex(s => s.dataset.target === '#' + formId);
+          if (idx !== -1) window.bsStepper.to(idx + 1);
+        } catch (err) {
+          console.error('Stepper navigation error:', err);
+        }
+      }
+
+      window.saveDataAndContinue = function(cur, next) {
+        console.log('Guardando datos y avanzando:', cur, '→', next); 
+        let ok = true;
+        if (cur === 'nombre-candidato') {
+          const fn = document.getElementById('candidate-firstname').value.trim();
+          const ln = document.getElementById('candidate-lastname-1').value.trim();
+
+          document.getElementById('firstname-error').innerText = '';
+          document.getElementById('lastname-error').innerText = '';
+
+          if (!fn) {
+            document.getElementById('firstname-error').innerText = 'El nombre es obligatorio';
+            ok = false;
+          }
+          if (!ln) {
+            document.getElementById('lastname-error').innerText = 'El primer apellido es obligatorio';
+            ok = false;
+          }
+
+          formData.firstname = fn;
+          formData.lastname = ln;
+        }
+        goToForm(next);
+      }
+
+     
     <script src="../../assets/vendor/libs/bs-stepper/bs-stepper.js">
 @endsection
