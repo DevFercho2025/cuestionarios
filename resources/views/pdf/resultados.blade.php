@@ -229,23 +229,30 @@
                           </tr>
                         </table>
                     </div>
+                    @foreach($imagenesBase64 as $imagen)
+                                <div class="contenedor-metrica">
+                                    <img src="{{ $imagen }}" alt="Métrica Imagen" style="max-width:100%; height: auto; border: 1px solid #ccc;"/>
+                                </div>
+                            @endforeach
                     @foreach($metricas as $metrica)
-                        <div class="contenedor-metrica">
-                            <h5 style="color:darkcyan; font-size:14;">{{ $metrica['titulo']}}</h5>
+                        <!--<div class="contenedor-metrica">
+                                <h5 style="color:darkcyan; font-size:14;">{/{ $metrica['titulo']}}</h5>
 
                             <table class="tabla-seccion-metrica">
                                 <tr>
-                                  <td class="etiqueta-izq">{{ $metrica['etiqueta_izq'] }}</td>
+                                  <td class="etiqueta-izq">{/{ $metrica['etiqueta_izq'] }}</td>
                                   <td class="separador izquierda"></td>
-                                  <td><img src="{{ url('/storage/logos/gradienteCalificador.jpeg') }} " style="height: 30px;"></td>
+                                  <td><img src="{/{ url('/storage/logos/gradienteCalificador.jpeg') }} " style="height: 10px;"></td>
                                   <td class="separador izquierda"></td>
-                                  <td class="etiqueta-der">{{ $metrica['etiqueta_der'] }}</td>
+                                  <td class="etiqueta-der">{/{ $metrica['etiqueta_der'] }}</td>
                                 </tr>
-                            </table>
+                            </table>-->
 
-                            <div class="seccion-metrica">
-                                <div class="linea-metrica">
-                                    <div class="etiqueta-izq">{{ $metrica['etiqueta_izq'] }}</div>
+                            
+
+                           <!-- <div class="seccion-metrica" id="seccion-metrica">
+                                <div class="linea-metrica" style="width: 952px">
+                                    <div class="etiqueta-izq">{/{ $metrica['etiqueta_izq'] }}</div>
                                         <div class="contenedor">
                                             <div class="separador izquierda"></div>
                                                 <div class="linea">
@@ -262,19 +269,19 @@
                                                     <span>90</span>
                                                     <span>100</span>
                                                 </div>
-                                                <div class="puntuacion" style="left: {{ $metrica['puntuacion'] -1}}%;">
-                                                    {{ $metrica['puntuacion'] }}
+                                                <div class="puntuacion" style="left: {/{ $metrica['puntuacion'] -1}}%;">
+                                                    {/{ $metrica['puntuacion'] }}
                                                 </div>
                                                 </div>
                                             <div class="separador derecha"></div>
                                         </div>
-                                    <div class="etiqueta-der">{{ $metrica['etiqueta_der'] }}</div>
+                                    <div class="etiqueta-der">{/{ $metrica['etiqueta_der'] }}</div>
                                 </div>
                                 <div class="texto-metrica">
-                                    <p>{{ $metrica['descripcion'] }}</p>
+                                    <p>{/{ $metrica['descripcion'] }}</p>
                                 </div>
                             </div>
-                        </div>
+                        </div>-->
                     @endforeach
                 </div>
             </section>
@@ -347,37 +354,6 @@
                 <td class="deco-td"><div class="circulo rojo"></div></td>
             </tr>
         </table>
-        
-        
     </div>
-
-    
-    
-    <!--
-        <h1>Informe de Resultados</h1>
-
-        <p><strong>Nombre y apellidos:</strong> {//{ $usuario->name }}</p>
-        <p><strong>Correo:</strong> {//{ $usuario->email }}</p>
-        <p><strong>Vacante:</strong> {//{ $aplicacion->cargo_aplicado ?? '--' }}</p>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Pregunta</th>
-                    <th>Respuesta del Usuario</th>
-                    <th>Respuesta Correcta</th>
-                </tr>
-            </thead>
-            <tbody>
-                @//foreach ($respuestas as $respuesta)
-                    <tr>
-                        <td>{//{ $respuesta->pregunta->pregunta ?? 'N/A' }}</td>
-                        <td>{//{ $respuesta->respuesta->respuesta ?? 'Sin respuesta' }}</td>
-                        <td>{//{ $respuesta->respuestaCorrecta->respuesta->respuesta ?? 'N/A' }}</td>
-                    </tr>
-                @//endforeach
-            </tbody>
-        </table>
-    -->
 </body>
 </html>

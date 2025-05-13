@@ -7,9 +7,8 @@ use App\Models\User;
 use App\Models\Respuesta_Usuario;
 use App\Models\TokenEvaluacion;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
-use Dompdf\Options;
 use App\Models\Aplicacion;
-use Dompdf\Dompdf;
+use Illuminate\Support\Facades\Log;
 
 class ResultadosController extends Controller
 {
@@ -60,10 +59,8 @@ class ResultadosController extends Controller
         ]);
     }
 
-    
-    
 
-    public function exportarPDF($id)
+    public function renderizarMetricas($id)
     {
         $token = TokenEvaluacion::findOrFail($id);
         $usuario = User::findOrFail($token->user_id);
@@ -116,11 +113,78 @@ class ResultadosController extends Controller
             ]
         ];
 
-        $html = view('pdf.resultados', compact('usuario', 'aplicacion', 'respuestas', 'metricas'));
+        return view('pdf.imagenes_reporte', compact('metricas'))->render(); #vista parcial con las gráficas
+    }
+
+    public function recibirImagenes(Request $request, $id)
+    {
+        $imagenesBase64 = $request->input('imagenes', []);
+
+        session(["imagenes_pdf_{$id}" => $imagenesBase64]);
+        return response()->json(['ok' => true]);
+    }
+    
+    public function exportarPDF($id)
+    {
+        $token = TokenEvaluacion::findOrFail($id);
+        $imagenesBase64 = session("imagenes_pdf_{$id}", []);
+        $usuario = User::findOrFail($token->user_id);
+        $aplicacion = Aplicacion::where('user_id', $usuario->id)->first();
+
+        $respuestas = Respuesta_Usuario::with([
+            'pregunta',
+            'respuesta',
+            'respuestaCorrecta.respuesta'
+        ])
+            ->where('user_id', $usuario->id)
+            ->where('token_id', $token->id)
+            ->get();
+
+        $puntuaciones = [
+            'Veracidad' => 75,
+            'Robo' => 60,
+            'Normas' => 75,
+            'Drogas y alcohol' => 75,
+        ];
+
+        $metricas = [
+            [
+                'titulo' => 'Veracidad',
+                'puntuacion' => $puntuaciones['Veracidad'],
+                'etiqueta_izq' => 'Tiende a falsear informes',
+                'etiqueta_der' => 'Dice la verdad',
+                'descripcion' => $this->obtenerDescripcion('Veracidad', $puntuaciones['Veracidad'])
+            ],
+            [
+                'titulo' => 'Robo',
+                'puntuacion' => $puntuaciones['Robo'],
+                'etiqueta_izq' => 'Tiende a cometer robos de bienes/dinero',
+                'etiqueta_der' => 'Respeta los bienes de la organización',
+                'descripcion' => $this->obtenerDescripcion('Robo', $puntuaciones['Robo'])
+            ],
+            [
+                'titulo' => 'Normas',
+                'puntuacion' => $puntuaciones['Normas'],
+                'etiqueta_izq' => 'Tiende a violar normas, leyes y reglamentos',
+                'etiqueta_der' => 'Respeta normas, leyes y reglamentos',
+                'descripcion' => $this->obtenerDescripcion('Normas', $puntuaciones['Normas'])
+            ],
+            [
+                'titulo' => 'Drogas y alcohol',
+                'puntuacion' => $puntuaciones['Drogas y alcohol'],
+                'etiqueta_izq' => 'Tiende a trabajar bajo la influencia de drogas',
+                'etiqueta_der' => 'No tiende a trabajar bajo la influencia de drogas',
+                'descripcion' => $this->obtenerDescripcion('Drogas y alcohol', $puntuaciones['Drogas y alcohol'])
+            ]
+        ];
+
+        $html = view('pdf.resultados', compact('usuario', 'aplicacion', 'respuestas', 'metricas', 'imagenesBase64'));
         $dompdf = PDF::loadHtml($html);
+        $dompdf->set_option('isHtml5ParserEnabled', true);
+        $dompdf->set_option('isPhpEnabled', true);
         $dompdf->setPaper('A4','portrait');
         $dompdf->render();
-
+        //return view('pdf.resultados', compact('usuario', 'aplicacion', 'respuestas', 'metricas', 'imagenesBase64'));
         return $dompdf->stream(); //ver en el navegador
         //return $dompdf->download("Resultados_token_{$token->token}.pdf");
     }

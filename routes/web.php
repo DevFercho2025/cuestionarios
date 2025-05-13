@@ -103,6 +103,8 @@ Route::group([
     Route::get('resultados', [ResultadosController::class, 'index'])->name('resultados.index');
     Route::get('/buscar-Resultados', [ResultadosController::class, 'buscarResultados'])->name('admin.buscar.resultados');
     Route::get('/resultados/{id}', [ResultadosController::class, 'verResultados'])->name('admin.ver.resultados');
+    Route::get('/renderizar-metricas/{id}', [ResultadosController::class, 'renderizarMetricas']);
+    Route::post('/exportar-pdf/{id}', [ResultadosController::class, 'recibirImagenes']);
     Route::get('/exportar-pdf/token-id/{id}', [ResultadosController::class, 'exportarPDF'])->name('admin.exportar.pdf');
 
     // Select de usuarios y vacantes

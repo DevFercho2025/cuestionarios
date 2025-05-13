@@ -25,6 +25,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
     <!-- Chart.js desde CDN (si quieres mostrar gráficas) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <script>
         $(document).ready(function(){
@@ -78,18 +79,18 @@
 
                             // 2. Construir tabla de respuestas
                             let tablaHtml = `
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Pregunta</th>
-                                    <th>Respuesta del Usuario</th>
-                                    <th>Respuesta Correcta</th>
-                                    <th>Resultado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Pregunta</th>
+                                            <th>Respuesta del Usuario</th>
+                                            <th>Respuesta Correcta</th>
+                                            <th>Resultado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            `;
 
                             $.each(respuestas, function(i, rUser){
                                 // Texto de la pregunta
@@ -150,13 +151,19 @@
                             $("#resultadosContainer").append(tablaHtml);
 
                             // 3. Botón para exportar PDF (si existe el ID del token)
-                            if(response.token && response.token.id){
+                            if (response.token && response.token.id) {
+                                let pdfHtml = `<button class="btn btn-danger btn-exportar-pdf" data-token="${response.token.id}">
+                                                    Exportar PDF
+                                            </button>`;
+                                $("#pdfContainer").append(pdfHtml);
+                            }
+                            /*if(response.token && response.token.id){
                                 let pdfHtml = `<a href="{{ url('/admin/exportar-pdf/token-id') }}/${response.token.id}"
                                                     class="btn btn-danger" target="_blank">
                                                         Exportar PDF
                                                 </a>`;
                                 $("#pdfContainer").append(pdfHtml);
-                            }
+                            }*/
 
                             // 4. (Opcional) Mostrar gráficas por sección: correctas vs. incorrectas
                             //    Agrupamos las respuestas según la sección y contamos cuántas
@@ -246,6 +253,44 @@
                             : 'Error al cargar los resultados.';
                         $("#resultadosContainer").html(`<div class="alert alert-danger">${errorMsg}</div>`);
                     }
+                });
+            });
+
+            // Delegación para botón PDF dinámico
+            $(document).on("click", ".btn-exportar-pdf", function () {
+                const tokenId = $(this).data("token");
+
+                $.get(`{{ url('/admin/renderizar-metricas') }}/${tokenId}`, function (html) {
+                    const container = $('<div id="previewMetricas" style="visibility: hidden"></div>').html(html);
+                    $("body").append(container);
+
+                    const graficas = container.find(".contenedor-metrica");
+                    const imagenes = [];
+                    let promesas = [];
+
+                    graficas.each(function () {
+                        let grafica = this;
+                        let promesa = html2canvas(grafica, {
+                            willReadFrequently: true
+                        }).then(canvas => {
+                            imagenes.push(canvas.toDataURL("image/jpeg"));
+                        }).catch(error => {
+                            console.error("Error al capturar la gráfica: ", error);
+                        });
+                        promesas.push(promesa);
+                    });
+
+                    Promise.all(promesas).then(() => {
+                        $.post(`/admin/exportar-pdf/${tokenId}`, {
+                            imagenes: imagenes,
+                            _token: '{{ csrf_token() }}'
+                        }).done(() => {
+                            //Ruta get para ver o descargar el PDF
+                            window.location.href = `/admin/exportar-pdf/token-id/${tokenId}`;
+                        }).always(() => {
+                            //container.remove();
+                        });
+                    });
                 });
             });
         });
