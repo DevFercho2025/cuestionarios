@@ -90,6 +90,7 @@ Route::group([
     Route::post('candidatos/codigo', [CandidatoController::class, 'guardarCodigo'])->name('guardar.codigo');
     Route::get('candidatos/lista', [CandidatoController::class, 'listaUsuarios'])->name('candidatos.lista');
     Route::get('candidatos/perfil/{id}', [CandidatoController::class, 'verPerfil'])->name('candidatos.perfil');
+    Route::post('/check-email', [CandidatoController::class, 'checkEmail'])->name('check.email');
 
     // Rutas para evaluaciones
     Route::get('/evaluaciones', [EvaluacionController::class, 'index'])->name('evaluaciones.index');

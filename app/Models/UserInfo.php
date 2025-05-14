@@ -17,6 +17,7 @@ class UserInfo extends Model
         'genero',
         'codigo_postal',
         'celular',
+        'pais',
     ];
 
     public $timestamps = false;

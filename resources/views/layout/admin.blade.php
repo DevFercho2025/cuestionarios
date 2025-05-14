@@ -36,6 +36,7 @@
     <link rel="stylesheet" href="{{asset('/assets/vendor/libs/swiper/swiper.css')}}" />
     <link rel="stylesheet" href="{{asset('/assets/vendor/css/pages/cards-statistics.css')}}" />
     <link rel="stylesheet" href="{{asset('/assets/vendor/css/pages/cards-analytics.css')}}" />
+    <link rel="stylesheet" href="{{asset('/assets/vendor/libs/bs-stepper/bs-stepper.css')}}" />
     <script src="{{asset('/assets/vendor/js/helpers.js')}}"></script>
     <script src="{{asset('/assets/vendor/js/template-customizer.js')}}"></script>
     <script src="{{asset('/assets/js/config.js')}}"></script>
@@ -104,6 +105,8 @@
 <script src="{{asset('/assets/js/dashboards-analytics.js')}}"></script>
 <script src="{{asset('/assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
 <script src="{{asset('/assets/js/tables-datatables-advanced.js')}}"></script>
+
+<script src="{{asset('/assets/vendor/libs/bs-stepper/bs-stepper.js')}}"></script>
 
 @stack('scripts')
 

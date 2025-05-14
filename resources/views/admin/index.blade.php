@@ -3,6 +3,8 @@
 
 <head>
   <link rel="stylesheet" href="../../assets/vendor/libs/bs-stepper/bs-stepper.css" />
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.2/dist/sweetalert2.min.css" rel="stylesheet">
+
 </head>
 
     <div class="card mb-4">
@@ -10,7 +12,7 @@
           <div class="col-md-6 order-2 order-md-1">
             <div class="card-body">
               <h4 class="card-title mb-4">Bienvenido <span class="fw-bold">{{ auth()->user()->name }}</span></h4>
-              <p class="card-title text-primary">Este es su panel de administración para {{ auth()->user()->company?->name ?? 'Sin compañía asignada' }}</p>
+              <p class="card-title text-primary">Este es su panel de administración para {{ Auth::user()->config->company_id?->name ?? 'Sin compañía asignada' }}</p>
               <p class="mb-4">Gestione las diferentes secciones del sistema desde aquí.</p>
             </div>
           </div>
@@ -241,7 +243,7 @@
             </div>
             
             <div class="line mt-lg-n4 mb-lg-3"></div>
-            <div class="step" data-target="#contexto-adicional">
+            <div class="step" data-target="#ubicacion-contacto">
               <button type="button" class="step-trigger flex-lg-wrap gap-lg-2 px-lg-0">
                 <span class="bs-stepper-circle"><i class="ri-check-line"></i></span>
                 <span class="bs-stepper-label ms-lg-0">
@@ -258,11 +260,11 @@
           <div class="bs-stepper-content">
             <form id="wizard-registro-candidato-form"
               method="POST"
-              action="#">
+              action="{{ route('candidatos.store') }}">
               @csrf
 
               <!--Paso 1: Nombre del candidato-->
-              <div id="nombre-candidato" class="content dstepper-block fv-plugins-bootstrap5 fv-plugins-framework">
+              <div id="identificacion" class="content dstepper-block fv-plugins-bootstrap5 fv-plugins-framework">
                 <div class="content-header mb-4">
                   <h6 class="mb-0">Identificación</h6>
                 </div>
@@ -303,7 +305,8 @@
                       <i class="ri-arrow-left-line me-sm-1 me-0"></i>
                       <span class="align-middle d-sm-inline-block d-none">Anterior</span>
                     </button>
-                    <button type="button" class="btn btn-primary btn-next waves-effect waves-light" id="next-step-nombre">
+                    <button type="button" class="btn btn-primary btn-next waves-effect waves-light" id="next-step-nombre"
+                      onclick="saveDataAndContinue('identificacion','detalles-personales')">
                       <span class="align-middle d-sm-inline-block d-none me-sm-1">Siguiente</span>
                       <i class="ri-arrow-right-line"></i>
                     </button>
@@ -324,7 +327,7 @@
                       class="form-control" placeholder="nombre@ejemplo.com"/>
                       <label for="user-email">Correo electrónico</label>
                     </div>
-                  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+                  <div id="email-error" class="invalid-feedback"></div></div>
 
                   <div class="col-sm-6 fv-plugins-icon-container">
                     <div class="form-floating form-floating-outline mb-6">
@@ -335,18 +338,18 @@
                         </select>
                         <label for="candidate-genero-legal">Género Legal</label>
                       </div>
-                  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+                  <div id="genero-error" class="invalid-feedback"></div></div>
                   
                   <div class="col-sm-6 fv-plugins-icon-container">
                     <div class="form-floating form-floating-outline mb-6">
                       <input  type="date" id="nacimiento-candidato" name="birthdate" class="form-control">
                       <label for="nacimiento-candidato">Fecha de Nacimiento</label>
                     </div>
-                  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+                  <div id="nacimiento-error" class="invalid-feedback"></div></div>
 
                  <div class="col-12 d-flex justify-content-between">
                     <button type="button" class="btn btn-outline-secondary btn-prev waves-effect"
-                      onclick="goToForm('nombre-candidato')">
+                      onclick="goToForm('identificacion')">
                       <i class="ri-arrow-left-line me-sm-1 me-0"></i>
                       <span class="align-middle d-sm-inline-block d-none">Anterior</span>
                     </button>
@@ -360,7 +363,7 @@
               </div>
 
               <!--Paso 3: Ubicación y contacto -->
-              <div id="ubicación-contacto" class="content fv-plugins-bootstrap5 fv-plugins-framework">
+              <div id="ubicacion-contacto" class="content fv-plugins-bootstrap5 fv-plugins-framework">
                 <div class="content-header mb-4">
                   <h6 class="mb-0">Contexto adicional</h6>
                   <small>Ubicación y contacto</small>
@@ -380,7 +383,7 @@
                         </select>
                         <label for="pais-candidato">Pais</label>
                       </div>
-                  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+                  <div id="pais-error" class="invalid-feedback"></div></div>
                   
 
                   <div class="col-sm-6">
@@ -389,7 +392,7 @@
                       class="form-control" placeholder="Ingrese el código postal del candidato">
                       <label for="candidate-postalcode">Código Postal</label>
                     </div>
-                  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+                  <div id="postalcode-error" class="invalid-feedback"></div></div>
 
 
                   <div class="col-sm-6">
@@ -400,7 +403,7 @@
                           pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '')"
                           class="form-control" placeholder="Ingrese el celular del candidato">
                       </div>
-                    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div></div>
+                    <div id="cellphone-error" class="invalid-feedback"></div></div>
                   </div>
 
                  <div class="col-12 d-flex justify-content-between">
@@ -418,12 +421,22 @@
 
                 </div>
               </div>
+
+              <input type="hidden" id="input-genero_legal"     name="genero_legal" />
+              <input type="hidden" id="input-nacimiento"       name="nacimiento" />
+              <input type="hidden" id="input-pais"             name="pais" />
+              <input type="hidden" id="input-codigo_postal"    name="codigo_postal" />
+              <input type="hidden" id="input-telefono"         name="telefono" />
+              <input type="hidden" id="input-firstname"        name="firstname" />
+              <input type="hidden" id="input-lastname"         name="lastname" />
+              <input type="hidden" id="input-email"            name="email" />
             </form>
           </div>
         </div>
       </div>
       <!-- Elemento más pequeño (40%) -->
       
+
     </div>
     
 
@@ -549,10 +562,10 @@
         </div>
     </div>
 
+  <script src="../../assets/vendor/libs/bs-stepper/bs-stepper.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.2/dist/sweetalert2.all.min.js"></script>
 
-@endsection
-
-@section('scripts')
     <script>
         $(function() {
             'use strict';
@@ -579,10 +592,10 @@
             firstname: null,
             lastname: null,
             email: null,
-            password: null,
         };
 
       document.addEventListener('DOMContentLoaded', () => {
+
         // Inicializar BS-Stepper
         setTimeout(() => {
           try {
@@ -602,23 +615,78 @@
         }, 500);
 
         // Campos ocultos: rellenar antes de enviar
-        const form = document.getElementById('wizard-registro-form');
+        const form = document.getElementById('wizard-registro-candidato-form');
         form.addEventListener('submit', (e) => {
           e.preventDefault();
           if (!validateInfo()) {
-            return; // Si la validación falla, no seguir
+            return;
           }
-          form.submit();
-        });
-      });
+          //info adicional candidato
+          document.getElementById('input-genero_legal').value = formData.genero_legal;
+          document.getElementById('input-nacimiento').value = formData.nacimiento;
+          document.getElementById('input-pais').value = formData.pais;
+          document.getElementById('input-codigo_postal').value = formData.codigo_postal;
+          document.getElementById('input-telefono').value = formData.telefono;
 
-      document.addEventListener('DOMContentLoaded', () => {
+          // Datos de usuario
+          document.getElementById('input-firstname').value = formData.firstname;
+          document.getElementById('input-lastname').value = formData.lastname;
+          document.getElementById('input-email').value = formData.email;
+          console.log("Enviando formulario...");
+          const formDataObj = new FormData(form);
+
+          fetch(form.action, {
+            method: 'POST',
+            body: formDataObj, // Enviar los datos del formulario
+            headers: {
+              'Accept': 'application/json', // Esperamos una respuesta JSON
+            }
+          })
+          .then(response => response.json()) // Parsear la respuesta JSON
+          .then(data => {
+            if (data.success) {
+              // Mostrar un mensaje de éxito con SweetAlert2
+              Swal.fire({
+                icon: 'success',
+                title: '¡Candidato creado exitosamente!',
+                text: 'El candidato ha sido creado correctamente.',
+                confirmButtonText: 'Aceptar'
+              });
+            } else {
+              // Si ocurre un error, mostrar el mensaje de error con SweetAlert2
+              Swal.fire({
+                icon: 'error',
+                title: 'Error al crear al candidato',
+                text: 'Hubo un error al crear al candidato: ' + data.message,
+                confirmButtonText: 'Aceptar'
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error al enviar el formulario:', error);
+            // Mostrar un error con SweetAlert2 en caso de que algo falle en la petición
+            Swal.fire({
+              icon: 'error',
+              title: 'Hubo un error al enviar el formulario',
+              text: 'Inténtalo nuevamente más tarde.',
+              confirmButtonText: 'Aceptar'
+            });
+          });
+        });
+
+
         const nextButtonNombre = document.getElementById('next-step-nombre');
         if (nextButtonNombre) {
           nextButtonNombre.addEventListener('click', () => {
-            saveDataAndContinue('nombre-candidato', 'detalles-personales');
+            saveDataAndContinue('identificacion', 'detalles-personales');
           });
         }
+
+        document.getElementById('NoAplica').addEventListener('click', function() {
+          const lastname2Input = document.getElementById('candidate-lastname-2');
+          lastname2Input.value = 'N/A';
+        });
+
       });
 
       function goToForm(formId) {
@@ -632,12 +700,12 @@
         }
       }
 
-      window.saveDataAndContinue = function(cur, next) {
-        console.log('Guardando datos y avanzando:', cur, '→', next); 
+      function saveDataAndContinue(cur, next) {
         let ok = true;
-        if (cur === 'nombre-candidato') {
-          const fn = document.getElementById('candidate-firstname').value.trim();
-          const ln = document.getElementById('candidate-lastname-1').value.trim();
+        if (cur === 'identificacion') {
+          const fn = document.getElementById('candidate-firstName').value.trim();
+          const ln1 = document.getElementById('candidate-lastname-1').value.trim();
+          const ln2 = document.getElementById('candidate-lastname-2').value.trim();
 
           document.getElementById('firstname-error').innerText = '';
           document.getElementById('lastname-error').innerText = '';
@@ -646,17 +714,88 @@
             document.getElementById('firstname-error').innerText = 'El nombre es obligatorio';
             ok = false;
           }
-          if (!ln) {
+          if (!ln1) {
             document.getElementById('lastname-error').innerText = 'El primer apellido es obligatorio';
             ok = false;
           }
 
           formData.firstname = fn;
-          formData.lastname = ln;
+
+          if (ln2 && ln2 !== 'N/A') {
+            formData.lastname = `${ln1} ${ln2}`;
+          } else {
+            formData.lastname = ln1;
+          }
         }
-        goToForm(next);
+        if(cur === 'detalles-personales'){
+          const email = document.getElementById('user-email').value.trim();
+          const genero = document.getElementById('candidate-genero-legal').value.trim();
+          const nacimiento = document.getElementById('nacimiento-candidato').value.trim();
+
+          document.getElementById('email-error').innerText = '';
+          document.getElementById('genero-error').innerText = '';
+          document.getElementById('nacimiento-error').innerText = '';
+
+          if (!email) {
+            document.getElementById('email-error').innerText = 'El correo electrónico es obligatorio';
+            ok = false;
+          }
+          if (!genero || genero === 'Elija una opción') {
+            document.getElementById('genero-error').innerText = 'El género es obligatorio';
+            ok = false;
+          }
+          if (!nacimiento) {
+            document.getElementById('nacimiento-error').innerText = 'La fecha de nacimiento es obligatoria';
+            ok = false;
+          }
+
+          // Si todo es correcto, guarda los datos
+          if (ok) {
+            formData.email = email;
+            formData.genero_legal = genero;
+            formData.nacimiento = nacimiento;
+          }
+        }
+        if(ok){
+          goToForm(next);
+        }
       }
 
-     
-    <script src="../../assets/vendor/libs/bs-stepper/bs-stepper.js">
+      function validateInfo(){
+        let ok=true;
+
+          const pais = document.getElementById('pais-candidato').value.trim();
+          const postalcode = document.getElementById('candidate-postalcode').value.trim();
+          const cellphone = document.getElementById('candidate-cellphone').value.trim();
+
+          document.getElementById('pais-error').innerText = '';
+          document.getElementById('postalcode-error').innerText = '';
+          document.getElementById('cellphone-error').innerText = '';
+
+          if (!pais || pais === 'Elija una opción') {
+            document.getElementById('pais-error').innerText = 'El país es obligatorio';
+            ok = false;
+          }
+          if (!postalcode) {
+            document.getElementById('postalcode-error').innerText = 'El código postal es obligatorio';
+            ok = false;
+          }
+          if (!cellphone) {
+            document.getElementById('cellphone-error').innerText = 'El número de celular es obligatorio';
+            ok = false;
+          } else if (!/^\d{10}$/.test(cellphone)) {
+            document.getElementById('cellphone-error').innerText = 'El número de celular debe tener 10 dígitos';
+            ok = false;
+          }
+
+          if (ok) {
+            formData.pais = pais;
+            formData.codigo_postal = postalcode;
+            formData.telefono = cellphone;
+          }
+
+          return ok;
+      }
+     </script>
+    
 @endsection

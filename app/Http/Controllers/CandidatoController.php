@@ -6,7 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Aplicacion;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 use function Ramsey\Uuid\v1;
 
@@ -71,20 +74,18 @@ class CandidatoController extends Controller
         return view('candidatos.registro.registro-candidato');
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
     {
-        // Validación con mensaje personalizado
         $validator = Validator::make($request->all(), [
-            'correo' => 'required|email|unique:users,email',
-            'nombre' => 'required|string',
-            'apellidoPaterno' => 'required|string',
-            'apellidoMaterno' => 'nullable|string',
-            'fecha_nacimiento' => 'nullable|date',
-            'genero' => 'nullable|string',
+            'firstname'     => 'required|string',
+            'lastname'      => 'required|string',
+            'nacimiento'    => 'required|date',
+            'genero_legal'  => 'nullable|string',
             'codigo_postal' => 'nullable|string|max:10',
-            'celular' => 'nullable|string|max:15',
+            'telefono'      => 'required|string|max:15',
+            'pais'          => 'required|string',
         ], [
-            'correo.unique' => 'Este email ya está registrado para un candidato.',
+            'email.unique' => 'Este email ya está registrado para este candidato en la misma empresa.',
         ]);
 
         if ($validator->fails()) {
@@ -93,34 +94,44 @@ class CandidatoController extends Controller
                 ->withInput();
         }
 
-        $nombreCompleto = $request->input('nombre') . ' ' . $request->input('apellidoPaterno');
-        $apellidoMaterno = $request->input('apellidoMaterno');
+        $nombreCompleto = $request->input('firstname').' '.$request->input('lastname');
 
-        if (strtolower(trim($apellidoMaterno)) !== 'no aplica') {
-            $nombreCompleto .= ' ' . $apellidoMaterno;
-        } else {
-            $apellidoMaterno = null;
+
+        $user = User::firstOrNew(['email' => $request->input('email')]);
+        if (!$user->exists) {
+            $user->password = bcrypt(Str::random(10));
         }
+        $user->name = $nombreCompleto;
 
-        // Crea el usuario
-        $user = User::create([
-            'name' => $nombreCompleto,
-            'email' => $request->input('correo'),
-            'password' => bcrypt(Str::random(10)),
+        $user->config()->updateOrCreate(
+            ['company_id' => Auth::user()->config->company_id],
+            [
+                'active'   => 1,
+                'role_id'  => 0,
+            ]
+        );
+
+        $user->info()->updateOrCreate(
+            [
+                'fecha_nacimiento' => $request->input('nacimiento'),
+                'genero'           => $request->input('genero_legal'),
+                'codigo_postal'    => $request->input('codigo_postal'),
+                'celular'          => $request->input('telefono'),
+                'pais'             => $request->input('pais'),
+                'created_at'       => Carbon::now(),
+            ]
+        );
+
+         return response()->json([
+            'success' => true,
+            'message' => 'Candidato creado exitosamente.',
         ]);
+    }
 
-        $user->config()->create([
-            'active' => 1,
-        ]);
-
-        $user->info()->create([
-            'fecha_nacimiento' => $request->input('fechaNacimiento'),
-            'genero' => $request->input('genero'),
-            'codigo_postal' => $request->input('codigoPostal'),
-            'celular' => $request->input('celular'),
-        ]);
-
-        return redirect()->route('candidatos.index')->with('success', 'Candidato registrado correctamente');
+     public function checkEmail(Request $request)
+    {
+        $exists = User::where('email', $request->email)->exists();
+        return response()->json(['exists' => $exists]);
     }
 
     public function show($id)
