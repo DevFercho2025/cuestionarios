@@ -216,6 +216,7 @@
                                 cancelButtonColor: '#d32f2f',
                                 showCancelButton: true,
                                 buttonsStyling: true,
+                                background: '#262b3c',
                                 preConfirm: () => {
                                     return {
                                         pregunta: document.getElementById('swal-pregunta').value,
@@ -291,61 +292,60 @@
                             });
 
                             Swal.fire({
-                                title: 'Editar Pregunta',
                                 html: `
-                                    <style>
-                                        .custom-input {
-                                            width: 100%;
-                                            padding: 0.625em 1em;
-                                            font-size: 1rem;
-                                            border: 1px solid #d9d9d9;
-                                            border-radius: 0.25em;
-                                            box-sizing: border-box;
-                                            margin-top: 0.25em;
-                                            margin-bottom: 1em;
-                                        }
-                                    </style>
-                                    <form id="editForm">
-                                        <div class="form-group">
-                                            <label for="pregunta">Pregunta:</label>
-                                            <input type="text" id="pregunta" class="custom-input" value="${rowData.pregunta}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="cuestionario">Cuestionario:</label>
-                                            <input type="text" id="cuestionario" class="custom-input" value="${rowData.cuestionario}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="swal-seccion">Sección:</label>
-                                            <select id="swal-seccion" class="custom-input">
+                                    <div class="col-md mb-6 mb-md-0">
+                                    <div class="card">
+                                        <h2 class="card-header">Editar Pregunta</h2>
+                                        <div class="card-body">
+                                            <div class="form-floating form-floating-outline mb-6">
+                                                <input type="text" id="pregunta" class="form-control" placeholder="Pregunta" value="${rowData.pregunta}" required>
+                                                <label for="pregunta">Pregunta</label>
+                                            </div>
+                                            <div class="form-floating form-floating-outline mb-6">
+                                                <input type="text" id="cuestionario" class="form-control" placeholder="Cuestionario" value="${rowData.cuestionario}" required>
+                                                <label for="cuestionario">Cuestionario</label>
+                                            </div>
+                                            <div class="form-floating form-floating-outline mb-6">
+                                                <select id="swal-seccion" class="form-select">
                                                 ${options}
-                                            </select>
+                                                </select>
+                                                <label for="swal-seccion">Sección</label>
+                                            </div>
                                         </div>
-                                    </form>
+                                    </div>
+                                    </div>
                                 `,
+                                showClass: { popup: 'animate__animated animate__fadeInDown' },
+                                hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                                 focusConfirm: false,
+                                confirmButtonText: 'Crear',
+                                confirmButtonColor: '#3d4e81',
+                                cancelButtonText: 'Cancelar',
+                                cancelButtonColor: '#d32f2f',
+                                showCancelButton: true,
+                                buttonsStyling: true,
+                                background: '#262b3c',
                                 preConfirm: () => {
                                     var pregunta = $('#pregunta').val();
                                     var cuestionario = $('#cuestionario').val();
-                                    var seccion_id = $('#swal-seccion').val(); //ID de la sección seleccionada
+                                    var seccion_id = $('#swal-seccion').val();
 
-                                    $.ajax({
-                                        url: `/admin/preguntas/${id}`,
-                                        type: 'PUT',
-                                        headers: {
-                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                        },
-                                        data: {
-                                            pregunta: pregunta,
-                                            cuestionario: cuestionario,
-                                            seccion_id: seccion_id
-                                        },
-                                        success: function(response) {
-                                            Swal.fire('¡Actualizado!', 'Los datos se han actualizado correctamente.', 'success');
-                                            table.ajax.reload();
-                                        },
-                                        error: function(xhr) {
-                                            Swal.fire('Error', 'Hubo un problema al actualizar los datos.', 'error');
-                                        }
+                                    return $.ajax({
+                                    url: `/admin/preguntas/${id}`,
+                                    type: 'PUT',
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: {
+                                        pregunta: pregunta,
+                                        cuestionario: cuestionario,
+                                        seccion_id: seccion_id
+                                    }
+                                    }).then(response => {
+                                    Swal.fire('¡Actualizado!', 'Los datos se han actualizado correctamente.', 'success');
+                                    table.ajax.reload();
+                                    }).catch(() => {
+                                    Swal.showValidationMessage('Hubo un problema al actualizar los datos.');
                                     });
                                 }
                             });

@@ -1,6 +1,32 @@
 @extends('layout.admin')
 
 @section('content')
+
+<style>
+    #loaderPDF {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        color: white;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+</style>
+    <!-- loader para cuando se exporta PDF-->
+    <div id="loaderPDF" class="hidden">
+        <div class="preloader-wrapper active"></div>
+        <span>Cargando PDF, por favor espere...</span>
+    </div>
+
     <div class="container my-4">
         <div class="card shadow-lg">
             <div class="card-body">
@@ -12,6 +38,28 @@
                         <button type="submit" class="btn btn-primary">Buscar</button>
                     </div>
                 </form>
+
+                <!-- Tabla de tokens -->
+                <div class="row">
+                    <div class="col s12">
+                        <div class="card dark-card z-depth-3">
+                            <div class="card-datatable table-responsive">
+                                <table id="tokensTable" class="dt-responsive table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>Id candidato</th>
+                                        <th>Nombre candidato</th>
+                                        <th>Cuestionario</th>
+                                        <th>Secciones completadas</th>
+                                        <th>Estado</th>
+                                        <!--Completado, pendiente por terminar, No ha iniciado -->
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <div id="resultadosContainer"></div>
                 <div id="graficasContainer" class="mt-5"></div>
@@ -157,13 +205,6 @@
                                             </button>`;
                                 $("#pdfContainer").append(pdfHtml);
                             }
-                            /*if(response.token && response.token.id){
-                                let pdfHtml = `<a href="{{ url('/admin/exportar-pdf/token-id') }}/${response.token.id}"
-                                                    class="btn btn-danger" target="_blank">
-                                                        Exportar PDF
-                                                </a>`;
-                                $("#pdfContainer").append(pdfHtml);
-                            }*/
 
                             // 4. (Opcional) Mostrar gráficas por sección: correctas vs. incorrectas
                             //    Agrupamos las respuestas según la sección y contamos cuántas
@@ -259,10 +300,12 @@
             // Delegación para botón PDF dinámico
             $(document).on("click", ".btn-exportar-pdf", function () {
                 const tokenId = $(this).data("token");
+                $("#loaderPDF").removeClass("hidden");
 
                 $.get(`{{ url('/admin/renderizar-metricas') }}/${tokenId}`, function (html) {
-                    const container = $('<div id="previewMetricas" style="visibility: hidden"></div>').html(html);
+                    const container = $('<div id="previewMetricas"  style="position: fixed; top: -9999px; left: -9999px; opacity: 1; z-index: -1;"></div>').html(html);
                     $("body").append(container);
+                    $('head').append('<link rel="stylesheet" href="{{ asset('assets/css/pdf.css') }}">');
 
                     const graficas = container.find(".contenedor-metrica");
                     const imagenes = [];
@@ -270,10 +313,16 @@
 
                     graficas.each(function () {
                         let grafica = this;
+                        $(grafica).css({
+                            backgroundColor: 'white',
+                            padding: '10px',
+                            border: 'none',
+                            boxShadow: 'none'
+                        });
                         let promesa = html2canvas(grafica, {
                             willReadFrequently: true
                         }).then(canvas => {
-                            imagenes.push(canvas.toDataURL("image/jpeg"));
+                            imagenes.push(canvas.toDataURL("image/png"));
                         }).catch(error => {
                             console.error("Error al capturar la gráfica: ", error);
                         });
@@ -285,10 +334,10 @@
                             imagenes: imagenes,
                             _token: '{{ csrf_token() }}'
                         }).done(() => {
-                            //Ruta get para ver o descargar el PDF
-                            window.location.href = `/admin/exportar-pdf/token-id/${tokenId}`;
+                            window.open(`/admin/exportar-pdf/token-id/${tokenId}`, '_blank');
                         }).always(() => {
-                            //container.remove();
+                            $("#loaderPDF").addClass("hidden");
+                            container.remove();
                         });
                     });
                 });

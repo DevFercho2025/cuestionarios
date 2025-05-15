@@ -17,11 +17,6 @@
                                 @endif
                             </h4>
                         </div>
-                        <div class="col s4 right-align">
-                            <a id="registrarCandidatoBtn" class="btn btn-large gradient-btn pulse">
-                                Nuevo Candidato
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -43,6 +38,9 @@
                                 <th>Código Postal</th>
                                 <th>Celular</th>
                                 <th>Fecha Registro</th>
+                                @if (auth()->user()?->config?->role?->isSuperAdmin())
+                                    <th>Compañía</th>
+                                @endif
                                 <th>Acciones</th>
                             </tr>
                             </thead>
@@ -126,12 +124,96 @@
                 function initializeDataTable(){
                     var userPermissions = @json($userPermissions);
                     try {
+                       var columns = [
+                            {data: 'id'},
+                            {
+                                data: 'name',
+                                render: function (data, type, row) {
+                                    return `<span class="editable" data-id="${row.id}" data-field="name">${data}</span>`;
+                                }
+                            },
+                            {
+                                data: 'email',
+                                render: function (data, type, row) {
+                                    return `<span class="editable" data-id="${row.id}" data-field="email">${data}</span>`;
+                                }
+                            },
+                            {
+                                data: 'fecha_nacimiento',
+                                render: function (data) {
+                                    return data ? new Date(data).toLocaleDateString() : '-';
+                                }
+                            },
+                            { 
+                                data: 'genero',
+                                render: function (data, type, row) {
+                                    return `<span class="editable" data-id="${row.id}" data-field="genero">${data ?? '-'}</span>`;
+                                }
+                            },
+                            { 
+                                data: 'codigo_postal',
+                                render: function (data, type, row) {
+                                    return `<span class="editable" data-id="${row.id}" data-field="codigo_postal">${data ?? '-'}</span>`;
+                                }
+                            },
+                            { 
+                                data: 'celular',
+                                render: function (data, type, row) {
+                                    return `<span class="editable" data-id="${row.id}" data-field="celular">${data ?? '-'}</span>`;
+                                }
+                            },
+                            {
+                                data: 'created_at',
+                                render: function (data) {
+                                    return new Date(data).toLocaleString();
+                                }
+                            },
+
+                            // Solo mostrar columna compañía si es superAdmin
+                            userPermissions.isSuperAdmin ? {
+                                data: 'company_name',
+                                title: 'Compañía',
+                                render: function(data, type, row) {
+                                    return data ?? 'Sin compañía';
+                                }
+                            } : null,
+
+                            {
+                                data: null,
+                                render: function(data, type, row){
+                                    let botones = `
+                                        <div class="action-buttons">
+                                            <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
+                                                    data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
+                                                <i class="ri-delete-bin-6-line"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-info waves-effect waves-light ver-perfil-btn tooltipped"
+                                                    data-position="top" data-tooltip="Ver perfil" data-id="${row.id}">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                    `;
+
+                                    if (userPermissions.isAuthenticated && userPermissions.isAdmin && !userPermissions.isSuperAdmin) {
+                                        botones += `
+                                            <button type="button" class="btn btn-primary waves-effect waves-light generar-codigo-btn tooltipped" data-id="${row.id}" data-tooltip="Generar Código">
+                                                <i class="ri-key-fill"></i>
+                                            </button>
+                                        `;
+                                    }
+
+                                    botones += '</div>';
+
+                                    return botones;
+                                }
+                            }
+                        ].filter(Boolean);
+
                         var table = jQuery('#candidatosTable').DataTable({
                             ajax: {
                                 url: "{{ route('candidatos.datatable')}}",
                                 data: function(d) {
-                                d.conVacante = jQuery('#conVacante').val();
-                            },
+                                    d.conVacante = jQuery('#conVacante').val();
+                                },
                                 dataSrc: 'data',
                                 error: function (xhr, error, thrown) {
                                     console.error('Error en la carga de datos:', error, thrown);
@@ -145,82 +227,8 @@
                                     }
                                 }
                             },
-                            columns: [
-                                {data: 'id'},
-                                {
-                                    data: 'name',
-                                    render: function (data, type, row) {
-                                        return `<span class="editable" data-id="${row.id}" data-field="name">${data}</span>`;
-                                    }
-                                },
-                                {
-                                    data: 'email',
-                                    render: function (data, type, row) {
-                                        return `<span class="editable" data-id="${row.id}" data-field="email">${data}</span>`;
-                                    }
-                                },
-                                {
-                                    data: 'fecha_nacimiento',
-                                    render: function (data) {
-                                        return data ? new Date(data).toLocaleDateString() : '-';
-                                    }
-                                },
-                                { 
-                                    data: 'genero',
-                                    render: function (data, type, row) {
-                                        return `<span class="editable" data-id="${row.id}" data-field="genero">${data ?? '-'}</span>`;
-                                    }
-                                },
-                                { 
-                                    data: 'codigo_postal',
-                                    render: function (data, type, row) {
-                                        return `<span class="editable" data-id="${row.id}" data-field="codigo_postal">${data ?? '-'}</span>`;
-                                    }
-                                },
-                                { 
-                                    data: 'celular',
-                                    render: function (data, type, row) {
-                                        return `<span class="editable" data-id="${row.id}" data-field="celular">${data ?? '-'}</span>`;
-                                    }
-                                },
-                                {
-                                    data: 'created_at',
-                                    render: function (data) {
-                                        return new Date(data).toLocaleString();
-                                    }
-                                },
-                                {
-                                    data: null,
-                                    render: function(data, type, row){
-                                        let botones = `
-                                            <div class="action-buttons">
-                                                <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
-                                                        data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
-                                                    <i class="ri-delete-bin-6-line"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-info waves-effect waves-light ver-perfil-btn tooltipped"
-                                                        data-position="top" data-tooltip="Ver perfil" data-id="${row.id}">
-                                                    <i class="ri-eye-line"></i>
-                                                </button>
-                                        `;
-
-                                        if (userPermissions.isAuthenticated && userPermissions.isAdmin && !userPermissions.isSuperAdmin) {
-                                            botones += `
-                                                <button type="button" class="btn btn-primary waves-effect waves-light generar-codigo-btn tooltipped" data-id="${row.id}" data-tooltip="Generar Código">
-                                                    <i class="ri-key-fill"></i>
-                                                </button>
-                                            `;
-                                        }
-
-                                        // Cerrar el div 'action-buttons'
-                                        botones += '</div>';
-
-                                        return botones;
-                                    }
-                                }
-                            ],
+                            columns: columns,
                             responsive: true,
-                            // Se elimina la opción de idioma para evitar textos extra de traducción
                             drawCallback: function () {
                                 if (typeof M !== 'undefined') {
                                     M.Tooltip.init(document.querySelectorAll('.tooltipped'));

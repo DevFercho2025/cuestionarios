@@ -200,7 +200,7 @@
                                             <label for="swal-bloque">Bloque</label>
                                         </div>
                                         <div class="form-floating form-floating-outline mb-6">
-                                            <select id="swal-categoria" class="form-control browser-default">
+                                            <select id="swal-categoria" class="form-select">
                                                 ${options}
                                             </select>
                                             <label for="swal-categoria">Categoría</label>
@@ -338,7 +338,6 @@
                         });
 
                         Swal.fire({
-                            title: '',
                             html: `
                             <div class="col-md mb-6 mb-md-0">
                                 <div class="card">
@@ -353,7 +352,7 @@
                                             <label for="swal-bloque">Bloque</label>
                                         </div>
                                         <div class="form-floating form-floating-outline mb-6">
-                                            <select id="swal-categoria" class="form-control browser-default">
+                                            <select id="swal-categoria" class="form-select">
                                                 ${options}
                                             </select>
                                             <label for="swal-categoria">Categoría/Cuestionario</label>
@@ -374,6 +373,7 @@
                             cancelButtonText: 'Cancelar',
                             cancelButtonColor: '#d32f2f',
                             showCancelButton: true,
+                            buttonsStyling: true,
                             background: '#262b3c',
                             preConfirm: () => {
                                 return {

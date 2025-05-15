@@ -12,7 +12,7 @@
           <div class="col-md-6 order-2 order-md-1">
             <div class="card-body">
               <h4 class="card-title mb-4">Bienvenido <span class="fw-bold">{{ auth()->user()->name }}</span></h4>
-              <p class="card-title text-primary">Este es su panel de administración para {{ Auth::user()->config->company_id?->name ?? 'Sin compañía asignada' }}</p>
+              <p class="card-title text-primary">Este es su panel de administración para {{ Auth::user()->config->Company->name ?? 'Sin compañía asignada' }}</p>
               <p class="mb-4">Gestione las diferentes secciones del sistema desde aquí.</p>
             </div>
           </div>

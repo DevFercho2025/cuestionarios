@@ -26,10 +26,18 @@ class CandidatoController extends Controller
     {
         try {
             $conVacante = filter_var($request->input('conVacante', 0), FILTER_VALIDATE_BOOLEAN);
+            $companyId = Auth::user()->config->company_id;
+            $user = Auth::user();
+            $isSuperAdmin = $user->config->role->isSuperAdmin() ?? false;
 
-            $candidatos = User::with(['info', 'config.role'])
+            $candidatos = User::with(['info', 'config.role', 'config.company'])
             ->whereHas('config.role', function ($q) {
                 $q->where('id','=', 0);
+            })
+            ->when(!$isSuperAdmin, function ($query) use ($companyId) {
+                $query->whereHas('config', function ($q) use ($companyId) {
+                    $q->where('company_id', $companyId);
+                });
             })
             ->when($conVacante, function ($query) { #Si es true, muestra candidatos con aplicaciones
                 $query->whereHas('aplicaciones');
@@ -42,8 +50,8 @@ class CandidatoController extends Controller
 
 
             //Formatear datos antes
-            $candidatosData = $candidatos->map(function ($user) {
-                return [
+            $candidatosData = $candidatos->map(function ($user) use ($isSuperAdmin) {
+                 $data = [
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
@@ -53,6 +61,11 @@ class CandidatoController extends Controller
                     'celular' => optional($user->info)->celular,
                     'created_at' => $user->created_at
                 ];
+
+                if ($isSuperAdmin) {
+                    $data['company_name'] = $user->config->company->name ?? 'Sin compañía';
+                }
+                return $data;
             });
 
             return response()->json(['data' => $candidatosData]);
@@ -102,6 +115,7 @@ class CandidatoController extends Controller
             $user->password = bcrypt(Str::random(10));
         }
         $user->name = $nombreCompleto;
+        $user->save();
 
         $user->config()->updateOrCreate(
             ['company_id' => Auth::user()->config->company_id],

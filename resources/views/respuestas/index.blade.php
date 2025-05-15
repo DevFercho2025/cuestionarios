@@ -185,16 +185,16 @@
 
                             Swal.fire({
                                 html: `
-                                    <div class="col-md mb-6 mb-md-0">
+                                    <div class="col-md mb-6 mb-md-0" >
                                         <div class="card">
                                             <h2 class="card-header">Crear Respuesta</h2>
                                             <div class="card-body">
                                                 <div class="form-floating form-floating-outline mb-6">
-                                                    <input id="swal-respuesta" type="text" class="form-control" placeholder="Respuesta" required="">
+                                                    <input id="swal-respuesta" type="text" class="form-control" placeholder="Respuesta" required>
                                                     <label for="swal-respuesta">Respuesta</label>
                                                 </div>
                                                 <div class="form-floating form-floating-outline mb-6">
-                                                    <input type="text" id="swal-opcion" class="form-control" placeholder="Opción" required="">
+                                                    <input type="text" id="swal-opcion" class="form-control" placeholder="Opción" required>
                                                     <label for="swal-opcion">Opción</label>
                                                 </div>
                                                 <div class="form-floating form-floating-outline mb-6">
@@ -207,19 +207,16 @@
                                         </div>
                                     </div>
                                 `,
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                },
+                                showClass: { popup: 'animate__animated animate__fadeInDown' },
+                                hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                                 focusConfirm: false,
-                                confirmButtonText: '<i class="material-icons left">check</i> Crear',
-                                confirmButtonColor: '#26a69a',
-                                cancelButtonText: '<i class="material-icons left">close</i> Cancelar',
-                                cancelButtonColor: '#ef5350',
+                                confirmButtonText: 'Crear',
+                                confirmButtonColor: '#3d4e81',
+                                cancelButtonText: 'Cancelar',
+                                cancelButtonColor: '#d32f2f',
                                 showCancelButton: true,
                                 buttonsStyling: true,
+                                background: '#262b3c',
                                 preConfirm: () => {
                                     return {
                                         respuesta: document.getElementById('swal-respuesta').value,
@@ -297,10 +294,10 @@
                                     });
 
                                     Swal.fire({
-                                        title: 'Editar Respuesta',
                                         html: `
                                             <div class="col-md mb-6 mb-md-0">
                                             <div class="card">
+                                                <h2 class="card-header">Editar Respuesta</h2>
                                                 <div class="card-body">
                                                     <div class="form-floating form-floating-outline mb-6">
                                                         <input id="swal-respuesta" type="text" class="form-control" placeholder="Respuesta" value="${respuesta.respuesta}" required="">
@@ -320,18 +317,16 @@
                                             </div>
                                             </div>
                                         `,
-                                        showClass: {
-                                            popup: 'animate__animated animate__fadeInDown'
-                                        },
-                                        hideClass: {
-                                            popup: 'animate__animated animate__fadeOutUp'
-                                        },
+                                        showClass: { popup: 'animate__animated animate__fadeInDown' },
+                                        hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                                         focusConfirm: false,
                                         confirmButtonText: 'Actualizar',
                                         confirmButtonColor: '#3d4e81',
                                         cancelButtonText: 'Cancelar',
                                         cancelButtonColor: '#d32f2f',
                                         showCancelButton: true,
+                                        buttonsStyling: true,
+                                        background: '#262b3c',
                                         preConfirm: () => {
                                             return {
                                                 respuesta: document.getElementById('swal-respuesta').value,
