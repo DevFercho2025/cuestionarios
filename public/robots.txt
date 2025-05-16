@@ -1,2 +1,15 @@
 User-agent: *
-Disallow:
+
+#Bloqueo de áreas administrativas y privadas
+Disallow: /admin
+Disallow: /candidate
+Disallow: /api
+Disallow: /logout
+
+#Permiso para páginas públicas
+Allow: /login
+Allow: /register
+Allow: /
+
+#Sitemap
+Sitemap: https://practicas-psico/sitemap.xml

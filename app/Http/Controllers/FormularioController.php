@@ -188,8 +188,8 @@ class FormularioController extends Controller
 
         
         $seccionesRespondidas = Respuesta_Usuario::where('user_id', $user_id) //respuestas con el id del usuario
-        ->join('preguntas', 'respuestas_usuario.pregunta_id', '=', 'preguntas.pregunta_id')
-        ->pluck('preguntas.seccion_id')  //Muestra solo el seccion_id de las preguntas del join.
+        ->join('psico_alobri_preguntas', 'psico_alobri_respuestas_usuario.pregunta_id', '=', 'psico_alobri_preguntas.pregunta_id')
+        ->pluck('psico_alobri_preguntas.seccion_id')  //Muestra solo el seccion_id de las preguntas del join.
         ->unique() //Elimina duplicados
         ->toArray();
 

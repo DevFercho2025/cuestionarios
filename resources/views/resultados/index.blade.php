@@ -51,8 +51,8 @@
                                         <th>Nombre candidato</th>
                                         <th>Cuestionario</th>
                                         <th>Secciones completadas</th>
-                                        <th>Estado</th>
-                                        <!--Completado, pendiente por terminar, No ha iniciado -->
+                                        <th>token</th>
+                                        <th>Estado <!--Completado, pendiente por terminar, No ha iniciado --></th>
                                     </tr>
                                     </thead>
                                 </table>
@@ -60,11 +60,10 @@
                         </div>
                     </div>
                 </div>
+                <br>
                 
                 <div id="resultadosContainer"></div>
                 <div id="graficasContainer" class="mt-5"></div>
-
-                
             </div>
         </div>
     </div>
@@ -75,6 +74,125 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
+
+    <!--Script para datatable-->
+    <script>
+        if (typeof jQuery === 'undefined') {
+            document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof jQuery !== 'undefined') {
+                initializeApp();
+            } else {
+                console.error('jQuery no está disponible. Intenta incluirlo manualmente en tu plantilla.');
+                alert('Error: jQuery no está cargado correctamente. Por favor, contacta al administrador.');
+            }
+        });
+
+        function initializeApp() {
+            // Configuración global de AJAX: token CSRF
+            jQuery.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            // Inicializar componentes del template
+            if (typeof M !== 'undefined') {
+                M.Modal.init(document.querySelectorAll('.modal'));
+                M.FormSelect.init(document.querySelectorAll('select'));
+                M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+            }
+
+            // Inicialización de DataTable
+            if (typeof jQuery.fn.DataTable === 'undefined') {
+                console.error('DataTables no está disponible.');
+                var dtCss = document.createElement('link');
+                dtCss.rel = 'stylesheet';
+                dtCss.href = 'https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css';
+                document.head.appendChild(dtCss);
+
+                var dtScript = document.createElement('script');
+                dtScript.src = 'https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js';
+                dtScript.onload = function () {
+                    initializeDataTable();
+                };
+                document.body.appendChild(dtScript);
+            } else {
+                initializeDataTable();
+            }
+        }
+
+        function initializeDataTable() {
+            try{
+                var table = jQuery('#tokensTable').DataTable({
+                    ajax: {
+                        url: "{{ route('resultados.datatable') }}",
+                        dataSrc: '',
+                        error: function (xhr, error, thrown) {
+                            console.error('Error en la carga de datos:', error, thrown);
+                            if (typeof M !== 'undefined') {
+                                M.toast({
+                                    html: '<i class="material-icons left">error</i> Error al cargar los datos',
+                                    classes: 'rounded red'
+                                });
+                            } else {
+                                alert('Error al cargar los datos de la tabla');
+                            }
+                        }
+                    },
+                    columns: [
+                        {data: 'id_candidato'},
+                        {data: 'nombre'},
+                        {data: 'cuestionario'},
+                        {data: 'secciones_completadas'},
+                        {data: 'token'},
+                        {data: 'estado'}
+                    ],
+                    responsive: true,
+                    // Se elimina la opción de idioma para evitar textos extra de traducción
+                    drawCallback: function () {
+                        if (typeof M !== 'undefined') {
+                            M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+                        }
+                    },
+                    initComplete: function () {
+                        console.log('DataTable inicializada completamente');
+                    }
+                });
+
+                // Función para recargar la tabla
+                function reloadTable() {
+                    table.ajax.reload(function () {
+                        if (typeof M !== 'undefined') {
+                            M.toast({
+                                html: '<i class="material-icons left">refresh</i> Tabla actualizada',
+                                classes: 'rounded'
+                            });
+                        }
+                    }, false);
+                }
+
+                // Comprobar disponibilidad de SweetAlert2
+                if (typeof Swal === 'undefined') {
+                    console.error('SweetAlert2 no está disponible.');
+                    var swalScript = document.createElement('script');
+                    swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+                    document.body.appendChild(swalScript);
+                }
+
+                if (typeof M !== 'undefined') {
+                    M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+                }
+            }catch (error) {
+                console.error('Error al inicializar la tabla:', error);
+                alert('Ocurrió un error al inicializar la aplicación: ' + error.message);
+            }
+        }
+    </script>
+
+    <!--Script para PDF-->
     <script>
         $(document).ready(function(){
             //limpiar contenedores
@@ -114,7 +232,7 @@
                                                     </div>
                                                     <div class="col-md-3">
                                                         <label class="fw-bold">Vacante:</label>
-                                                        <p>${aplicacion ? aplicacion.cargo_aplicado : '--'}</p>
+                                                        <p>${aplicacion ? aplicacion.vacante : '--'}</p>
                                                     </div>
                                                     <div class="col-md-3">
                                                         <label class="fw-bold">Correo:</label>
@@ -160,7 +278,7 @@
 
                                 // Obtención del id de la respuesta correcta
                                 let respuestaCorrectaId = (rUser.respuestaCorrecta && rUser.respuestaCorrecta.respuestas_id)
-                                    ? rUser.respuestaCorrecta.respuestas_id
+                                    ? rUser.respuestaCorrecta.respuesta_id
                                     : null;
 
                                 // Se considera que la respuesta es correcta si existe respuesta correcta y coincide el id

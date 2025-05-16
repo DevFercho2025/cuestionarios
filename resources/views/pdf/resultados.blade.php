@@ -62,8 +62,8 @@
                             </td>
                             <td class="columna-candidato">
                                 <div>
-                                    <p><strong>Cuenta:</strong> <!-- {{ $aplicacion->cuenta ?? '---' }} --></p>
-                                    <p><strong>Cargo:</strong> {{ $aplicacion->cargo_aplicado ?? '---' }}</p>
+                                    <p><strong>Cuenta:</strong> {{ Auth::user()->config->Company->name ?? '---'}}</p>
+                                    <p><strong>Cargo:</strong> {{ $aplicacion->vacante ?? '---' }}</p>
                                     <p><strong>Idioma:</strong> Español</p>
                                 </div>
                             </td>
@@ -174,7 +174,7 @@
                                     <p><div style="color:darkcyan;">Puntuación general:</div> Se requiere aclaración</p>
                                 </td>
                                 <td>
-                                    <p><div style="color:darkcyan;">Registrado por:</div> Web</p>
+                                    <p><div style="color:darkcyan;">Registrado por:</div>{{auth()->user()->name}}</p>
                                 </td>
                             </tr>
                             <tr>

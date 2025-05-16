@@ -45,11 +45,7 @@ class CandidatoController extends Controller
                 $query->whereDoesntHave('aplicaciones');
             })
             ->get();
-            //agregar where para filtrar candidatos solamente de la compañía del usuario logueado
-            //generar servicio
 
-
-            //Formatear datos antes
             $candidatosData = $candidatos->map(function ($user) use ($isSuperAdmin) {
                  $data = [
                     'id' => $user->id,

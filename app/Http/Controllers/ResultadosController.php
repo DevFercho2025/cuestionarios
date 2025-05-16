@@ -8,6 +8,7 @@ use App\Models\Respuesta_Usuario;
 use App\Models\TokenEvaluacion;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use App\Models\Aplicacion;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class ResultadosController extends Controller
@@ -15,6 +16,49 @@ class ResultadosController extends Controller
     public function index()
     {
         return view('resultados.index');
+    }
+
+    public function datatable(){
+        try{
+            $companyId = Auth::user()->config->company_id;
+            $user = Auth::user();
+            $isSuperAdmin = $user->config->role->isSuperAdmin() ?? false;
+
+            $candidatos = User::with(['info', 'config.role', 'config.company'])
+            ->whereHas('config.role', function ($q) {
+                $q->where('id','=', 0);
+            })
+            ->when(!$isSuperAdmin, function ($query) use ($companyId) {
+                $query->whereHas('config', function ($q) use ($companyId) {
+                    $q->where('company_id', $companyId);
+                });
+            })->get();
+
+            $candidatosData = $candidatos->map(function ($user) use ($isSuperAdmin) {
+                 $data = [
+                    'id_candidato' => $user->id,
+                    'nombre' => $user->name,
+                    'cuestionario' => $user->email,
+                    'secciones_completadas' => optional($user->info)->fecha_nacimiento ? \Carbon\Carbon::parse($user->info->fecha_nacimiento)->toDateString() : null, // Formato de fecha
+                    'token' => optional($user->info)->genero,
+                    'estado' => optional($user->info)->codigo_postal,
+                ];
+
+                if ($isSuperAdmin) {
+                    $data['company_name'] = $user->config->company->name ?? 'Sin compañía';
+                }
+                return $data;
+            });
+            return response()->json(['data' => $candidatosData]);
+
+        }catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Hubo un problema al obtener los tokens de evaluaciones.',
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ], 500);
+        }
     }
 
     public function buscarResultados(Request $request)
@@ -58,7 +102,6 @@ class ResultadosController extends Controller
             'token'       => $token
         ]);
     }
-
 
     public function renderizarMetricas($id)
     {
