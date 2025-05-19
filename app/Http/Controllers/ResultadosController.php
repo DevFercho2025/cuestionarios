@@ -18,37 +18,69 @@ class ResultadosController extends Controller
         return view('resultados.index');
     }
 
+    public function verResultados($id)
+    {
+        // TODO: Implementar vista de resultados
+        return view('resultados.ver', ['id' => $id]); // O simplemente un dump temporal
+    }
+
     public function datatable(){
         try{
             $companyId = Auth::user()->config->company_id;
             $user = Auth::user();
             $isSuperAdmin = $user->config->role->isSuperAdmin() ?? false;
 
-            $candidatos = User::with(['info', 'config.role', 'config.company'])
+            $candidatos = User::with(['info', 'config.role', 'config.company', 'tokensEvaluaciones','categorias.secciones','respuestasUsuario'])
             ->whereHas('config.role', function ($q) {
                 $q->where('id','=', 0);
             })
-            ->when(!$isSuperAdmin, function ($query) use ($companyId) {
-                $query->whereHas('config', function ($q) use ($companyId) {
-                    $q->where('company_id', $companyId);
+            ->when(!$isSuperAdmin, function ($q) use ($companyId) {
+                $q->whereHas('config', function ($q2) use ($companyId) {
+                    $q2->where('company_id', $companyId);
                 });
             })->get();
 
-            $candidatosData = $candidatos->map(function ($user) use ($isSuperAdmin) {
-                 $data = [
-                    'id_candidato' => $user->id,
-                    'nombre' => $user->name,
-                    'cuestionario' => $user->email,
-                    'secciones_completadas' => optional($user->info)->fecha_nacimiento ? \Carbon\Carbon::parse($user->info->fecha_nacimiento)->toDateString() : null, // Formato de fecha
-                    'token' => optional($user->info)->genero,
-                    'estado' => optional($user->info)->codigo_postal,
-                ];
+            $candidatosData = [];
 
-                if ($isSuperAdmin) {
-                    $data['company_name'] = $user->config->company->name ?? 'Sin compañía';
+            foreach ($candidatos as $user) {
+                // Tomar el último token del usuario
+                $tokenEval = $user->tokensEvaluaciones->sortByDesc('created_at')->first();
+                $token = $tokenEval?->token ?? 'Sin token';
+                $tokenId = $tokenEval?->id;
+
+                foreach ($user->categorias as $categoria) {
+                    if (!$categoria) continue;
+
+                    $seccionesCompletadasIds = Respuesta_Usuario::where('user_id', $user->id)
+                        ->where('token_id', $tokenId)
+                        ->join('psico_alobri_preguntas', 'psico_alobri_respuestas_usuario.pregunta_id', '=', 'psico_alobri_preguntas.pregunta_id')
+                        ->pluck('psico_alobri_preguntas.seccion_id')
+                        ->unique()
+                        ->toArray();
+
+                    $secciones = $categoria->secciones;
+                    $totalSecciones = $secciones->count();
+
+                    $seccionesCompletadas = $secciones->whereIn('id', $seccionesCompletadasIds);
+                    $seccionesCompletadasNombres = $seccionesCompletadas->pluck('titulo')->toArray();
+
+                    $completadas = $seccionesCompletadas->count();
+
+                    $estado = ($totalSecciones > 0 && $completadas === $totalSecciones)
+                        ? "Completado: <br> $completadas/$totalSecciones realizadas"
+                        : "Pendiente: <br> $completadas/$totalSecciones realizadas";
+
+                    $candidatosData[] = [
+                        'id_candidato' => $user->id,
+                        'nombre' => $user->name,
+                        'cuestionario' => $categoria->titulo_cuestionario,
+                        'secciones_completadas' => $seccionesCompletadasNombres,
+                        'token' => $token,
+                        'estado' => $estado,
+                    ];
                 }
-                return $data;
-            });
+            }
+
             return response()->json(['data' => $candidatosData]);
 
         }catch (\Exception $e) {

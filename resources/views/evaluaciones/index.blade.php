@@ -294,13 +294,17 @@
                                         if (response.success) {
                                             Swal.fire('¡Éxito!', response.message, 'success');
                                         } else {
-                                            Swal.fire('Error', 'No se pudieron asignar las evaluaciones.', 'error');
+                                            Swal.fire('Error', response.message || 'No se pudieron asignar las evaluaciones.', 'error');
                                         }
                                     },
                                     error: function (xhr, status, error) {
-                                        // Mostramos el error para depuración
-                                        console.error('Error al asignar evaluaciones:', error);
-                                        Swal.fire('Error', 'Hubo un problema al asignar las evaluaciones.', 'error');
+                                        let msg = 'Hubo un problema al asignar las evaluaciones.'; // mensaje por defecto
+
+                                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                                            msg = xhr.responseJSON.message;
+                                        }
+
+                                        Swal.fire('Error', msg, 'error');
                                     }
                                 });
                             }

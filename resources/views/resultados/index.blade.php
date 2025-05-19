@@ -35,35 +35,32 @@
                     @csrf
                     <div class="input-group">
                         <input type="text" name="token" class="form-control" placeholder="Ingrese el token" required>
-                        <button type="submit" class="btn btn-primary">Buscar</button>
+                        <button type="submit" class="btn btn-primary">Obtener Resultados</button>
                     </div>
                 </form>
-
+                <div id="resultadosContainer"></div>
+            </div>
+        </div>
+        <br>
                 <!-- Tabla de tokens -->
-                <div class="row">
-                    <div class="col s12">
-                        <div class="card dark-card z-depth-3">
-                            <div class="card-datatable table-responsive">
-                                <table id="tokensTable" class="dt-responsive table table-bordered">
-                                    <thead>
-                                    <tr>
-                                        <th>Id candidato</th>
-                                        <th>Nombre candidato</th>
-                                        <th>Cuestionario</th>
-                                        <th>Secciones completadas</th>
-                                        <th>token</th>
-                                        <th>Estado <!--Completado, pendiente por terminar, No ha iniciado --></th>
-                                    </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                        </div>
+        <div class="row">
+            <div class="col s12">
+                <div class="card dark-card z-depth-3">
+                    <div class="card-datatable table-responsive">
+                        <table id="tokensTable" class="dt-responsive table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>Id candidato</th>
+                                <th>Nombre candidato</th>
+                                <th>Cuestionario</th>
+                                <th>Secciones completadas</th>
+                                <th>token</th>
+                                <th>Estado</th>
+                            </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
-                <br>
-                
-                <div id="resultadosContainer"></div>
-                <div id="graficasContainer" class="mt-5"></div>
             </div>
         </div>
     </div>
@@ -129,9 +126,8 @@
                 var table = jQuery('#tokensTable').DataTable({
                     ajax: {
                         url: "{{ route('resultados.datatable') }}",
-                        dataSrc: '',
+                        dataSrc: 'data',
                         error: function (xhr, error, thrown) {
-                            console.error('Error en la carga de datos:', error, thrown);
                             if (typeof M !== 'undefined') {
                                 M.toast({
                                     html: '<i class="material-icons left">error</i> Error al cargar los datos',
@@ -146,8 +142,44 @@
                         {data: 'id_candidato'},
                         {data: 'nombre'},
                         {data: 'cuestionario'},
-                        {data: 'secciones_completadas'},
-                        {data: 'token'},
+                        {data: 'secciones_completadas',
+                            render: function(data, type, row) {
+                                const colores = ['primary', 'warning', 'info', 'danger', 'success'];
+
+                                return data.map(function(nombre, index) {
+                                    const color = colores[index % colores.length];
+                                    /*La operación con módulo deja que sea cícloco, recorriento los elementos de colores (que van de 0 a 4).
+                                        index(seccion en el array) / 5 (cantidad de colores)
+                                        0/5 = 0, color elegido = 0 (primary)
+                                        1/5 = 1, color elegido = 1 (warning)
+                                        y así.
+                                    */
+
+                                    return `
+                                        <div class="card shadow-none bg-transparent border border-${color} mb-1">
+                                            <div class="card-body text-${color}">
+                                                <p class="card-text">${nombre}</p>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('<br>');
+                            }
+                        },
+                        {data: 'token',
+                            render: function(data, type, row) {
+                                const tokenCorto = data.length > 10 ? data.substring(0, 10) + '...' : data;
+                                const idBtn = 'copyBtn-' + row.id_candidato + '-' + Math.floor(Math.random() * 10000);
+
+                                return  `
+                                    <div style="display: inline-flex; align-items: center; gap: 8px;">
+                                        <span id="tokenText-${idBtn}" style="white-space: nowrap;">${tokenCorto}</span>
+                                        <button class="btn btn-small copy-btn" data-token="${data}" id="${idBtn}" title="Copiar token">
+                                            <i class="ri-file-copy-line"></i>
+                                        </button>
+                                    </div>
+                                `;
+                            }
+                        },
                         {data: 'estado'}
                     ],
                     responsive: true,
@@ -173,6 +205,52 @@
                         }
                     }, false);
                 }
+
+                $('#tokensTable').on('click', '.copy-btn', function() {
+                    const token = $(this).data('token');
+                    const row = $(this).closest('tr');
+                    const estadoTexto = row.find('td').eq(5).text().trim(); //td 5 = columna de estado
+
+                    // Verificamos si el estado contiene la palabra "Pendiente"
+                    const esPendiente = estadoTexto.toLowerCase().includes('pendiente');
+
+                    if (esPendiente) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Evaluación incompleta',
+                            text: 'Este candidato aún no completa todas las secciones de su evaluación. Si genera un reporte de sus resultados, tenga en cuenta que será incompleto.',
+                            showCancelButton: true,
+                            confirmButtonText: 'Copiar de todas formas',
+                            cancelButtonText: 'Cancelar',
+                            confirmButtonColor: '#f1c40f',
+                            cancelButtonColor: '#d33'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                copiarToken(token);
+                            }
+                        });
+                    } else {
+                        copiarToken(token);
+                    }
+
+                   function copiarToken(token) {
+                        navigator.clipboard.writeText(token).then(() => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Token copiado correctamente',
+                                text: 'Ahora puedes ver las respuestas de este candidato.',
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'OK'
+                            });
+                        }).catch(() => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error al copiar',
+                                text: 'No se pudo copiar el token. Intenta manualmente.',
+                            });
+                        });
+                    }
+                });
 
                 // Comprobar disponibilidad de SweetAlert2
                 if (typeof Swal === 'undefined') {
@@ -243,78 +321,6 @@
 
                             $("#resultadosContainer").append(infoHtml);
 
-                            // 2. Construir tabla de respuestas
-                            let tablaHtml = `
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Pregunta</th>
-                                            <th>Respuesta del Usuario</th>
-                                            <th>Respuesta Correcta</th>
-                                            <th>Resultado</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                            `;
-
-                            $.each(respuestas, function(i, rUser){
-                                // Texto de la pregunta
-                                let preguntaTexto = rUser.pregunta && rUser.pregunta.pregunta
-                                    ? rUser.pregunta.pregunta
-                                    : 'Pregunta no encontrada';
-
-                                // Texto de la respuesta del usuario
-                                let respuestaUsuarioTexto = rUser.respuesta && rUser.respuesta.respuesta
-                                    ? rUser.respuesta.respuesta
-                                    : 'Sin respuesta';
-
-                                // Texto de la respuesta correcta
-                                let respuestaCorrectaTexto = (rUser.respuestaCorrecta
-                                    && rUser.respuestaCorrecta.respuesta
-                                    && rUser.respuestaCorrecta.respuesta.respuesta)
-                                    ? rUser.respuestaCorrecta.respuesta.respuesta
-                                    : 'No registrada';
-
-                                // Obtención del id de la respuesta correcta
-                                let respuestaCorrectaId = (rUser.respuestaCorrecta && rUser.respuestaCorrecta.respuestas_id)
-                                    ? rUser.respuestaCorrecta.respuesta_id
-                                    : null;
-
-                                // Se considera que la respuesta es correcta si existe respuesta correcta y coincide el id
-                                let esCorrecta = respuestaCorrectaId && (respuestaCorrectaId == rUser.respuesta_id);
-
-                                // Definir cómo se muestra la respuesta del usuario:
-                                // Si es correcta → verde; si es incorrecta (o no hay respuesta correcta) → rojo.
-                                let respuestaUsuarioHTML = esCorrecta
-                                    ? `<span class="text-success">${respuestaUsuarioTexto}</span>`
-                                    : `<span class="text-danger">${respuestaUsuarioTexto}</span>`;
-
-                                // La respuesta correcta se muestra en verde siempre.
-                                let respuestaCorrectaHTML = `<span class="text-success">${respuestaCorrectaTexto}</span>`;
-
-                                // Resultado: 1 si es correcta, 0 si es incorrecta.
-                                let resultadoValor = esCorrecta ? 1 : 0;
-
-                                // Construir la fila de la tabla
-                                tablaHtml += `
-                                            <tr>
-                                                <td>${preguntaTexto}</td>
-                                                <td>${respuestaUsuarioHTML}</td>
-                                                <td>${respuestaCorrectaHTML}</td>
-                                                <td>${resultadoValor}</td>
-                                            </tr>
-                                        `;
-                                    });
-
-
-                                    tablaHtml += `
-                                    </tbody>
-                                </table>
-                            </div>
-                            `;
-
-                            $("#resultadosContainer").append(tablaHtml);
 
                             // 3. Botón para exportar PDF (si existe el ID del token)
                             if (response.token && response.token.id) {
@@ -324,86 +330,6 @@
                                 $("#pdfContainer").append(pdfHtml);
                             }
 
-                            // 4. (Opcional) Mostrar gráficas por sección: correctas vs. incorrectas
-                            //    Agrupamos las respuestas según la sección y contamos cuántas
-                            //    fueron correctas e incorrectas.
-                            let sectionsData = {};
-                            $.each(respuestas, function(i, rUser){
-                                let tituloSeccion = (rUser.pregunta
-                                    && rUser.pregunta.seccion
-                                    && rUser.pregunta.seccion.titulo)
-                                    ? rUser.pregunta.seccion.titulo
-                                    : 'Sin sección';
-
-                                let correctId = (rUser.respuestaCorrecta && rUser.respuestaCorrecta.respuestas_id)
-                                    ? rUser.respuestaCorrecta.respuestas_id
-                                    : null;
-
-                                let isCorrect = (correctId && (correctId == rUser.respuesta_id));
-
-                                if(!sectionsData[tituloSeccion]) {
-                                    sectionsData[tituloSeccion] = { correct: 0, incorrect: 0 };
-                                }
-
-                                if(correctId) {
-                                    if(isCorrect) {
-                                        sectionsData[tituloSeccion].correct++;
-                                    } else {
-                                        sectionsData[tituloSeccion].incorrect++;
-                                    }
-                                } else {
-                                    // Si no hay respuesta correcta registrada,
-                                    // podríamos contarla como "no evaluada" o incorrecta.
-                                    sectionsData[tituloSeccion].incorrect++;
-                                }
-                            });
-
-                            // Construimos los canvas de Chart.js si hay datos
-                            if(Object.keys(sectionsData).length > 0){
-                                let graficasHtml = `<h4 class="mt-5">Gráficas por Sección</h4>`;
-
-                                $.each(sectionsData, function(sectionName, counts){
-                                    let canvasId = 'chart_' + sectionName.replace(/\s+/g, '_');
-                                    graficasHtml += `
-                                <div class="card my-3">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">${sectionName}</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <canvas id="${canvasId}" width="400" height="300"></canvas>
-                                    </div>
-                                </div>
-                            `;
-                                });
-                                $("#graficasContainer").append(graficasHtml);
-
-                                // Crear la gráfica para cada sección
-                                $.each(sectionsData, function(sectionName, counts){
-                                    let canvasId = 'chart_' + sectionName.replace(/\s+/g, '_');
-                                    let ctx = document.getElementById(canvasId).getContext('2d');
-                                    new Chart(ctx, {
-                                        type: 'pie',
-                                        data: {
-                                            labels: ['Correctas', 'Incorrectas'],
-                                            datasets: [{
-                                                data: [counts.correct, counts.incorrect],
-                                                backgroundColor: ['#28a745', '#dc3545']
-                                            }]
-                                        },
-                                        options: {
-                                            responsive: true,
-                                            plugins: {
-                                                legend: {
-                                                    position: 'top'
-                                                },
-                                                title: {
-                                                    display: false
-                                                }
-                                            }
-                                        }
-                                    });
-                                });
-                            }
                         }
                     },
                     error: function(xhr){

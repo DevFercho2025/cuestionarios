@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Categoria;
 use App\Models\usuarios_categoria;
+use App\Models\ContadorEvaluacion;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class EvaluacionController extends Controller
 {
@@ -22,23 +25,46 @@ class EvaluacionController extends Controller
     public function asignarCategorias(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,id', //usuario al que se le asignan evaluaciones
             'categorias' => 'required|array',
             'categorias.*' => 'exists:psico_alobri_categorias,id',
         ]);
     
         try {
-            foreach ($request->categorias as $catId) {
+            $asignadorId = Auth::id();  //usuario que asigna las evaluaciones
+            $contador = ContadorEvaluacion::where('user_id', $asignadorId)->first();
+            if (!$contador) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No hay un contador de evaluaciones para su usuario. Contacte a Soporte.'
+                ], 400);
+            }
+
+            if ($contador->pruebas_disponibles == 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No tienes pruebas disponibles para asignar evaluaciones. Adquiere más pruebas'
+                ], 403);
+            }
+
+            foreach ($request->categorias as $categoriaId) {
                 Usuarios_categoria::firstOrCreate([
                     'user_id' => $request->user_id,
-                    'categorias_id' => $catId,
+                    'categorias_id' => $categoriaId,
                 ]);
             }
-    
+
+            #Actualiza el contador para el asignador de evaluaciones (el usuario logueado)
+            $contador->decrement('pruebas_disponibles');
+            $contador->increment('pruebas_usadas');
             return response()->json(['success' => true, 'message' => 'Evaluaciones asignadas']);
+
         } catch (\Exception $e) {
-            
-            return response()->json(['success' => false, 'message' => 'Error al asignar evaluaciones'], 500);
+            Log::error('Error al asignar evaluaciones: ' . $e->getMessage(), [
+                'exception' => $e,
+                'user_id' => Auth::id(),
+                'request_data' => $request->all(),
+            ]);
         }
     }
 

@@ -15,6 +15,6 @@ class Categoria extends Model
 
     public function secciones()
     {
-        return $this->hasMany(Seccion::class);
+        return $this->hasMany(Seccion::class, 'categoria_id');
     }
 }

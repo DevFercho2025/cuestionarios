@@ -74,6 +74,15 @@ class User extends Authenticatable
         return $this->belongsToMany(Categoria::class, 'psico_alobri_usuarios_categorias', 'user_id', 'categorias_id');
     }
 
+    public function tokensEvaluaciones()
+    {
+        return $this->hasMany(TokenEvaluacion::class, 'user_id');
+    }
+
+    public function respuestasUsuario()
+    {
+        return $this->hasMany(Respuesta_Usuario::class, 'user_id');
+    }
 
 
 }
