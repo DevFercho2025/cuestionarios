@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\User;
 use App\Models\Client;
+use App\Models\ContadorEvaluacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -90,6 +91,13 @@ class AuthController extends Controller
             'company_id'         => $company->id,
         ]);
         $client->save();
+
+        // 5) Registrar el contador de evaluaciones predeterminado.
+        ContadorEvaluacion::create([
+            'user_id'            => $user->id,
+            'pruebas_disponibles'=> 3,
+            'pruebas_usadas'     => 0,
+        ]);
 
         // Finalmente, loguea al usuario o rediríge
         auth()->login($user);

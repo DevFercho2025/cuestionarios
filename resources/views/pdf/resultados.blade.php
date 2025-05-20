@@ -238,41 +238,211 @@
             </section>
             
             <section class="pagina-tres">
-                    <div class="contenedor-s experiencia">
-                        <img  class="icono-informe" src="{{ public_path('storage/logos/logoAlobri.jpeg') }}">
-                        <h5>Información relativa a experiencia y trayectoria informada por el candidato</h5>
+                    <div class="contenedor-s experiencia" style="margin-top:80px;">
+                        <div style="display: inline-block; text-align: left;">
+                            <table style="margin: 0 auto;">
+                              <tr>
+                                <td style="vertical-align: middle; padding-right: 10px;">
+                                  <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                                </td>
+                                <td style="vertical-align: middle;">
+                                  <div>Información relativa a experiencia y trayectoria informada por el candidato</div>
+                                </td>
+                              </tr>
+                            </table>
+                        </div>
+                        <table width="100%" cellspacing="0" cellpadding="10">
+                            <tr>
+                                 <!-- Columna 1 -->
+                               <td style="vertical-align: middle; font-size: 12px; padding: 5px;">
+                                    <table cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
+                                        <tr>
+                                            <td style="vertical-align: middle;">
+                                                <div style="font-family: 'DejaVu Sans', sans-serif; font-style: normal; font-weight: bold; font-size: 16px;  width: 20px; height: 20px; border-radius: 50%; background-color:rgb(59,156,156); text-align: center; line-height: 15px; font-weight: bold; color: white;">
+                                                    &#10003;
+                                                </div>
+                                            </td>
+                                            <td style="vertical-align: middle; padding-left: 10px;">
+                                                <div>Respuestas que requieren</div>
+                                                <div>una aclaración adicional</div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+
+                                <!-- Columna 2 -->
+                               <td style="vertical-align: middle; font-size: 12px; padding: 5px;">
+                                    <table cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
+                                        <tr>
+                                            <td style="vertical-align: middle;">
+                                                <div style="width: 20px; height: 20px; border-radius: 50%; background-color: rgb(206, 51, 51); text-align: center; line-height: 18px; font-weight: bold; color: white;">
+                                                    !
+                                                </div>
+                                            </td>
+                                            <td style="vertical-align: middle; padding-left: 10px;">
+                                                <div>Respuestas que requieren</div>
+                                                <div>una aclaración adicional</div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+
+                                <!-- Columna 3 -->
+                                <td style="vertical-align: middle; font-size: 12px; padding: 5px;">
+                                    <table cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
+                                        <tr>
+                                            <td style="vertical-align: middle;">
+                                                <div style="width: 20px; height: 20px; border-radius: 50%; background-color: rgb(206, 51, 51); text-align: center; line-height: 18px; font-weight: bold; color: white;">
+                                                    %
+                                                </div>
+                                            </td>
+                                            <td style="vertical-align: middle; padding-left: 10px;">
+                                                <div>Respuesta similar dentro</div>
+                                                <div>de la cuenta</div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+
+                                <!-- Columna 4 vacía -->
+                                <td style="width: 25%;">&nbsp;</td>
+                            </tr>
+                        </table>
                     </div>
                     <div class="contenedor-s general">
-                        <img  class="icono-informe" src="{{ public_path('storage/logos/logoAlobri.jpeg') }}">
-                        <h5>General</h5>
+                        <div style="display: inline-block; text-align: left;">
+                            <table style="margin: 0 auto;">
+                              <tr>
+                                <td style="vertical-align: middle; padding-right: 10px;">
+                                  <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                                </td>
+                                <td style="vertical-align: middle;">
+                                  <div>General</div>
+                                </td>
+                              </tr>
+                            </table>
+                        </div>
+                        <table>
+                            <tr>
+                                <!-- COLUMNA IZQUIERDA -->
+                                <td style="width: 60%; vertical-align: top;">
+                                    <div style="display: flex; align-items: center;">
+                                        <!-- Círculo con logo -->
+                                        <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background-color: #e0e0e0; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                                            <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 24px; height: 24px;" />
+                                        </div>
+                                        <!-- Texto -->
+                                        <div style="font-size: 12px;">
+                                            <strong>Título</strong><br>
+                                            Descripción o resumen breve aquí.
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- COLUMNA DERECHA -->
+                                <td style="width: 40%; vertical-align: top; font-size: 12px;">
+                                    Texto adicional, descripción extendida o detalles importantes que complementan la información.
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                     <div class="contenedor-s record-criminal">
-                        <img  class="icono-informe" src="{{ public_path('storage/logos/logoAlobri.jpeg') }}">
-                        <h5>Récord Criminal</h5>
+                        <div style="display: inline-block; text-align: left;">
+                            <table style="margin: 0 auto;">
+                              <tr>
+                                <td style="vertical-align: middle; padding-right: 10px;">
+                                  <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                                </td>
+                                <td style="vertical-align: middle;">
+                                  <div>Record-Criminal</div>
+                                </td>
+                              </tr>
+                            </table>
+                        </div>
                     </div>
                     <div class="contenedor-s desvinculacion">
-                        <img  class="icono-informe" src="{{ public_path('storage/logos/logoAlobri.jpeg') }}">
-                        <h5>Desvinculación de la Empresa</h5>
+                        <div style="display: inline-block; text-align: left;">
+                            <table style="margin: 0 auto;">
+                              <tr>
+                                <td style="vertical-align: middle; padding-right: 10px;">
+                                  <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                                </td>
+                                <td style="vertical-align: middle;">
+                                  <div>Desvinculación de la empresa</div>
+                                </td>
+                              </tr>
+                            </table>
+                        </div>
                     </div>
                     <div class="contenedor-s historial-manejo">
-                        <img  class="icono-informe" src="{{ public_path('storage/logos/logoAlobri.jpeg') }}">
-                        <h5>Historial de Manejo</h5>
+                        <div style="display: inline-block; text-align: left;">
+                            <table style="margin: 0 auto;">
+                              <tr>
+                                <td style="vertical-align: middle; padding-right: 10px;">
+                                  <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                                </td>
+                                <td style="vertical-align: middle;">
+                                  <div>Historial de Manejo</div>
+                                </td>
+                              </tr>
+                            </table>
+                        </div>
                     </div>
                     <div class="contenedor-s drogas">
-                        <img  class="icono-informe" src="{{ public_path('storage/logos/logoAlobri.jpeg') }}">
-                        <h5>Drogas</h5>
+                        <div style="display: inline-block; text-align: left;">
+                            <table style="margin: 0 auto;">
+                              <tr>
+                                <td style="vertical-align: middle; padding-right: 10px;">
+                                  <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                                </td>
+                                <td style="vertical-align: middle;">
+                                  <div>Drogas</div>
+                                </td>
+                              </tr>
+                            </table>
+                        </div>
                     </div>
                     <div class="contenedor-s alcohol">
-                        <img  class="icono-informe" src="{{ public_path('storage/logos/logoAlobri.jpeg') }}">
-                        <h5>Alcohol</h5>
+                        <div style="display: inline-block; text-align: left;">
+                            <table style="margin: 0 auto;">
+                              <tr>
+                                <td style="vertical-align: middle; padding-right: 10px;">
+                                  <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                                </td>
+                                <td style="vertical-align: middle;">
+                                  <div>Alcohol</div>
+                                </td>
+                              </tr>
+                            </table>
+                        </div>
                     </div>
                     <div class="contenedor-s historia-laboral">
-                        <img  class="icono-informe" src="{{ public_path('storage/logos/logoAlobri.jpeg') }}">
-                        <h5>Historia Laboral</h5>
+                        <div style="display: inline-block; text-align: left;">
+                            <table style="margin: 0 auto;">
+                              <tr>
+                                <td style="vertical-align: middle; padding-right: 10px;">
+                                  <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                                </td>
+                                <td style="vertical-align: middle;">
+                                  <div>Historial Laboral</div>
+                                </td>
+                              </tr>
+                            </table>
+                        </div>
                     </div>
                     <div class="contenedor-s seguridad-laboral">
-                        <img  class="icono-informe" src="{{ public_path('storage/logos/logoAlobri.jpeg') }}">
-                        <h5>Seguridad Laboral</h5>
+                        <div style="display: inline-block; text-align: left;">
+                            <table style="margin: 0 auto;">
+                              <tr>
+                                <td style="vertical-align: middle; padding-right: 10px;">
+                                  <img src="{{ public_path('storage/logos/logoAlobri.jpeg') }}" style="width: 30px;">
+                                </td>
+                                <td style="vertical-align: middle;">
+                                  <div>Seguridad Laboral</div>
+                                </td>
+                              </tr>
+                            </table>
+                        </div>
                     </div>
             </section>
 

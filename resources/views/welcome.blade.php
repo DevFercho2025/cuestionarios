@@ -1,10 +1,116 @@
 @extends('layout.app')
 
 @section('content')
-    <!-- Page Header -->
-    <div class="row">
+    <head>
+        <link rel="stylesheet" href="../../assets/vendor/css/pages/front-page-landing.css">
+    </head>
+
+    <nav class="layout-navbar container shadow-none py-0" style="background-color:rgba(0, 0, 0, 0.651)">
+      <div class="navbar navbar-expand-lg landing-navbar border-top-0 px-4 px-md-8">
+        <!-- Menu logo-->
+        <div class="navbar-brand app-brand demo d-flex py-0 py-lg-2 me-6">
+            <!-- Mobile menu toggle: Start-->
+            <button class="navbar-toggler border-0 px-0 me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="tf-icons ri-menu-fill ri-24px align-middle"></i>
+            </button>
+            <!-- Mobile menu toggle: End-->
+            <a href="landing-page.html" class="app-brand-link">
+                <span class="app-brand-text demo menu-text fw-semibold ms-2 ps-1 text-primary">MPOnePlus</span>
+            </a>
+        </div>
+        <!-- / Menu logo-->
+
+        <!-- Menu wrapper: Start -->
+        <div class="collapse navbar-collapse landing-nav-menu" id="navbarSupportedContent">
+          <button class="navbar-toggler border-0 text-heading position-absolute end-0 top-0 scaleX-n1-rtl" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="tf-icons ri-close-fill"></i>
+          </button>
+          <ul class="navbar-nav me-auto p-4 p-lg-0">
+            <li class="nav-item">
+              <a class="nav-link fw-medium"href="#overview">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-medium" href="#services">Servicios</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-medium" href="#process">Proceso</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-medium" href="#testimonials">Testimonios</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-medium" href="#contacto">Contáctenos</a>
+            </li>
+          </ul>
+        </div>
+        <div class="landing-menu-overlay d-lg-none"></div>
+        <!-- Menu wrapper: End -->
+
+        <ul class="navbar-nav flex-row align-items-center ms-auto">
+          <!-- Style Switcher -->
+          <li class="nav-item dropdown-style-switcher dropdown me-2 me-xl-0">
+            <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow me-sm-4 waves-effect waves-light" href="javascript:void(0);" data-bs-toggle="dropdown">
+              <i class="ri-22px text-heading ri-computer-line"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-styles">
+              <li>
+                <a class="dropdown-item waves-effect" href="javascript:void(0);" data-theme="light">
+                  <span class="align-middle"><i class="ri-sun-line ri-22px me-3"></i>Light</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item waves-effect" href="javascript:void(0);" data-theme="dark">
+                  <span class="align-middle"><i class="ri-moon-clear-line ri-22px me-3"></i>Dark</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item waves-effect" href="javascript:void(0);" data-theme="system">
+                  <span class="align-middle"><i class="ri-computer-line ri-22px me-3"></i>System</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <!-- / Style Switcher-->
+
+          <li>
+            <a href="{{ route('register.wizard') }}" class="btn btn-secondary px-2 px-sm-4 px-lg-2 px-xl-4 waves-effect waves-light me-4" target="_blank"><span class="tf-icons ri-user-line me-md-1"></span><span class="d-none d-md-block">Registrarse</span></a>
+          </li>
+          <li>
+            <a href="{{ route('login') }}" class="btn btn-primary px-2 px-sm-4 px-lg-2 px-xl-4 waves-effect waves-light" target="_blank"><span class="ri-user-shared-2-fill me-md-1"></span><span class="d-none d-md-block">Iniciar Sesión</span></a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+     <section id="landingHero" class="section-py landing-hero position-relative">
+        <img alt="hero background" class="position-absolute top-0 start-0 w-100 h-100 z-n1" data-speed="1" data-app-light-img="front-pages/backgrounds/hero-bg-light.png" data-app-dark-img="front-pages/backgrounds/hero-bg-dark.png">
+        <div class="container">
+          <div class="hero-text-box text-center pb-4">
+            <h3 class="text-primary hero-title fs-2 pt-4">Evaluaciones psicométricas profesionales</h3>
+            <h2 class="h6 mb-8 mt-4">
+              Soluciones confiables para la selección y<br>desarrollo de talento con resultados validados científicamente.
+            </h2>
+            <a href="#contacto" class="btn btn-lg btn-primary waves-effect waves-light">Solicitar información</a>
+          </div>
+          <div class="position-relative hero-animation-img mb-1">
+            <a href="#">
+                <!--Aquí imagen principal de atrás-->
+              <div class="hero-dashboard-img text-center">
+                <img src="../../assets/img/front-pages/landing-page/hero-dashboard-dark.png" alt="hero dashboard" class="animation-img" data-speed="2" data-app-light-img="front-pages/landing-page/hero-dashboard-light.png" data-app-dark-img="front-pages/landing-page/hero-dashboard-dark.png" style="transform: translate(-11.97px, 6.47px);">
+              </div>
+              <!--Aquí imágenes encima-->
+              <div class="position-absolute hero-elements-img">
+                <img src="../../assets/img/front-pages/landing-page/hero-elements-dark.png" alt="hero elements" class="animation-img" data-speed="4" data-app-light-img="front-pages/landing-page/hero-elements-light.png" data-app-dark-img="front-pages/landing-page/hero-elements-dark.png" style="transform: translate(-35.93px, 0.95px);">
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+    <!-- Page Header original
+    <div class="row" id="header">
         <div class="col-12">
-            <div class="card bg-primary mb-4">
+            <div class="card bg-primary mb-4 ">
                 <div class="d-flex align-items-end row">
                     <div class="col-md-7">
                         <div class="card-body">
@@ -15,7 +121,7 @@
                     </div>
                     <div class="col-md-5 text-center text-md-end">
                         <div class="card-body pb-0 px-0 px-md-4 d-none d-md-block">
-                            <img src="{{ asset('/assets/img/illustrations/man-with-laptop-light.png') }}"
+                            <img src="{/{ asset('/assets/img/illustrations/man-with-laptop-light.png') }}"
                                  height="140"
                                  alt="View Profile"
                                  data-app-light-img="illustrations/man-with-laptop-light.png"
@@ -25,10 +131,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>-->
 
     <!-- Overview Section -->
-    <div class="row">
+    <div class="row" id="overview">
         <div class="col-12">
             <div class="card mb-4">
                 <div class="card-body">
@@ -92,7 +198,7 @@
     </div>
 
     <!-- Services Section -->
-    <div class="row">
+    <div class="row" id="services">
         <div class="col-12">
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -180,7 +286,7 @@
     </div>
 
     <!-- Process Section -->
-    <div class="row">
+    <div class="row" id="process">
         <div class="col-12">
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -247,7 +353,7 @@
     </div>
 
     <!-- Testimonials Section -->
-    <div class="row">
+    <div class="row" id="testimonials">
         <div class="col-12">
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -323,7 +429,7 @@
     </div>
 
     <!-- CTA Section -->
-    <div class="row">
+    <div class="row" id="cta">
         <div class="col-12">
             <div class="card bg-primary mb-4">
                 <div class="card-body p-4 text-center">
@@ -475,7 +581,7 @@
     </div>
 
     <!-- Clients Section -->
-    <div class="row">
+    <div class="row" id="clients">
         <div class="col-12">
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -543,6 +649,9 @@
             </div>
         </div>
     </div>
+
+    <script src="../../assets/js/front-page-landing.js"></script>
+    
 @endsection
 
 @section('scripts')
