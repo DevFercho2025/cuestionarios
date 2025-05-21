@@ -38,20 +38,14 @@
                 </div>
             </div>
         </div>
-        <!--Volver a dashboard-->
-        <div class="row">
-            <div class="col s12">
-                <a href="{{ route('admin.index') }}" class="waves-effect waves-light btn-large blue">
-                    Regresar a Admin
-                </a>
-            </div>
-        </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="{{ asset('js/tables-datatables-advanced.js') }}"></script>
 
     @push('scripts')
     <script>
-        
         if (typeof jQuery === 'undefined') {
             document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
         }
@@ -62,7 +56,7 @@
             } else {
                 console.error('jQuery no está disponible. Intenta incluirlo manualmente en tu plantilla.');
                 alert('Error: jQuery no está cargado correctamente. Por favor, contacta al administrador.');
-                }
+            }
         });
 
         function initializeApp() {
@@ -132,15 +126,22 @@
                                 return botones = `
                                     <div class="action-buttons">
                                         <button type="button" class="btn btn-success waves-effect waves-light asignar-evaluacion-btn tooltipped"
-                                            data-position="top" data-tooltip="Añadir Evaluación" data-id="${row.user_id}">
+                                            data-position="top" title="Asignar Evaluaciones" data-id="${row.user_id}">
                                             <i class="ri-add-line"></i>
                                         </button>
+                                        <br>
                                         <button type="button" class="btn btn-secondary waves-effect waves-light ver-evaluaciones-btn tooltipped"
-                                            data-position="top" data-tooltip="Ver evaluaciones" data-id="${row.user_id}">
+                                            data-position="top" title="Ver evaluaciones asignadas para esta aplicación" data-id="${row.user_id}">
                                             <i class="ri-eye-fill"></i>
                                         </button>
+                                        <br>
+                                        <button type="button" class="btn btn-warning waves-effect waves-light configurar-btn tooltipped"
+                                            data-position="top" title="Configurar Evaluación" data-id="${row.id}">
+                                            <i class="ri-settings-3-line"></i>
+                                        </button>
+                                        <br>
                                         <button type="button" class="btn btn-danger waves-effect waves-light eliminar-aplicacion-btn tooltipped"
-                                            data-position="top" data-tooltip="Eliminar aplicación" data-id="${row.id}">
+                                            data-position="top" title="Eliminar Evaluación" data-id="${row.id}">
                                             <i class="ri-delete-bin-6-line"></i>
                                         </button>
                                     </div>
@@ -184,7 +185,7 @@
                 $(document).on('click', '.ver-evaluaciones-btn', function () {
                     const userId = $(this).data('id');
 
-                    $.get(`/admin/evaluaciones/usuario/${userId}`, function (categorias) {
+                    $.get(`/psicometricas/admin/evaluaciones/usuario/${userId}`, function (categorias) {
                         if (!categorias || categorias.length === 0) {
                             Swal.fire('Evaluaciones', 'Este usuario no tiene evaluaciones asignadas.', 'info');
                             return;
@@ -307,6 +308,69 @@
                                         Swal.fire('Error', msg, 'error');
                                     }
                                 });
+                            }
+                        });
+                    });
+                });
+
+                //configurar evaluacion
+               $(document).on('click', '.configurar-btn', function () {
+                    const aplicacionId = $(this).data('id');
+
+                    // Obtener configuración actual antes de mostrar el modal
+                    $.get(`{{ url('psicometricas/admin/aplicaciones') }}/${aplicacionId}/configuracion`, function(config) {
+                        Swal.fire({
+                            title: 'Configurar Aplicación',
+                            html: `
+                                <div style="text-align:left">
+                                    <label><strong>Cámara prendida:</strong></label>
+                                    <select id="camara" class="browser-default">
+                                        <option value="1" ${config.camera == 1 ? 'selected' : ''}>Sí</option>
+                                        <option value="0" ${config.camera == 0 ? 'selected' : ''}>No</option>
+                                    </select>
+                                    <br><br>
+                                    <label><strong>Ubicación prendida:</strong></label>
+                                    <select id="ubicacion" class="browser-default">
+                                        <option value="1" ${config.location == 1 ? 'selected' : ''}>Sí</option>
+                                        <option value="0" ${config.location == 0 ? 'selected' : ''}>No</option>
+                                    </select>
+                                    <!--<br><br>
+                                    <label><strong>Secciones y tiempos:</strong></label>
+                                    <div id="contenedorSecciones" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; max-height:200px; overflow-y:auto;">
+                                         Aquí llenar con las secciones
+                                    </div> -->
+                                </div>
+                            `,
+                            showCancelButton: true,
+                            confirmButtonText: 'Guardar configuración',
+                            cancelButtonText: 'Cancelar',
+                            preConfirm: () => {
+                                const camara = $('#camara').val();
+                                const ubicacion = $('#ubicacion').val();
+
+                                return $.ajax({
+                                    url: "{{ route('admin.aplicaciones.configurar') }}",
+                                    type: 'POST',
+                                    data: {
+                                        aplicacion_id: aplicacionId,
+                                        camera: camara,
+                                        location: ubicacion,
+                                        _token: "{{ csrf_token() }}"
+                                    },
+                                    dataType: 'json'
+                                }).then(response => {
+                                    if (!response.success) {
+                                        throw new Error(response.message || 'No se pudo guardar la configuración');
+                                    }
+                                    return response;
+                                }).catch(error => {
+                                    Swal.showValidationMessage(error.message);
+                                    return false;
+                                });
+                            }
+                        }).then(result => {
+                            if (result.isConfirmed) {
+                                Swal.fire('¡Configurado!', 'La configuración fue guardada correctamente.', 'success');
                             }
                         });
                     });

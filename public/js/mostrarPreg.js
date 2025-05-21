@@ -35,7 +35,14 @@ function manejarCambioRespuesta(event) {
 inicializarMostrarPreguntas();*/
 
 //para mostrar de a 3 preguntas c:
-console.log("Script de mostrar preguntas inicializado.");
+
+
+if (document.readyState === "complete") {
+    inicializarMostrarPreguntas();
+    iniciarTemporizador();
+    console.log(document.querySelector('input[name="rango_inicio"]'));
+    console.log(document.querySelector('input[name="rango_fin"]'));
+}
 
 function inicializarMostrarPreguntas() {
     document.body.removeEventListener("change", manejarCambioRespuesta); // Evita duplicar eventos
@@ -110,4 +117,41 @@ function manejarCambioRespuesta(event) {
         }
     }
 }
-inicializarMostrarPreguntas();
+
+function iniciarTemporizador() {
+    console.log("script para temporizador de evaluación cargado");
+
+    const progresoTexto = document.querySelector(".texto-Progreso");
+    const idSeccion = progresoTexto.dataset.idSeccion;
+
+    const temporizadorElemento = document.getElementById("temporizador-" + idSeccion);
+    let tiempoAgotadoInput = document.getElementById("tiempo_agotado");
+    temporizadorElemento.style.display = "block";
+
+    let tiempoTexto = temporizadorElemento.textContent.match(/\d{1,2}:\d{2}/);
+    let [minutos, segundos] = tiempoTexto[0].split(":").map(num => parseInt(num, 10)); //guarda min y seg por separado, los pone entre :
+    let tiempoRestante = (minutos * 60) + segundos; //convierte el tiempo a segundos
+
+    let intervalo = setInterval(() => {
+        if (tiempoRestante > 0) {
+            tiempoRestante--;
+            let min = Math.floor(tiempoRestante / 60);
+            let seg = tiempoRestante % 60;
+            temporizadorElemento.textContent = `Tiempo restante: ${min}:${seg.toString().padStart(2, '0')}`;
+        } else {
+            clearInterval(intervalo);
+            temporizadorElemento.textContent = "Tiempo agotado";
+            tiempoAgotadoInput.value = "1";
+
+            //desabilitar respuestas
+            let respuestas = document.querySelectorAll(".pregunta .respuesta");
+            document.querySelectorAll(".pregunta .form-check-input").forEach(input => {
+                input.disabled = true;
+            });
+
+
+            //alert("Se agotó el tiempo para esta sección.");
+            document.querySelector("form").submit(); //click a siguiente automáticamente
+        }
+    }, 1000);
+}

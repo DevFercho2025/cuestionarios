@@ -58,7 +58,7 @@
                                                 <td class="text-truncate">
                                                     @if (in_array($seccion->id, $seccionesCompletadas))
                                                         <!-- Botón deshabilitado -->
-                                                        <a href="" class="btn btn-sm btn-secondary" tabindex="-1" aria-disabled="true" style="pointer-events: none; cursor: not-allowed;">
+                                                        <a class="btn btn-sm btn-secondary" tabindex="-1" aria-disabled="true" style="pointer-events: none; cursor: not-allowed;">
                                                             Evaluación Completada
                                                         </a>
                                                     @else

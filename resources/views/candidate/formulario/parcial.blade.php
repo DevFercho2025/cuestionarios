@@ -152,11 +152,13 @@
 
     <div class="barra-Superior d-flex align-items-center justify-content-between">
         <div class="barra-titulo-cuestionario flex-grow-1 text-center">
-            @foreach ($preguntas as $pregunta)
-                @if ($loop->first)
-                    <h1 style="color: rgba(51,58,153,255);">{{ $pregunta->cuestionario }}</h1>
-                @endif
-            @endforeach
+            <h1 style="color: rgba(51,58,153,255);">{{ $preguntas->first()->cuestionario }}</h1>
+
+            <!--@ foreach ($ preguntas a s $ pregunta)
+                @ if ($ loop- >f irst)
+                    <h1 style="color: rgba(51,58,153,255);">{/{ $pregunta->cuestionario }}</h1>
+                @ endif
+            @ endforeach-->
         </div>
 
         <div class="separador"></div>
@@ -185,7 +187,7 @@
         <div class="separador"></div>
 
         <div class="barra-indicador-video d-flex justify-content-center align-items-center">
-            <div class="recording-container">
+            <div class="recording-container" style="{{ $cameraRequired == 0 ? 'display: none;' : '' }}">
                 <div class="recording-indicator"></div>
             </div>
         </div>

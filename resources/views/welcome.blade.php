@@ -14,7 +14,7 @@
                 <i class="tf-icons ri-menu-fill ri-24px align-middle"></i>
             </button>
             <!-- Mobile menu toggle: End-->
-            <a href="landing-page.html" class="app-brand-link">
+            <a href="welcome.blade.php" class="app-brand-link">
                 <span class="app-brand-text demo menu-text fw-semibold ms-2 ps-1 text-primary">MPOnePlus</span>
             </a>
         </div>

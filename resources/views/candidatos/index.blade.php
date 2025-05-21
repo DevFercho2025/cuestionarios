@@ -369,7 +369,7 @@
                         jQuery('#candidatosTable').on('click', '.ver-perfil-btn', function () {
                             var id = jQuery(this).data('id');
 
-                            window.location.href = `/admin/candidatos/perfil/${id}`;
+                            window.location.href = `/psicometricas/admin/candidatos/perfil/${id}`;
                         });
                         
                         //Ir a formulario de registro de candidato

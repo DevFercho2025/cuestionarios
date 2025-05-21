@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ImagenUsuario;
 use App\Models\Respuesta_Usuario;
 use App\Models\pregunta;
+use App\Models\Aplicacion;
 use App\Models\Seccion;
 use App\Models\TokenEvaluacion;
 use Illuminate\Support\Facades\Log;
@@ -28,7 +29,12 @@ class FormularioController extends Controller
         $categoria_id = $request->query('categoria_id'); 
         $seccion_id = $request->query('seccion_id'); 
         
-        return view('candidate.permisos', compact('categoria_id', 'seccion_id'));
+        $user = Auth::user();
+        $aplicacion = Aplicacion::where('user_id', $user->id)->first();
+        $cameraRequired = $aplicacion->camera;
+        $locationRequired = $aplicacion->location;
+        
+        return view('candidate.permisos', compact('categoria_id', 'seccion_id', 'cameraRequired', 'locationRequired'));
     }
 
     public function guardarCandidato(Request $request)
@@ -51,16 +57,28 @@ class FormularioController extends Controller
                 return response()->json(['error' => 'El parámetro seccion_id es obligatorio'], 400);
             }
 
-            $preguntas = Pregunta::with([
+            $cameraRequired = $request->query('cameraRequired');
+            $locationRequired = $request->query('locationRequired');
+
+            /*$preguntas = Pregunta::with([
                 'respuestas' => function ($query) {
                     $query->select('respuesta_id', 'pregunta_id', 'respuesta', 'opcion');
                 }
             ])
             ->where('seccion_id', $seccion_id)
             ->get()
+            ->shuffle();*/
+
+            $preguntas = Pregunta::select('pregunta_id', 'seccion_id', 'pregunta', 'cuestionario', 'required')
+            ->with([
+                'respuestas:respuesta_id,pregunta_id,respuesta,opcion',
+                'seccion:id,categoria_id,titulo,time_at,bloque'
+            ])
+            ->where('seccion_id', $seccion_id)
+            ->get()
             ->shuffle();
 
-            $cantidadRepeticiones = intval($preguntas->count() * 0.06);
+            $cantidadRepeticiones = min(intval($preguntas->count() * 0.06), 5);
             $preguntasRepetidas = $preguntas->random($cantidadRepeticiones);
     
             $preguntas = $preguntas->concat($preguntasRepetidas)->shuffle();
@@ -72,7 +90,7 @@ class FormularioController extends Controller
             }
     
             $candidato = $user;
-            return view('candidate.formulario.parcial', compact('preguntas', 'secciones', 'candidato', 'seccion_id'));
+            return view('candidate.formulario.parcial', compact('preguntas', 'secciones', 'candidato', 'seccion_id', 'cameraRequired', 'locationRequired'));
     
         } catch (\Exception $e) {
             Log::error("Error en cargarFormulario: " . $e->getMessage(), [

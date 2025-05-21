@@ -98,4 +98,32 @@ class AplicacionController extends Controller
         $vacantes = Aplicacion::select('vacante')->distinct()->get();
         return response()->json($vacantes);
     }
+
+    public function obtenerConfiguracion($id)
+    {
+        $aplicacion = Aplicacion::findOrFail($id);
+        return response()->json([
+            'camera' => $aplicacion->camera,
+            'location' => $aplicacion->location,
+        ]);
+    }
+
+    public function configurar(Request $request)
+    {
+        $request->validate([
+            'aplicacion_id' => 'required|exists:psico_alobri_aplicaciones,id',  // Ajusta si el nombre de tabla es distinto
+            'camera' => 'required|boolean',
+            'location' => 'required|boolean',
+        ]);
+
+        $aplicacion = Aplicacion::findOrFail($request->aplicacion_id);
+        $aplicacion->camera = $request->camera;
+        $aplicacion->location = $request->location;
+        $aplicacion->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Configuración guardada correctamente.'
+        ]);
+    }
 }

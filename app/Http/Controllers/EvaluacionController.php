@@ -92,5 +92,6 @@ class EvaluacionController extends Controller
     
         return response()->json(['success' => true, 'message' => 'Evaluaciones eliminadas']);
     }
+    
 
 }
