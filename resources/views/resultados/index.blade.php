@@ -346,7 +346,7 @@
                 const tokenId = $(this).data("token");
                 $("#loaderPDF").removeClass("hidden");
 
-                $.get(`{{ url('/admin/renderizar-metricas') }}/${tokenId}`, function (html) {
+                $.get(`{{ url('/psicometricas/admin/renderizar-metricas') }}/${tokenId}`, function (html) {
                     const container = $('<div id="previewMetricas"  style="position: fixed; top: -9999px; left: -9999px; opacity: 1; z-index: -1;"></div>').html(html);
                     $("body").append(container);
                     $('head').append('<link rel="stylesheet" href="{{ asset('assets/css/pdf.css') }}">');
@@ -374,11 +374,11 @@
                     });
 
                     Promise.all(promesas).then(() => {
-                        $.post(`/admin/exportar-pdf/${tokenId}`, {
+                        $.post(`/psicometricas/admin/exportar-pdf/${tokenId}`, {
                             imagenes: imagenes,
                             _token: '{{ csrf_token() }}'
                         }).done(() => {
-                            window.open(`/admin/exportar-pdf/token-id/${tokenId}`, '_blank');
+                            window.open(`/psicometricas/admin/exportar-pdf/token-id/${tokenId}`, '_blank');
                         }).always(() => {
                             $("#loaderPDF").addClass("hidden");
                             container.remove();
