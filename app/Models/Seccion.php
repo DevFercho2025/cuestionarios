@@ -9,13 +9,13 @@ use Carbon\Carbon;
 class Seccion extends Model
 {
     use HasFactory;
-    protected $table = "psico_alobri_secciones"; #título tabla
-    protected $fillable = ["titulo", "bloque", "categoria_id", "time_at"]; #columnas, 
-    public $timestamps = true; #laravel crea automáticamente "created_at, updated_at" pero esta tabla no tiene esos campos.
+    protected $table = "psico_alobri_sections"; #título tabla
+    protected $fillable = ["tittle", "bloock", "test_id", "time_at"]; #columnas, 
+    public $timestamps = true;
 
     public function categoria()
     {
-        return $this->belongsTo(Categoria::class, 'categoria_id', 'id');
+        return $this->belongsTo(Categoria::class, 'test_id', 'id');
     }
 
     public function getTiempoEvaluacionAttribute()

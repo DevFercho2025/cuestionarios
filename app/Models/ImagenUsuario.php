@@ -9,13 +9,13 @@ class ImagenUsuario extends Model
 {
     use HasFactory;
 
-    protected $table = 'psico_alobri_imagenes_usuario';
-    protected $fillable = ['id_usuario', 'file_name', 'file_path', 'created_at','token_id'];
+    protected $table = 'psico_alobri_test_photos';
+    protected $fillable = ['user_id', 'file_name', 'file_path', 'created_at','token_id'];
     public $timestamps = false;
 
     public function usuario()
     {
-        return $this->belongsTo(User::class, 'id_usuario');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function tokenEv()

@@ -9,12 +9,12 @@ class Categoria extends Model
 {
     use HasFactory;
 
-    protected $table = "psico_alobri_categorias";
-    protected $fillable = ["titulo_cuestionario","created_at","updated_at","time_at"];
+    protected $table = "psico_alobri_tests";
+    protected $fillable = ["test_title","created_at","updated_at","time_at"];
     public $timestamps = true;
 
     public function secciones()
     {
-        return $this->hasMany(Seccion::class, 'categoria_id');
+        return $this->hasMany(Seccion::class, 'id');
     }
 }

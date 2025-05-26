@@ -8,14 +8,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class usuarios_categoria extends Model
 {
     use HasFactory;
-    protected $table = 'psico_alobri_usuarios_categorias';
-    protected $fillable = ['user_id', 'categorias_id'];
+    protected $table = 'psico_alobri_user_assigned_tests';
+    protected $fillable = ['user_id', 'test_id'];
     public $timestamps = false;
 
 
     public function categoria()
     {
-        return $this->belongsTo(Categoria::class, 'categorias_id');
+        return $this->belongsTo(Categoria::class, 'test_id');
     }
 
 }

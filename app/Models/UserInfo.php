@@ -13,16 +13,16 @@ class UserInfo extends Model
 
     protected $fillable = [
         'user_id',
-        'fecha_nacimiento',
-        'genero',
-        'codigo_postal',
-        'celular',
-        'pais',
+        'date_of_birth',
+        'gender',
+        'postal_code',
+        'phone',
+        'country',
     ];
 
     public $timestamps = false;
 
-    protected $dates = ['fecha_nacimiento', 'created_at'];
+    protected $dates = ['date_of_birth', 'created_at'];
 
     public function usuario()
     {

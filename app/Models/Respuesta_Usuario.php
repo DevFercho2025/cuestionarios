@@ -9,12 +9,12 @@ class Respuesta_Usuario extends Model
 {
     use HasFactory;
 
-    protected $table = "psico_alobri_respuestas_usuario";
-    protected $fillable = ['user_id','pregunta_id', 'respuesta_id','ip_usuario','token_id'];
+    protected $table = "psico_alobri_user_answers";
+    protected $fillable = ['user_id','question_id', 'answer_id','ip_address','token_id'];
     public $timestamps = false; 
 
     public function tokenEv(){
-        return $this->belongsTo(TokenEvaluacion::class, 'token_id');
+        return $this->belongsTo(TokenEvaluacion::class, 'id');
     }
 
     public function usuario(){
@@ -23,17 +23,13 @@ class Respuesta_Usuario extends Model
 
     public function pregunta()
     {
-        return $this->belongsTo(Pregunta::class, 'pregunta_id');
+        return $this->belongsTo(Pregunta::class, 'question_id');
     }
 
     public function respuesta()
     {
-        return $this->belongsTo(Respuesta::class, 'respuesta_id');
+        return $this->belongsTo(Respuesta::class, 'answer_id');
     }
 
-    public function respuestaCorrecta()
-    {
-        return $this->hasOne(Respuesta_Correcta::class, 'pregunta_id', 'pregunta_id');
-    }
 
 }

@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class ContadorEvaluacion extends Model
 {
-    protected $table = 'psico_alobri_contador_evaluaciones';
+    protected $table = 'psico_alobri_test_assignment_counter';
 
     protected $fillable = [
         'user_id',
-        'pruebas_disponibles',
-        'pruebas_usadas',
-        'num_pruebasPsicometricas',
-        'num_pruebas_socioeconómicas',
+        'available_tests',
+        'used_tests',
+        'num_psychometric_tests',
+        'num_socioeconomic_tests',
     ];
 
     public $timestamps = false;

@@ -64,25 +64,27 @@ class User extends Authenticatable
     }
 
 
+    #cambiar a userAcessCodes()
     public function aplicaciones()
     {
         return $this->hasMany(Aplicacion::class);
     }
 
+    #cambiar a assignedTests()
     public function categorias()
     {
-        return $this->belongsToMany(Categoria::class, 'psico_alobri_usuarios_categorias', 'user_id', 'categorias_id');
+        return $this->belongsToMany(Categoria::class, 'psico_alobri_user_assigned_tests', 'user_id', 'test_id');
     }
 
+    #cambiar a userTokens()
     public function tokensEvaluaciones()
     {
         return $this->hasMany(TokenEvaluacion::class, 'user_id');
     }
 
+    #cambiar a userAnswers()
     public function respuestasUsuario()
     {
         return $this->hasMany(Respuesta_Usuario::class, 'user_id');
     }
-
-
 }

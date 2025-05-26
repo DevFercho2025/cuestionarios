@@ -9,14 +9,14 @@ class Respuesta extends Model
 {
     use HasFactory;
 
-    protected $table = "psico_alobri_respuestas"; 
-    protected $fillable = ["respuesta", "opcion", "pregunta_id"];
-    protected $primaryKey = "respuesta_id";
+    protected $table = "psico_alobri_answers"; 
+    protected $fillable = ["answer", "option", "question_id"];
+    protected $primaryKey = "id";
 
     public $timestamps = false; 
 
     public function pregunta()
     {
-        return $this->belongsTo(Pregunta::class, 'pregunta_id', 'pregunta_id');
+        return $this->belongsTo(Pregunta::class, 'question_id', 'id');
     }
 }
