@@ -1,5 +1,5 @@
 @extends('layout.admin')
-@section('title', 'Gestión de Secciones')
+@section('title', 'Gestión de pruebas')
 @section('content')
     <div class="container">
         <!-- Encabezado -->
@@ -8,29 +8,30 @@
                 <div class="card-panel dark-gradient">
                     <div class="row valign-wrapper mb-0">
                         <div class="col s8">
-                            <h4 class="white-text">Gestión de Secciones</h4>
+                            <h4 class="white-text">Gestión de Pruebas</h4>
                         </div>
                         <div class="col s4 right-align">
-                            <a id="createSeccionBtn" class="btn btn-large gradient-btn pulse">
-                               Nueva Sección
+                            <a id="createTestBtn" class="btn btn-large gradient-btn pulse">
+                               Crear una nueva Prueba
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Tabla de Secciones -->
+        <!-- Tabla de Pruebas -->
         <div class="row">
             <div class="col s12">
                 <div class="card dark-card z-depth-3">
                     <div class="card-datatable table-responsive">
-                        <table id="seccionesTable" class="dt-responsive table table-bordered">
+                        <table id="testsTable" class="dt-responsive table table-bordered">
                             <thead>
                             <tr>
                                 <th>Título</th>
-                                <th>Bloque</th>
-                                <th>Cuestionario</th>
-                                <th>Tiempo</th>
+                                <th>Tipo</th>
+                                <th>Categoria</th>
+                                <th>Total de Secciones</th>
+                                <th>Tiempo estimado de realización</th>
                                 <th>Acciones</th>
                             </tr>
                             </thead>
@@ -97,9 +98,9 @@
 
     function initializeDataTable() {
         try {
-            var table = jQuery('#seccionesTable').DataTable({
+            var table = jQuery('#testsTable').DataTable({
                 ajax: {
-                    url: "{{ route('secciones.datatable') }}",
+                    url: "{{ route('pruebas.datatable') }}",
                     dataSrc: '',
                     error: function (xhr, error, thrown) {
                         console.error('Error en la carga de datos:', error, thrown);
@@ -115,8 +116,9 @@
                 },
                 columns: [
                     {data: 'titulo'},
-                    {data: 'bloque'},
-                    {data: 'cuestionario'},
+                    {data: 'tipo'},
+                    {data: 'categoria'},
+                    {data: 'secciones'},
                     {data: 'time_at'},
                     {
                         data: null,
@@ -167,8 +169,9 @@
                 swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
                 document.body.appendChild(swalScript);
             }
+
             // Crear Sección
-            jQuery("#createSeccionBtn").click(function () {
+            /*jQuery("#createTestBtn").click(function () {
                 if (typeof Swal === 'undefined') {
                     alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
                     return;
@@ -313,57 +316,71 @@
                         });
                     }
                 });
-            });
+            });*/
 
 
-            // Editar Sección
-            jQuery('#seccionesTable').on('click', '.edit-btn', function () {
+            // Editar una prueba
+            jQuery('#testsTable').on('click', '.edit-btn', function () {
                 if (typeof Swal === 'undefined') {
                     alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
                     return;
                 }
 
                 var id = jQuery(this).data('id');
-                let row = jQuery('#seccionesTable').DataTable().row(jQuery(this).parents('tr')).data();
+                let table = jQuery('#testsTable').DataTable();
+                let row = table.row(jQuery(this).parents('tr')).data();
 
+                // Cargar categorías y tipos
                 jQuery.ajax({
-                    url: "{{ route('tests.all') }}",
+                    url: "{{ route('pruebas.categorias.tipos') }}",
                     type: "GET",
                     dataType: "json",
-                    success: function (pruebas) {
-                        let options = '';
-                        pruebas.forEach(prueba => {
-                            const selected = row.categoria_id && row.categoria_id === prueba.id ? 'selected' : '';
-                            options += `<option value="${prueba.id}" ${selected}>${prueba.test_title}</option>`;
+                    success: function (categories) {
+                        // Opciones para categorías
+                        let catOptions = '';
+                        categories.forEach(cat => {
+                            const selected = row.categoria === cat.category_name ? 'selected' : '';
+                            catOptions += `<option value="${cat.id}" ${selected}>${cat.category_name}</option>`;
+                        });
+
+                        // Encontrar categoría y obtener sus tipos
+                        let selectedCategory = categories.find(cat => cat.id == row.categoria_id);
+                        let tipos = selectedCategory ? selectedCategory.test_types : [];
+
+                        // Opciones para tipos
+                        let typeOptions = '';
+                        tipos.forEach(type => {
+                            const selected = row.tipo === type.type_name ? 'selected' : '';
+                            typeOptions += `<option value="${type.id}" ${selected}>${type.type_name}</option>`;
                         });
 
                         Swal.fire({
                             html: `
-                            <div class="col-md mb-6 mb-md-0">
-                                <div class="card">
-                                    <h2 class="card-header">Editar Sección</h2>
-                                    <div class="card-body">
-                                        <div class="form-floating form-floating-outline mb-6">
-                                            <input id="swal-titulo" type="text" class="form-control" placeholder="Título" required value="${row.titulo}">
-                                            <label for="swal-titulo">Título</label>
-                                        </div>
-                                        <div class="form-floating form-floating-outline mb-6">
-                                            <input id="swal-bloque" type="text" class="form-control" placeholder="Bloque" required value="${row.bloque}">
-                                            <label for="swal-bloque">Bloque</label>
-                                        </div>
-                                        <div class="form-floating form-floating-outline mb-6">
-                                            <select id="swal-categoria" class="form-select">
-                                                ${options}
-                                            </select>
-                                            <label for="swal-categoria">Categoría/Cuestionario</label>
-                                        </div>
-                                        <div class="form-floating form-floating-outline mb-6">
-                                            <input id="swal-time_at" type="text" class="form-control" placeholder="Tiempo" required value="${row.time_at}">
-                                            <label for="swal-time_at">Tiempo</label>
+                                <div class="col-md mb-6 mb-md-0">
+                                    <div class="card">
+                                        <h2 class="card-header">Editar Test</h2>
+                                        <div class="card-body">
+                                            <div class="form-floating form-floating-outline mb-6">
+                                                <input id="swal-titulo" type="text" class="form-control" placeholder="Título" required value="${row.titulo}">
+                                                <label for="swal-titulo">Título</label>
+                                            </div>
+
+                                            <div class="form-floating form-floating-outline mb-6">
+                                                <select id="swal-categoria" class="form-select" required>
+                                                    ${catOptions}
+                                                </select>
+                                                <label for="swal-categoria">Categoría</label>
+                                            </div>
+
+                                            <div class="form-floating form-floating-outline mb-6">
+                                                <select id="swal-tipo" class="form-select" required>
+                                                    ${typeOptions}
+                                                </select>
+                                                <label for="swal-tipo">Tipo</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                             `,
                             showClass: { popup: 'animate__animated animate__fadeInDown' },
                             hideClass: { popup: 'animate__animated animate__fadeOutUp' },
@@ -378,16 +395,15 @@
                             preConfirm: () => {
                                 return {
                                     titulo: document.getElementById('swal-titulo').value,
-                                    bloque: document.getElementById('swal-bloque').value,
                                     categoria_id: document.getElementById('swal-categoria').value,
-                                    time_at: document.getElementById('swal-time_at').value,
+                                    tipo_id: document.getElementById('swal-tipo').value,
                                     _token: '{{ csrf_token() }}'
                                 };
                             }
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 jQuery.ajax({
-                                    url: `/admin/secciones/${id}`,  // Actualiza la URL para el modelo Sección
+                                    url: `{{ url('psicometricas/admin/pruebas') }}/${id}`, 
                                     type: "PUT",
                                     data: result.value,
                                     dataType: "json",
@@ -401,10 +417,10 @@
                                             timerProgressBar: true,
                                             background: '#262b3c',
                                         });
-                                        reloadTable();
+                                        table.ajax.reload(null, false);
                                     },
                                     error: function (xhr) {
-                                        let errorMsg = 'No se pudo actualizar la sección.';
+                                        let errorMsg = 'No se pudo actualizar el test.';
                                         if (xhr.responseJSON && xhr.responseJSON.message) {
                                             errorMsg = xhr.responseJSON.message;
                                         }
@@ -419,6 +435,28 @@
                                 });
                             }
                         });
+
+                        // Cuando cambie la categoría, actualizar el select de tipos
+                        jQuery(document).off('change', '#swal-categoria'); // Remover listener previo para evitar duplicados
+                        jQuery(document).on('change', '#swal-categoria', function () {
+                            let catId = jQuery(this).val();
+                            let categoriaSeleccionada = categories.find(cat => cat.id == catId);
+                            let tiposNuevaCategoria = categoriaSeleccionada ? categoriaSeleccionada.test_types : [];
+
+                            let newTypeOptions = '';
+                          
+                            if (!Array.isArray(tiposNuevaCategoria) || tiposNuevaCategoria.length === 0) {
+                                newTypeOptions = `<option value="" disabled selected>Categoría sin tipos</option>`;
+                            } else {
+                                tiposNuevaCategoria.forEach((type, index) => {
+                                    // Selecciona el primero por defecto
+                                    let selected = index === 0 ? 'selected' : '';
+                                    newTypeOptions += `<option value="${type.id}" ${selected}>${type.type_name}</option>`;
+                                });
+                            }
+
+                            jQuery('#swal-tipo').html(newTypeOptions);
+                        });
                     },
                     error: function () {
                         M.toast({
@@ -432,7 +470,7 @@
 
 
             // Eliminar Sección
-            jQuery('#seccionesTable').on('click', '.delete-btn', function () {
+            /*jQuery('#seccionesTable').on('click', '.delete-btn', function () {
                 if (typeof Swal === 'undefined') {
                     alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
                     return;
@@ -486,8 +524,8 @@
                         });
                     }
                 });
-            });
-
+            });*/
+                
             // Reinicializar tooltips
             if (typeof M !== 'undefined') {
                 M.Tooltip.init(document.querySelectorAll('.tooltipped'));

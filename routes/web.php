@@ -6,7 +6,7 @@ use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\RespuestaController;
 use App\Http\Controllers\RespuestaCorrectaController;
 use App\Http\Controllers\SeccionController;
-use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\CandidatoController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\UsuarioController;
@@ -51,7 +51,7 @@ Route::prefix('psicometricas')->group(function (){
         Route::delete('secciones/{id}', [SeccionController::class, 'destroy'])->name('secciones.destroy');
         Route::get('secciones/datatable', [SeccionController::class, 'datatable'])->name('secciones.datatable');
         Route::get('secciones/all', [SeccionController::class, 'all'])->name('secciones.all');
-        Route::get('categorias/all', [CategoriaController::class, 'all'])->name('categorias.all');
+        Route::get('tests/all', [TestController::class, 'all'])->name('tests.all');
 
         // Rutas para Preguntas
         Route::get('preguntas', [PreguntaController::class, 'index'])->name('preguntas.index');
@@ -111,6 +111,14 @@ Route::prefix('psicometricas')->group(function (){
         Route::get('/renderizar-metricas/{id}', [ResultadosController::class, 'renderizarMetricas']);
         Route::post('/exportar-pdf/{id}', [ResultadosController::class, 'recibirImagenes']);
         Route::get('/exportar-pdf/token-id/{id}', [ResultadosController::class, 'exportarPDF'])->name('admin.exportar.pdf');
+
+
+        Route::get('pruebas', [TestController::class, 'index'])->name('pruebas.index');
+        Route::get('/pruebas/datatable', [TestController::class, 'datatable'])->name('pruebas.datatable');
+        Route::get('/pruebas/categorias-tipos', [TestController::class, 'categoriaConTipos'])->name('pruebas.categorias.tipos');
+        Route::put('/pruebas/{id}', [TestController::class, 'update']);
+
+        Route::get('/pruebas/{id}', [TestController::class, 'show']);
 
         // Select de usuarios y vacantes
         Route::get('usuarios/all', [AplicacionController::class, 'usuarios'])->name('usuarios.all');

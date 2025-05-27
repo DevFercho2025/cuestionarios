@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Respuesta_Correcta; // O RespCorrecta, según convención
+use App\Models\Respuesta_Correcta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 

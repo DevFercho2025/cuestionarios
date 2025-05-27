@@ -13,12 +13,12 @@ class Seccion extends Model
     protected $fillable = ["tittle", "bloock", "test_id", "time_at"]; #columnas, 
     public $timestamps = true;
 
-    public function categoria()
+    public function test()
     {
-        return $this->belongsTo(Categoria::class, 'test_id', 'id');
+        return $this->belongsTo(Test::class, 'test_id');
     }
 
-    public function getTiempoEvaluacionAttribute()
+    public function getTiempoSeccionAttribute()
     {
         $tiempo = Carbon::parse($this->time_at);
 

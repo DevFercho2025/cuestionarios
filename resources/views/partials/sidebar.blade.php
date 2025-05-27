@@ -124,11 +124,11 @@
                     <div data-i18n="Evaluaciones">Evaluaciones</div>
                 </a>
                 <ul class="menu-sub">
-                    <!--<li class="menu-item">
-                        <a href="#" class="menu-link">
-                            <div data-i18n="Categorías">Cuestionarios</div>
+                    <li class="menu-item">
+                        <a href="{{ route('pruebas.index') }}" class="menu-link">
+                            <div data-i18n="Gestionar pruebas">Gestionar Pruebas</div>
                         </a>
-                    </li>-->
+                    </li>
                     <li class="menu-item">
                         <a href="{{ route('secciones.index') }}" class="menu-link">
                             <div data-i18n="Secciones">Secciones</div>
