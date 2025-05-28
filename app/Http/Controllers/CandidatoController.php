@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 use function Ramsey\Uuid\v1;
 
@@ -51,11 +50,11 @@ class CandidatoController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'fecha_nacimiento' => optional($user->info)->fecha_nacimiento ? \Carbon\Carbon::parse($user->info->fecha_nacimiento)->toDateString() : null, // Formato de fecha
-                    'genero' => optional($user->info)->genero,
-                    'codigo_postal' => optional($user->info)->codigo_postal,
-                    'celular' => optional($user->info)->celular,
-                    'created_at' => $user->created_at
+                    'fecha_nacimiento' => $user->info->date_of_birth ? substr($user->info->date_of_birth, 0, 10) : null,
+                    'genero' => $user->info->gender,
+                    'codigo_postal' => $user->info->postal_code,
+                    'celular' => $user->info->phone,
+                    'created_at' => $user->created_at->toDateString()
                 ];
 
                 if ($isSuperAdmin) {

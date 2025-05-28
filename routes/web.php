@@ -52,6 +52,8 @@ Route::prefix('psicometricas')->group(function (){
         Route::get('secciones/datatable', [SeccionController::class, 'datatable'])->name('secciones.datatable');
         Route::get('secciones/all', [SeccionController::class, 'all'])->name('secciones.all');
         Route::get('tests/all', [TestController::class, 'all'])->name('tests.all');
+        Route::get('secciones/by-test/{testId}', [SeccionController::class, 'byTest']);
+
 
         // Rutas para Preguntas
         Route::get('preguntas', [PreguntaController::class, 'index'])->name('preguntas.index');
@@ -61,6 +63,7 @@ Route::prefix('psicometricas')->group(function (){
         Route::put('preguntas/{id}', [PreguntaController::class, 'update'])->name('preguntas.update');
         Route::delete('preguntas/{id}', [PreguntaController::class, 'destroy'])->name('preguntas.destroy');
         Route::get('preguntas/categorias', [PreguntaController::class, 'categorias'])->name('admin.preguntas.categorias');
+        Route::get('question-types/all', [PreguntaController::class, 'allQuestionTypes'])->name('question_types.all');
 
         // Rutas para Respuestas
         Route::get('respuestas', [RespuestaController::class, 'index'])->name('respuestas.index');
@@ -117,8 +120,10 @@ Route::prefix('psicometricas')->group(function (){
         Route::get('/pruebas/datatable', [TestController::class, 'datatable'])->name('pruebas.datatable');
         Route::get('/pruebas/categorias-tipos', [TestController::class, 'categoriaConTipos'])->name('pruebas.categorias.tipos');
         Route::put('/pruebas/{id}', [TestController::class, 'update']);
-
         Route::get('/pruebas/{id}', [TestController::class, 'show']);
+        Route::post('/pruebas', [TestController::class, 'store']);
+        Route::delete('/pruebas/{id}', [TestController::class, 'destroy']);
+
 
         // Select de usuarios y vacantes
         Route::get('usuarios/all', [AplicacionController::class, 'usuarios'])->name('usuarios.all');

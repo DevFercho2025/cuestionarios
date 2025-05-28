@@ -58,24 +58,21 @@ class User extends Authenticatable
         return $this->hasOne(UserInfo::class, 'user_id');
     }
 
+    public function assignedTests()
+    {
+        return $this->belongsToMany(Test::class, 'psico_alobri_user_assigned_tests', 'user_id', 'test_id');
+    }
+
     public function isTalentinaUser()
     {
         return $this->config && $this->config->is_talentina_user;
     }
 
-
-    #cambiar a userAcessCodes()
-    public function aplicaciones()
+    public function userTestsAcessCodes()
     {
-        return $this->hasMany(Aplicacion::class);
+        return $this->hasMany(AccessCode::class);
     }
-
-    #cambiar a assignedTests()
-    public function categorias()
-    {
-        return $this->belongsToMany(Categoria::class, 'psico_alobri_user_assigned_tests', 'user_id', 'test_id');
-    }
-
+    
     #cambiar a userTokens()
     public function tokensEvaluaciones()
     {

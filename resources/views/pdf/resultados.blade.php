@@ -63,7 +63,7 @@
                             <td class="columna-candidato">
                                 <div>
                                     <p><strong>Cuenta:</strong> {{ Auth::user()->config->Company->name ?? '---'}}</p>
-                                    <p><strong>Cargo:</strong> {{ $aplicacion->vacante ?? '---' }}</p>
+                                    <p><strong>Cargo:</strong> {{ $aplicacion->vacancy ?? '---' }}</p>
                                     <p><strong>Idioma:</strong> Español</p>
                                 </div>
                             </td>
@@ -169,7 +169,7 @@
                             </tr>
                             <tr>
                                 <td>  
-                                    <p><div style="color:darkcyan; padding-left:10px;">Número telefónico:</div> <span style="padding-left:10px;">{{ $usuario->info->celular ?? '---' }}</span></p>
+                                    <p><div style="color:darkcyan; padding-left:10px;">Número telefónico:</div> <span style="padding-left:10px;">{{ $usuario->info->phone ?? '---' }}</span></p>
                                 <td> 
                                     <p><div style="color:darkcyan;">Puntuación general:</div> Se requiere aclaración</p>
                                 </td>

@@ -310,7 +310,7 @@
                                                     </div>
                                                     <div class="col-md-3">
                                                         <label class="fw-bold">Vacante:</label>
-                                                        <p>${aplicacion ? aplicacion.vacante : '--'}</p>
+                                                        <p>${aplicacion ? aplicacion.vacancy : '--'}</p>
                                                     </div>
                                                     <div class="col-md-3">
                                                         <label class="fw-bold">Correo:</label>

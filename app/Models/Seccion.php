@@ -10,7 +10,7 @@ class Seccion extends Model
 {
     use HasFactory;
     protected $table = "psico_alobri_sections"; #título tabla
-    protected $fillable = ["tittle", "bloock", "test_id", "time_at"]; #columnas, 
+    protected $fillable = ["title", "block", "test_id", "time_at"]; #columnas, 
     public $timestamps = true;
 
     public function test()

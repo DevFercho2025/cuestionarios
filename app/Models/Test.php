@@ -26,7 +26,7 @@ class Test extends Model
     }
 
     #time_at es la sumatoria de todos los tiempos de las secciones del test
-    public function setTotalTimeAttribute()
+    public function recalculateTotalTime()
     {
         $totalSeg = 0;
 
@@ -37,6 +37,12 @@ class Test extends Model
 
         $intervalo = CarbonInterval::seconds($totalSeg)->cascade(); //cascade convierte total de segundos a tiempo estandar en h, m y s.
         $this->time_at = sprintf('%02d:%02d:%02d', $intervalo->hours, $intervalo->minutes, $intervalo->seconds);
+        $this->save();
         #sprintf asegura guardado con HH:MM:SS
+    }
+
+    public function assignedUsers()
+    {
+        return $this->belongsToMany(User::class, 'psico_alobri_user_assigned_tests', 'test_id', 'user_id');
     }
 }

@@ -5,17 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class usuarios_categoria extends Model
+class userAssignedTest extends Model
 {
     use HasFactory;
     protected $table = 'psico_alobri_user_assigned_tests';
     protected $fillable = ['user_id', 'test_id'];
     public $timestamps = false;
 
-
-    public function categoria()
+    public function user()
     {
-        return $this->belongsTo(Categoria::class, 'test_id');
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function test()
+    {
+        return $this->belongsTo(Test::class, 'test_id');
     }
 
 }

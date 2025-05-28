@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccessCode;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Respuesta_Usuario;
@@ -30,7 +31,7 @@ class ResultadosController extends Controller
             $user = Auth::user();
             $isSuperAdmin = $user->config->role->isSuperAdmin() ?? false;
 
-            $candidatos = User::with(['info', 'config.role', 'config.company', 'tokensEvaluaciones','categorias.secciones','respuestasUsuario'])
+            $candidatos = User::with(['info', 'config.role', 'config.company', 'tokensEvaluaciones','assignedTests.sections','respuestasUsuario'])
             ->whereHas('config.role', function ($q) {
                 $q->where('id','=', 0);
             })
@@ -48,21 +49,21 @@ class ResultadosController extends Controller
                 $token = $tokenEval?->token ?? 'Sin token';
                 $tokenId = $tokenEval?->id;
 
-                foreach ($user->categorias as $categoria) {
-                    if (!$categoria) continue;
+                foreach ($user->assignedTests as $test) {
+                    if (!$test) continue;
 
                     $seccionesCompletadasIds = Respuesta_Usuario::where('user_id', $user->id)
                         ->where('token_id', $tokenId)
-                        ->join('psico_alobri_preguntas', 'psico_alobri_respuestas_usuario.pregunta_id', '=', 'psico_alobri_preguntas.pregunta_id')
-                        ->pluck('psico_alobri_preguntas.seccion_id')
+                        ->join('psico_alobri_questions', 'psico_alobri_user_answers.question_id', '=', 'psico_alobri_questions.id')
+                        ->pluck('psico_alobri_questions.section_id')
                         ->unique()
                         ->toArray();
 
-                    $secciones = $categoria->secciones;
+                    $secciones = $test->sections;
                     $totalSecciones = $secciones->count();
 
                     $seccionesCompletadas = $secciones->whereIn('id', $seccionesCompletadasIds);
-                    $seccionesCompletadasNombres = $seccionesCompletadas->pluck('titulo')->toArray();
+                    $seccionesCompletadasNombres = $seccionesCompletadas->pluck('title')->toArray();
 
                     $completadas = $seccionesCompletadas->count();
 
@@ -73,7 +74,7 @@ class ResultadosController extends Controller
                     $candidatosData[] = [
                         'id_candidato' => $user->id,
                         'nombre' => $user->name,
-                        'cuestionario' => $categoria->titulo_cuestionario,
+                        'cuestionario' => $test->test_title,
                         'secciones_completadas' => $seccionesCompletadasNombres,
                         'token' => $token,
                         'estado' => $estado,
@@ -114,12 +115,11 @@ class ResultadosController extends Controller
             ], 404);
         }
 
-        $aplicacion = Aplicacion::where('user_id', $usuario->id)->first();
+        $aplicacion = AccessCode::where('user_id', $usuario->id)->first();
 
         $respuestas = Respuesta_Usuario::with([
             'pregunta',
             'respuesta',
-            'respuestaCorrecta.respuesta'
         ])
             ->where('user_id', $usuario->id)
             ->where('token_id', $token->id)
@@ -139,16 +139,7 @@ class ResultadosController extends Controller
     {
         $token = TokenEvaluacion::findOrFail($id);
         $usuario = User::findOrFail($token->user_id);
-        $aplicacion = Aplicacion::where('user_id', $usuario->id)->first();
-
-        $respuestas = Respuesta_Usuario::with([
-            'pregunta',
-            'respuesta',
-            'respuestaCorrecta.respuesta'
-        ])
-            ->where('user_id', $usuario->id)
-            ->where('token_id', $token->id)
-            ->get();
+        $aplicacion = AccessCode::where('user_id', $usuario->id)->first();
 
         $puntuaciones = [
             'Veracidad' => 75,
@@ -204,16 +195,16 @@ class ResultadosController extends Controller
         $token = TokenEvaluacion::findOrFail($id);
         $imagenesBase64 = session("imagenes_pdf_{$id}", []);
         $usuario = User::findOrFail($token->user_id);
-        $aplicacion = Aplicacion::where('user_id', $usuario->id)->first();
+        $aplicacion = AccessCode::where('user_id', $usuario->id)->first();
 
-        $respuestas = Respuesta_Usuario::with([
+        /*$respuestas = Respuesta_Usuario::with([
             'pregunta',
             'respuesta',
             'respuestaCorrecta.respuesta'
         ])
             ->where('user_id', $usuario->id)
             ->where('token_id', $token->id)
-            ->get();
+            ->get();*/
 
         $puntuaciones = [
             'Veracidad' => 75,
@@ -253,7 +244,7 @@ class ResultadosController extends Controller
             ]
         ];
 
-        $html = view('pdf.resultados', compact('usuario', 'aplicacion', 'respuestas', 'metricas', 'imagenesBase64'));
+        $html = view('pdf.resultados', compact('usuario', 'aplicacion', 'metricas', 'imagenesBase64'));
         $dompdf = PDF::loadHtml($html);
         $dompdf->set_option('isHtml5ParserEnabled', true);
         $dompdf->set_option('isPhpEnabled', true);

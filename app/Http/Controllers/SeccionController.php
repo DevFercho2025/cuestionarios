@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Seccion;
+use App\Models\Test;
 use Illuminate\Http\Request;
 
 class SeccionController extends Controller
@@ -17,11 +18,11 @@ class SeccionController extends Controller
     public function datatable(Request $request)
     {
         // Cargar secciones con la relación 'categoria'
-        $secciones = Seccion::with('categoria')->get(); 
+        $secciones = Seccion::with('test')->get(); 
         
         $secciones = $secciones->map(function ($seccion) {
             // Agregar el título del cuestionario (categoría)
-            $seccion->cuestionario = $seccion->categoria ? $seccion->categoria->titulo_cuestionario : 'No disponible';
+            $seccion->cuestionario = $seccion->test->test_title;
             return $seccion;
         });
     
@@ -32,15 +33,17 @@ class SeccionController extends Controller
     {
         // Validamos
         $data = $request->validate([
-            'titulo'       => 'required|string|max:255',
-            'bloque'       => 'required|string',
-            'categoria_id' => 'required|exists:psico_alobri_categorias,id',
-            'time_at'      => 'nullable|date_format:H:i:s'
+            'title'   => 'required|string|max:255',
+            'block'  => 'required|string',
+            'test_id' => 'required|exists:psico_alobri_tests,id',
+            'time_at' => 'nullable|date_format:H:i:s',
         ]);
 
         $seccion = Seccion::create($data);
 
-        // Si es AJAX, retorna JSON
+        //actualizar duración total de la prueba según la nueva sección.
+        $seccion->test->recalculateTotalTime();
+
         if ($request->ajax()) {
             return response()->json([
                 'status'  => 'success',
@@ -56,13 +59,14 @@ class SeccionController extends Controller
     {
         $seccion = Seccion::findOrFail($id);
         $data = $request->validate([
-            'titulo'       => 'required|string|max:255',
-            'bloque'       => 'required|string',
-            'categoria_id' => 'required|string',
-            'time_at'      => 'nullable|date_format:H:i:s'
+            'title'   => 'required|string|max:255',
+            'block'  => 'required|string',
+            'test_id' => 'required|exists:psico_alobri_tests,id',
+            'time_at' => 'nullable|date_format:H:i:s',
         ]);
 
         $seccion->update($data);
+        $seccion->test->recalculateTotalTime();
 
         if ($request->ajax()) {
             return response()->json([
@@ -94,4 +98,16 @@ class SeccionController extends Controller
         $secciones = Seccion::all();
         return response()->json($secciones);
     }
+
+    public function byTest($testId)
+    {
+        $test = Test::with('sections:id,title,test_id')->find($testId);
+
+        if (!$test) {
+            return response()->json([], 404);
+        }
+
+        return response()->json($test->sections);
+    }
+
 }

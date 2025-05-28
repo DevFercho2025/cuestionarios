@@ -49,14 +49,6 @@
                 </div>
             </div>
         </div>
-        <!--Volver a dashboard-->
-        <div class="row">
-            <div class="col s12">
-                <a href="{{ route('admin.index') }}" class="waves-effect waves-light btn-large blue">
-                    Regresar a Admin
-                </a>
-            </div>
-        </div>
     </div>
 
     
@@ -141,7 +133,7 @@
                             {
                                 data: 'fecha_nacimiento',
                                 render: function (data) {
-                                    return data ? new Date(data).toLocaleDateString() : '-';
+                                    return data ? data : '-';
                                 }
                             },
                             { 
@@ -165,7 +157,7 @@
                             {
                                 data: 'created_at',
                                 render: function (data) {
-                                    return new Date(data).toLocaleString();
+                                    return data ? data : '-';
                                 }
                             },
 

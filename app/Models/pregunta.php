@@ -11,7 +11,7 @@ class pregunta extends Model
 
     #define qué tabla es preguntas
     protected $table = "psico_alobri_questions"; #título tabla
-    protected $fillable = ["question", "test_id", "required","section_id"]; #columnas, 
+    protected $fillable = ["question", "test_id", "required","section_id","question_type_id"]; #columnas, 
     protected $primaryKey = "id"; #se especifica si la llave primaria no se llama solo "id" en la bd.
 
     public $timestamps = false; #laravel crea automáticamente "created_at, updated_at" pero esta tabla no tiene esos campos.
@@ -23,6 +23,11 @@ class pregunta extends Model
 
     public function seccion()
     {
-        return $this->belongsTo(Seccion::class, 'seccion_id', 'id');
+        return $this->belongsTo(Seccion::class, 'section_id', 'id');
+    }
+
+    public function test()
+    {
+        return $this->belongsTo(Test::class, 'test_id');
     }
 }

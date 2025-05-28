@@ -114,8 +114,8 @@
                     }
                 },
                 columns: [
-                    {data: 'titulo'},
-                    {data: 'bloque'},
+                    {data: 'title'},
+                    {data: 'block'},
                     {data: 'cuestionario'},
                     {data: 'time_at'},
                     {
@@ -174,15 +174,15 @@
                     return;
                 }
 
-                // Primero obtenemos las categorías
+                // Primero obtenemos las evaluaciones que existen
                 jQuery.ajax({
                     url: "{{ route('tests.all') }}",
                     type: "GET",
                     dataType: "json",
-                    success: function (categorias) {
-                        let options = '<option disabled selected>Selecciona una categoría</option>';
-                        categorias.forEach(categoria => {
-                            options += `<option value="${categoria.id}">${categoria.titulo_cuestionario}</option>`;
+                    success: function (tests) {
+                        let options = '<option disabled selected>Selecciona una prueba</option>';
+                        tests.forEach(test => {
+                            options += `<option value="${test.id}">${test.test_title}</option>`;
                         });
 
                         Swal.fire({
@@ -203,7 +203,7 @@
                                             <select id="swal-categoria" class="form-select">
                                                 ${options}
                                             </select>
-                                            <label for="swal-categoria">Categoría</label>
+                                            <label for="swal-categoria">Prueba a la que pertenece</label>
                                         </div>
                                         <div class="form-floating form-floating-outline mb-6">
                                             <input type="text" id="swal-time_at" class="form-control" placeholder="Tiempo (hh:mm:ss)" value="00:00:00" required>
@@ -225,9 +225,9 @@
                             background: '#262b3c',
                             preConfirm: () => {
                                 return {
-                                    titulo: document.getElementById('swal-titulo').value,
-                                    bloque: document.getElementById('swal-bloque').value,
-                                    categoria_id: document.getElementById('swal-categoria').value,
+                                    title: document.getElementById('swal-titulo').value,
+                                    block: document.getElementById('swal-bloque').value,
+                                    test_id: document.getElementById('swal-categoria').value,
                                     time_at: document.getElementById('swal-time_at').value,
                                     _token: '{{ csrf_token() }}'
                                 }
@@ -330,11 +330,11 @@
                     url: "{{ route('tests.all') }}",
                     type: "GET",
                     dataType: "json",
-                    success: function (pruebas) {
+                    success: function (tests) {
                         let options = '';
-                        pruebas.forEach(prueba => {
-                            const selected = row.categoria_id && row.categoria_id === prueba.id ? 'selected' : '';
-                            options += `<option value="${prueba.id}" ${selected}>${prueba.test_title}</option>`;
+                        tests.forEach(test => {
+                            const selected = row.test_id && row.test_id === test.id ? 'selected' : '';
+                            options += `<option value="${test.id}" ${selected}>${test.test_title}</option>`;
                         });
 
                         Swal.fire({
@@ -344,11 +344,11 @@
                                     <h2 class="card-header">Editar Sección</h2>
                                     <div class="card-body">
                                         <div class="form-floating form-floating-outline mb-6">
-                                            <input id="swal-titulo" type="text" class="form-control" placeholder="Título" required value="${row.titulo}">
+                                            <input id="swal-titulo" type="text" class="form-control" placeholder="Título" required value="${row.title}">
                                             <label for="swal-titulo">Título</label>
                                         </div>
                                         <div class="form-floating form-floating-outline mb-6">
-                                            <input id="swal-bloque" type="text" class="form-control" placeholder="Bloque" required value="${row.bloque}">
+                                            <input id="swal-bloque" type="text" class="form-control" placeholder="Bloque" required value="${row.block}">
                                             <label for="swal-bloque">Bloque</label>
                                         </div>
                                         <div class="form-floating form-floating-outline mb-6">
@@ -377,9 +377,9 @@
                             background: '#262b3c',
                             preConfirm: () => {
                                 return {
-                                    titulo: document.getElementById('swal-titulo').value,
-                                    bloque: document.getElementById('swal-bloque').value,
-                                    categoria_id: document.getElementById('swal-categoria').value,
+                                    title: document.getElementById('swal-titulo').value,
+                                    block: document.getElementById('swal-bloque').value,
+                                    test_id: document.getElementById('swal-categoria').value,
                                     time_at: document.getElementById('swal-time_at').value,
                                     _token: '{{ csrf_token() }}'
                                 };
@@ -387,7 +387,7 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 jQuery.ajax({
-                                    url: `/admin/secciones/${id}`,  // Actualiza la URL para el modelo Sección
+                                    url: `/psicometricas/admin/secciones/${id}`,  // Actualiza la URL para el modelo Sección
                                     type: "PUT",
                                     data: result.value,
                                     dataType: "json",

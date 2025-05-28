@@ -10,7 +10,7 @@ class Respuesta extends Model
     use HasFactory;
 
     protected $table = "psico_alobri_answers"; 
-    protected $fillable = ["answer", "option", "question_id"];
+    protected $fillable = ["answer", "option", "question_id", "is_correct"];
     protected $primaryKey = "id";
 
     public $timestamps = false; 

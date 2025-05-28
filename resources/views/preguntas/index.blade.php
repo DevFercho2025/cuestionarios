@@ -113,9 +113,9 @@
                     },
                     columns: [
                         { data: 'pregunta_id' },
-                        { data: 'pregunta' },
-                        { data: 'cuestionario' },
-                        { data: 'seccion.titulo', defaultContent: '<span class="grey-text">Sin Sección</span>' },
+                        { data: 'question' },
+                        { data: 'test.titulo', defaultContent: '<span class="grey-text">Sin Test</span>' },
+                        { data: 'seccion.title', defaultContent: '<span class="grey-text">Sin Sección</span>' },
                         {
                             data: null,
                             render: function(data, type, row) {
@@ -166,46 +166,263 @@
                     document.body.appendChild(swalScript);
                 }
 
+                //crear pregunta sin formato
+                /*jQuery("#crearPreguntaBtn").click(function () {
+                    if (typeof Swal === 'undefined') {
+                        alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
+                        return;
+                    }
+
+                    // 1. Cargar todos los tests
+                    $.ajax({
+                        url: "{{ route('tests.all') }}", // Define ruta para traer tests con su id y título
+                        type: "GET",
+                        dataType: "json",
+                        success: function (tests) {
+                            if (!Array.isArray(tests) || tests.length === 0) {
+                                Swal.fire('Error', 'No hay tests disponibles para seleccionar.', 'error');
+                                return;
+                            }
+
+                            // Opciones para select de tests
+                            let testOptions = tests.map(t => `<option value="${t.id}">${t.test_title || t.titulo || t.title || t.name}</option>`).join('');
+
+                            // Cargar secciones del primer test por defecto
+                            let selectedTestId = tests[0].id;
+
+                            // Función para cargar secciones según test_id
+                            function loadSections(testId, callback) {
+                                $.ajax({
+                                    url: "{{ url('psicometricas/admin/secciones/by-test') }}/" + testId, // Ruta que devuelve secciones de un test dado
+                                    type: "GET",
+                                    dataType: "json",
+                                    success: function (secciones) {
+                                        if (!Array.isArray(secciones) || secciones.length === 0) {
+                                            callback('<option value="" disabled selected>No hay secciones</option>');
+                                        } else {
+                                            let secOptions = secciones.map(s => `<option value="${s.id}">${s.title}</option>`).join('');
+                                            callback(secOptions);
+                                        }
+                                    },
+                                    error: function () {
+                                        callback('<option value="" disabled selected>Error cargando secciones</option>');
+                                    }
+                                });
+                            }
+
+                            // Cargar secciones inicialmente para el primer test
+                            loadSections(selectedTestId, function (sectionOptions) {
+                                Swal.fire({
+                                    html: `
+                                        <div class="col-md mb-6 mb-md-0">
+                                            <div class="card">
+                                                <h2 class="card-header">Crear Pregunta</h2>
+                                                <div class="card-body">
+                                                    <div class="form-floating form-floating-outline mb-6">
+                                                        <input id="swal-question" type="text" class="form-control" placeholder="Pregunta" required>
+                                                        <label for="swal-question">Pregunta</label>
+                                                    </div>
+                                                    <div class="form-floating form-floating-outline mb-6">
+                                                        <select id="swal-test_id" class="form-select" required>
+                                                            ${testOptions}
+                                                        </select>
+                                                        <label for="swal-test_id">Test (Cuestionario)</label>
+                                                    </div>
+                                                    <div class="form-floating form-floating-outline mb-6">
+                                                        <select id="swal-section_id" class="form-select" required>
+                                                            ${sectionOptions}
+                                                        </select>
+                                                        <label for="swal-section_id">Sección</label>
+                                                    </div>
+                                                    <div class="form-check mb-6">
+                                                        <input class="form-check-input" type="checkbox" value="1" id="swal-required">
+                                                        <label class="form-check-label" for="swal-required">Requerida</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `,
+                                    showClass: { popup: 'animate__animated animate__fadeInDown' },
+                                    hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+                                    focusConfirm: false,
+                                    confirmButtonText: 'Crear',
+                                    confirmButtonColor: '#3d4e81',
+                                    cancelButtonText: 'Cancelar',
+                                    cancelButtonColor: '#d32f2f',
+                                    showCancelButton: true,
+                                    buttonsStyling: true,
+                                    background: '#262b3c',
+                                    preConfirm: () => {
+                                        const question = document.getElementById('swal-question').value.trim();
+                                        const test_id = document.getElementById('swal-test_id').value;
+                                        const section_id = document.getElementById('swal-section_id').value;
+                                        const required = document.getElementById('swal-required').checked ? 1 : 0;
+
+                                        if (!question || !test_id || !section_id) {
+                                            Swal.showValidationMessage('Por favor, complete todos los campos obligatorios.');
+                                            return false;
+                                        }
+
+                                        return {
+                                            question,
+                                            test_id,
+                                            section_id,
+                                            required,
+                                            _token: '{{ csrf_token() }}'
+                                        };
+                                    }
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $.ajax({
+                                            url: "{{ route('preguntas.store') }}",
+                                            type: "POST",
+                                            data: result.value,
+                                            dataType: "json",
+                                            success: function (response) {
+                                                Swal.fire({
+                                                    icon: 'success',
+                                                    title: '¡Éxito!',
+                                                    text: response.message || 'Pregunta creada exitosamente.',
+                                                    confirmButtonColor: '#3d4e81',
+                                                    timer: 2000,
+                                                    timerProgressBar: true,
+                                                    background: '#262b3c',
+                                                });
+                                                $('#preguntasTable').DataTable().ajax.reload(null, false);
+                                            },
+                                            error: function (xhr) {
+                                                let errorMsg = 'No se pudo crear la pregunta.';
+                                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                                    errorMsg = xhr.responseJSON.message;
+                                                }
+                                                Swal.fire({
+                                                    icon: 'error',
+                                                    title: 'Error',
+                                                    text: errorMsg,
+                                                    confirmButtonColor: '#d32f2f',
+                                                    background: '#262b3c',
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                // Cuando cambie el test, actualizar secciones
+                                $(document).off('change', '#swal-test_id');
+                                $(document).on('change', '#swal-test_id', function () {
+                                    let selectedTest = $(this).val();
+                                    loadSections(selectedTest, function (secOptions) {
+                                        $('#swal-section_id').html(secOptions);
+                                    });
+                                });
+                            });
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'No se pudieron cargar los tests.',
+                                confirmButtonColor: '#d32f2f',
+                            });
+                        }
+                    });
+                });*/
+
+                //crear pregunta con formato
                 jQuery("#crearPreguntaBtn").click(function () {
                     if (typeof Swal === 'undefined') {
                         alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
                         return;
                     }
 
-                    // Primero cargamos las secciones antes de mostrar el formulario
-                    $.ajax({
-                        url: "{{ route('secciones.all') }}",
-                        type: "GET",
-                        dataType: "json",
-                        success: function (secciones) {
-                            let options = '<option value="" disabled selected>Seleccione una sección</option>';
-                            $.each(secciones, function (i, sec) {
-                                options += `<option value="${sec.id}">${sec.titulo}</option>`;
-                            });
+                    // 1. Cargar todos los tests y tipos de pregunta simultáneamente
+                    $.when(
+                        $.ajax({
+                            url: "{{ route('tests.all') }}",
+                            type: "GET",
+                            dataType: "json"
+                        }),
+                        $.ajax({
+                            url: "{{ route('question_types.all') }}", // Ruta para obtener tipos de pregunta
+                            type: "GET",
+                            dataType: "json"
+                        })
+                    ).done(function (tests, questionTypes) {
+                        tests = tests[0];           // $.when devuelve arrays con [data, status, xhr]
+                        questionTypes = questionTypes[0];
 
+                        if (!Array.isArray(tests) || tests.length === 0) {
+                            Swal.fire('Error', 'No hay tests disponibles para seleccionar.', 'error');
+                            return;
+                        }
+                        if (!Array.isArray(questionTypes) || questionTypes.length === 0) {
+                            Swal.fire('Error', 'No hay tipos de pregunta disponibles.', 'error');
+                            return;
+                        }
+
+                        // Opciones para select tests
+                        let testOptions = tests.map(t => `<option value="${t.id}">${t.test_title || t.titulo || t.title || t.name}</option>`).join('');
+
+                        // Opciones para select tipos de pregunta
+                        let typeOptions = questionTypes.map(qt => `<option value="${qt.id}">${qt.name}</option>`).join('');
+
+                        let selectedTestId = tests[0].id;
+
+                        function loadSections(testId, callback) {
+                            $.ajax({
+                                url: "{{ url('psicometricas/admin/secciones/by-test') }}/" + testId,
+                                type: "GET",
+                                dataType: "json",
+                                success: function (secciones) {
+                                    if (!Array.isArray(secciones) || secciones.length === 0) {
+                                        callback('<option value="" disabled selected>No hay secciones</option>');
+                                    } else {
+                                        let secOptions = secciones.map(s => `<option value="${s.id}">${s.title}</option>`).join('');
+                                        callback(secOptions);
+                                    }
+                                },
+                                error: function () {
+                                    callback('<option value="" disabled selected>Error cargando secciones</option>');
+                                }
+                            });
+                        }
+
+                        loadSections(selectedTestId, function (sectionOptions) {
                             Swal.fire({
                                 html: `
-                                <div class="col-md mb-6 mb-md-0">
-                                <div class="card">
-                                    <h2 class="card-header">Crear Pregunta</h2>
-                                    <div class="card-body">
-                                        <div class="form-floating form-floating-outline mb-6">
-                                        <input id="swal-pregunta" type="text" class="form-control" placeholder="Pregunta" required="">
-                                        <label for="swal-pregunta">Pregunta</label>
-                                        </div>
-                                        <div class="form-floating form-floating-outline mb-6">
-                                        <input type="text" id="swal-cuestionario" class="form-control" placeholder="Cuestionario" required="">
-                                        <label for="swal-cuestionario">Cuestionario</label>
-                                        </div>
-                                        <div class="form-floating form-floating-outline mb-6">
-                                        <select id="swal-seccion" class="form-select">
-                                            ${options}
-                                        </select>
-                                        <label for="swal-seccion">Sección</label>
+                                    <div class="col-md mb-6 mb-md-0">
+                                        <div class="card">
+                                            <h2 class="card-header">Crear Pregunta</h2>
+                                            <div class="card-body">
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <input id="swal-question" type="text" class="form-control" placeholder="Pregunta" required>
+                                                    <label for="swal-question">Pregunta</label>
+                                                </div>
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <select id="swal-test_id" class="form-select" required>
+                                                        ${testOptions}
+                                                    </select>
+                                                    <label for="swal-test_id">Test (Cuestionario)</label>
+                                                </div>
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <select id="swal-section_id" class="form-select" required>
+                                                        ${sectionOptions}
+                                                    </select>
+                                                    <label for="swal-section_id">Sección</label>
+                                                </div>
+                                                <div class="form-floating form-floating-outline mb-6">
+                                                    <select id="swal-question_type_id" class="form-select" required>
+                                                        ${typeOptions}
+                                                    </select>
+                                                    <label for="swal-question_type_id">Tipo de pregunta</label>
+                                                </div>
+                                                <div class="form-check mb-6">
+                                                    <input class="form-check-input" type="checkbox" value="1" id="swal-required">
+                                                    <label class="form-check-label" for="swal-required">Requerida</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                </div>
                                 `,
                                 showClass: { popup: 'animate__animated animate__fadeInDown' },
                                 hideClass: { popup: 'animate__animated animate__fadeOutUp' },
@@ -218,16 +435,29 @@
                                 buttonsStyling: true,
                                 background: '#262b3c',
                                 preConfirm: () => {
+                                    const question = document.getElementById('swal-question').value.trim();
+                                    const test_id = document.getElementById('swal-test_id').value;
+                                    const section_id = document.getElementById('swal-section_id').value;
+                                    const question_type_id = document.getElementById('swal-question_type_id').value;
+                                    const required = document.getElementById('swal-required').checked ? 1 : 0;
+
+                                    if (!question || !test_id || !section_id || !question_type_id) {
+                                        Swal.showValidationMessage('Por favor, complete todos los campos obligatorios.');
+                                        return false;
+                                    }
+
                                     return {
-                                        pregunta: document.getElementById('swal-pregunta').value,
-                                        cuestionario: document.getElementById('swal-cuestionario').value,
-                                        seccion_id: document.getElementById('swal-seccion').value,
+                                        question,
+                                        test_id,
+                                        section_id,
+                                        question_type_id,
+                                        required,
                                         _token: '{{ csrf_token() }}'
                                     };
                                 }
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    jQuery.ajax({
+                                    $.ajax({
                                         url: "{{ route('preguntas.store') }}",
                                         type: "POST",
                                         data: result.value,
@@ -242,9 +472,7 @@
                                                 timerProgressBar: true,
                                                 background: '#262b3c',
                                             });
-
-                                            // Recargar tabla
-                                            jQuery('#preguntasTable').DataTable().ajax.reload(null, false);
+                                            $('#preguntasTable').DataTable().ajax.reload(null, false);
                                         },
                                         error: function (xhr) {
                                             let errorMsg = 'No se pudo crear la pregunta.';
@@ -262,21 +490,30 @@
                                     });
                                 }
                             });
-                        },
-                        error: function () {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'No se pudieron cargar las secciones.',
-                                confirmButtonColor: '#d32f2f',
+
+                            // Cuando cambie el test, actualizar secciones
+                            $(document).off('change', '#swal-test_id');
+                            $(document).on('change', '#swal-test_id', function () {
+                                let selectedTest = $(this).val();
+                                loadSections(selectedTest, function (secOptions) {
+                                    $('#swal-section_id').html(secOptions);
+                                });
                             });
-                        }
+                        });
+
+                    }).fail(function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No se pudieron cargar los tests o los tipos de pregunta.',
+                            confirmButtonColor: '#d32f2f',
+                        });
                     });
                 });
 
 
                 //editar pregunta
-                $('#preguntasTable').on('click', '.edit-btn', function() {
+                /*$('#preguntasTable').on('click', '.edit-btn', function() {
                     const id = $(this).data('id');  //ID de la fila seleccionada
                     var rowData = table.row($(this).closest('tr')).data();
                     
@@ -359,7 +596,205 @@
                             });
                         }
                     });
+                });*/
+
+                $('#preguntasTable').on('click', '.edit-btn', function() {
+                    const preguntaId = $(this).data('id');
+                    const table = $('#preguntasTable').DataTable();
+
+                    // Obtener datos de la fila seleccionada (opcional, puede contener info básica)
+                    var rowData = table.row($(this).closest('tr')).data();
+
+                    // 1. Cargar la pregunta con sus datos completos
+                    $.ajax({
+                        url: "{{ url('psicometricas/admin/preguntas') }}/" + preguntaId,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(pregunta) {
+                            // 2. Cargar todos los tests
+                            $.ajax({
+                                url: "{{ route('tests.all') }}",
+                                type: "GET",
+                                dataType: "json",
+                                success: function(tests) {
+                                    if (!Array.isArray(tests) || tests.length === 0) {
+                                        Swal.fire('Error', 'No hay tests disponibles para seleccionar.', 'error');
+                                        return;
+                                    }
+
+                                    let testOptions = tests.map(t => 
+                                        `<option value="${t.id}" ${t.id == pregunta.test_id ? 'selected' : ''}>${t.test_title || t.titulo || t.title || t.name}</option>`
+                                    ).join('');
+
+                                    // Función para cargar secciones de un test específico, con opción de seleccionar la sección actual
+                                    function loadSections(testId, selectedSectionId, callback) {
+                                        $.ajax({
+                                            url: "{{ url('psicometricas/admin/secciones/by-test') }}/" + testId,
+                                            type: "GET",
+                                            dataType: "json",
+                                            success: function (secciones) {
+                                                if (!Array.isArray(secciones) || secciones.length === 0) {
+                                                    callback('<option value="" disabled>No hay secciones</option>');
+                                                } else {
+                                                    let secOptions = secciones.map(s => 
+                                                        `<option value="${s.id}" ${s.id == selectedSectionId ? 'selected' : ''}>${s.title}</option>`
+                                                    ).join('');
+                                                    callback(secOptions);
+                                                }
+                                            },
+                                            error: function () {
+                                                callback('<option value="" disabled>Error cargando secciones</option>');
+                                            }
+                                        });
+                                    }
+
+                                    // 3. Cargar tipos de pregunta
+                                    $.ajax({
+                                        url: "{{ route('question_types.all') }}",
+                                        type: "GET",
+                                        dataType: "json",
+                                        success: function(questionTypes) {
+                                            let typeOptions = questionTypes.map(qt => 
+                                                `<option value="${qt.id}" ${qt.id == pregunta.question_type_id ? 'selected' : ''}>${qt.name}</option>`
+                                            ).join('');
+
+                                            // 4. Cargar las secciones del test seleccionado, para poner el select correcto
+                                            loadSections(pregunta.test_id, pregunta.section_id, function(sectionOptions) {
+                                                // 5. Mostrar SweetAlert con el formulario precargado
+                                                Swal.fire({
+                                                    html: `
+                                                        <div class="col-md mb-6 mb-md-0">
+                                                            <div class="card">
+                                                                <h2 class="card-header">Editar Pregunta</h2>
+                                                                <div class="card-body">
+                                                                    <div class="form-floating form-floating-outline mb-6">
+                                                                        <input id="swal-question" type="text" class="form-control" placeholder="Pregunta" value="${pregunta.question}" required>
+                                                                        <label for="swal-question">Pregunta</label>
+                                                                    </div>
+
+                                                                    <div class="form-floating form-floating-outline mb-6">
+                                                                        <select id="swal-test_id" class="form-select" required>
+                                                                            ${testOptions}
+                                                                        </select>
+                                                                        <label for="swal-test_id">Test (Cuestionario)</label>
+                                                                    </div>
+
+                                                                    <div class="form-floating form-floating-outline mb-6">
+                                                                        <select id="swal-section_id" class="form-select" required>
+                                                                            ${sectionOptions}
+                                                                        </select>
+                                                                        <label for="swal-section_id">Sección</label>
+                                                                    </div>
+
+                                                                    <div class="form-floating form-floating-outline mb-6">
+                                                                        <select id="swal-question_type_id" class="form-select" required>
+                                                                            ${typeOptions}
+                                                                        </select>
+                                                                        <label for="swal-question_type_id">Tipo de Pregunta</label>
+                                                                    </div>
+
+                                                                    <div class="form-check mb-6">
+                                                                        <input class="form-check-input" type="checkbox" value="1" id="swal-required" ${pregunta.required ? 'checked' : ''}>
+                                                                        <label class="form-check-label" for="swal-required">Requerida</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    `,
+                                                    showClass: { popup: 'animate__animated animate__fadeInDown' },
+                                                    hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+                                                    focusConfirm: false,
+                                                    confirmButtonText: 'Guardar',
+                                                    confirmButtonColor: '#3d4e81',
+                                                    cancelButtonText: 'Cancelar',
+                                                    cancelButtonColor: '#d32f2f',
+                                                    showCancelButton: true,
+                                                    buttonsStyling: true,
+                                                    background: '#262b3c',
+                                                    preConfirm: () => {
+                                                        const question = document.getElementById('swal-question').value.trim();
+                                                        const test_id = document.getElementById('swal-test_id').value;
+                                                        const section_id = document.getElementById('swal-section_id').value;
+                                                        const question_type_id = document.getElementById('swal-question_type_id').value;
+                                                        const required = document.getElementById('swal-required').checked ? 1 : 0;
+
+                                                        if (!question || !test_id || !section_id || !question_type_id) {
+                                                            Swal.showValidationMessage('Por favor, complete todos los campos obligatorios.');
+                                                            return false;
+                                                        }
+
+                                                        return {
+                                                            question,
+                                                            test_id,
+                                                            section_id,
+                                                            question_type_id,
+                                                            required,
+                                                            _token: '{{ csrf_token() }}'
+                                                        };
+                                                    }
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        $.ajax({
+                                                            url: `/preguntas/${preguntaId}`,
+                                                            type: "PUT",
+                                                            data: result.value,
+                                                            dataType: "json",
+                                                            success: function (response) {
+                                                                Swal.fire({
+                                                                    icon: 'success',
+                                                                    title: '¡Éxito!',
+                                                                    text: response.message || 'Pregunta actualizada exitosamente.',
+                                                                    confirmButtonColor: '#3d4e81',
+                                                                    timer: 2000,
+                                                                    timerProgressBar: true,
+                                                                    background: '#262b3c',
+                                                                });
+                                                                table.ajax.reload(null, false);
+                                                            },
+                                                            error: function (xhr) {
+                                                                let errorMsg = 'No se pudo actualizar la pregunta.';
+                                                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                                                    errorMsg = xhr.responseJSON.message;
+                                                                }
+                                                                Swal.fire({
+                                                                    icon: 'error',
+                                                                    title: 'Error',
+                                                                    text: errorMsg,
+                                                                    confirmButtonColor: '#d32f2f',
+                                                                    background: '#262b3c',
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+                                                });
+
+                                                // Cuando cambie el test, actualizar secciones
+                                                $(document).off('change', '#swal-test_id');
+                                                $(document).on('change', '#swal-test_id', function () {
+                                                    let selectedTest = $(this).val();
+                                                    loadSections(selectedTest, null, function(secOptions) {
+                                                        $('#swal-section_id').html(secOptions);
+                                                    });
+                                                });
+                                            });
+                                        },
+                                        error: function() {
+                                            Swal.fire('Error', 'No se pudieron cargar los tipos de pregunta.', 'error');
+                                        }
+                                    });
+                                },
+                                error: function() {
+                                    Swal.fire('Error', 'No se pudieron cargar los tests.', 'error');
+                                }
+                            });
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'No se pudo cargar la pregunta.', 'error');
+                        }
+                    });
                 });
+
+
 
                 // Eliminar Pregunta
                 $('#preguntasTable').on('click', '.eliminar-pregunta-btn', function() {

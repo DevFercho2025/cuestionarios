@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Aplicacion;
+use App\Models\AccessCode;
 
 class CodigoController extends Controller
 {
@@ -15,9 +15,9 @@ class CodigoController extends Controller
     
         $codigo = $request->input('codigo');
     
-        $aplicacion = Aplicacion::where('codigo', $codigo)->first();
+        $accessCode = AccessCode::where('code', $codigo)->first();
     
-        if (!$aplicacion) {
+        if (!$accessCode) {
             return back()->withErrors(['codigo' => 'Código no válido']);
         }
     

@@ -31,5 +31,8 @@ class Respuesta_Usuario extends Model
         return $this->belongsTo(Respuesta::class, 'answer_id');
     }
 
-
+    public function getIsCorrectAttribute()
+    {
+        return $this->respuesta?->is_correct ?? false;
+    }
 }

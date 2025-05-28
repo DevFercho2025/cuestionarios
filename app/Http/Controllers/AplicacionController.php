@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Aplicacion;
+use App\Models\AccessCode;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -17,16 +17,16 @@ class AplicacionController extends Controller
     // DataTable
     public function datatable()
     {
-        $aplicaciones = \App\Models\Aplicacion::with('usuario')->get();
+         $codes = AccessCode::with('user')->get();
 
-        $data = $aplicaciones->map(function ($aplicacion) {
+        $data = $codes->map(function ($code) {
             return [
-                'id' => $aplicacion->id,
-                'user_id' => $aplicacion->user_id,
-                'nombre' => $aplicacion->usuario->name,
-                'email' => $aplicacion->usuario->email,
-                'vacante' => $aplicacion->vacante,
-                'codigo' => $aplicacion->codigo,
+                'id' => $code->id,
+                'user_id' => $code->user_id,
+                'nombre' => $code->user->name,
+                'email' => $code->user->email,
+                'vacante' => $code->vacancy,
+                'codigo' => $code->code,
             ];
         });
 
@@ -42,26 +42,26 @@ class AplicacionController extends Controller
             'codigo' => 'required|string|max:255',
         ]);
 
-        $aplicacion = Aplicacion::create($request->all());
+        $accessCode = AccessCode::create($request->all());
 
         return response()->json([
             'message' => 'Aplicación creada correctamente.',
-            'aplicacion' => $aplicacion
+            'aplicacion' => $accessCode
         ]);
     }
 
     // Obtener una aplicación específica (para editar)
     public function show($id)
     {
-        $aplicacion = Aplicacion::findOrFail($id);
+         $accessCode = AccessCode::findOrFail($id);
 
-        return response()->json($aplicacion);
+        return response()->json($accessCode);
     }
 
     // Actualizar una aplicación
     public function update(Request $request, $id)
     {
-        $aplicacion = Aplicacion::findOrFail($id);
+        $code = AccessCode::findOrFail($id);
 
         $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -69,7 +69,7 @@ class AplicacionController extends Controller
             'codigo' => 'required|string|max:255',
         ]);
 
-        $aplicacion->update($request->all());
+        $code->update($request->all());
 
         return response()->json([
             'message' => 'Aplicación actualizada correctamente.'
@@ -79,8 +79,8 @@ class AplicacionController extends Controller
     // Eliminar aplicación
     public function destroy($id)
     {
-        $aplicacion = Aplicacion::findOrFail($id);
-        $aplicacion->delete();
+        $code = AccessCode::findOrFail($id);
+        $code->delete();
 
         return response()->json([
             'message' => 'Aplicación eliminada correctamente.'
@@ -95,13 +95,13 @@ class AplicacionController extends Controller
 
     public function vacantes()
     {
-        $vacantes = Aplicacion::select('vacante')->distinct()->get();
+        $vacantes =  AccessCode::select('vacancy')->distinct()->get();
         return response()->json($vacantes);
     }
 
     public function obtenerConfiguracion($id)
     {
-        $aplicacion = Aplicacion::findOrFail($id);
+        $aplicacion = AccessCode::findOrFail($id);
         return response()->json([
             'camera' => $aplicacion->camera,
             'location' => $aplicacion->location,
@@ -116,7 +116,7 @@ class AplicacionController extends Controller
             'location' => 'required|boolean',
         ]);
 
-        $aplicacion = Aplicacion::findOrFail($request->aplicacion_id);
+        $aplicacion = AccessCode::findOrFail($request->aplicacion_id);
         $aplicacion->camera = $request->camera;
         $aplicacion->location = $request->location;
         $aplicacion->save();

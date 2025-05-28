@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pregunta;
-use App\Models\Categoria;
+use App\Models\Test;
+use App\Models\QuestionType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -16,19 +17,33 @@ class PreguntaController extends Controller
 
     public function datatable(Request $request)
     {
-        $preguntas = Pregunta::with('seccion')->get();
+        $preguntas = Pregunta::with(['seccion','test'])->get()->map(function ($p) {
+            return [
+                'pregunta_id' => $p->id,
+                'question'    => $p->question,
+                'test_id'     => $p->test_id,
+                'test'        => [
+                    'titulo' => $p->test ? $p->test->test_title : null
+                ],
+                'required'    => $p->required,
+                'seccion'     => [
+                    'title' => $p->seccion ? $p->seccion->title : null
+                ]
+            ];
+        });
+        Log::info('Preguntas para datatable:', $preguntas->toArray());
         return response()->json($preguntas);
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'pregunta'     => 'required|string',
-            'cuestionario' => 'required|string',
-            'seccion_id'   => 'required|exists:psico_alobri_secciones,id',
-            'required'     => 'nullable|boolean', 
+            'question'          => 'required|string',
+            'test_id'           => 'required|exists:psico_alobri_tests,id',
+            'section_id'        => 'required|exists:psico_alobri_sections,id',
+            'required'          => 'nullable|boolean',
+            'question_type_id'  => 'required|exists:psico_alobri_question_types,id',
         ]);
-
 
         $data['required'] = $data['required'] ?? 0;
 
@@ -55,17 +70,12 @@ class PreguntaController extends Controller
             $pregunta = Pregunta::findOrFail($id);
 
             $data = $request->validate([
-                'pregunta'     => 'required|string',
-                'cuestionario' => 'required|string',
-                'seccion_id'   => 'required|exists:psico_alobri_secciones,id'
+                'question'    => 'required|string',
+                'test_id'     => 'required|exists:psico_alobri_tests,id',
+                'section_id'  => 'required|exists:psico_alobri_secciones,id',
             ]);
 
-            //Verifica si los valores son diferentes y los actualiza si es necesario
-            $pregunta->pregunta = $data['pregunta'] !== $pregunta->pregunta ? $data['pregunta'] : $pregunta->pregunta;
-            $pregunta->cuestionario = $data['cuestionario'] !== $pregunta->cuestionario ? $data['cuestionario'] : $pregunta->cuestionario;
-            $pregunta->seccion_id = $data['seccion_id'] !== $pregunta->seccion_id ? $data['seccion_id'] : $pregunta->seccion_id;
-
-            $pregunta->save();
+            $pregunta->update($data);
 
             return response()->json([
                 'status'  => 'success',
@@ -96,15 +106,22 @@ class PreguntaController extends Controller
     public function categorias()
     {
         try {
-            $categorias = Categoria::all();
-            Log::info('Categorías obtenidas con éxito', ['categorias' => $categorias]);
+            $categorias = Test::all();
+            Log::info('Pruebas obtenidas con éxito', ['categorias' => $categorias]);
             return response()->json($categorias);
         } catch (\Exception $e) {
-            Log::error('Error al obtener categorías', [
+            Log::error('Error al obtener pruebas', [
                 'error_message' => $e->getMessage(),
                 'stack_trace' => $e->getTraceAsString()
             ]);
-            return response()->json(['message' => 'Error al obtener categorías'], 500);
+            return response()->json(['message' => 'Error al obtener pruebas'], 500);
         }
+    }
+
+    public function allQuestionTypes()
+    {
+        $types = QuestionType::select('id', 'name')->get();
+
+        return response()->json($types);
     }
 }

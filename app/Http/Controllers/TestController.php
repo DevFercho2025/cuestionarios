@@ -66,6 +66,59 @@ class TestController extends Controller
         return redirect()->route('tests.index')->with('success', 'Test actualizado exitosamente.');
     }
 
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'titulo'       => 'required|string|max:255',
+            'categoria_id' => 'required|integer|exists:psico_alobri_categories,id',
+            'tipo_id'      => 'nullable|integer|exists:psico_alobri_test_types,id',
+        ]);
+
+        $test = new Test();
+        $test->test_title = $data['titulo'];
+        $test->type_id = $data['tipo_id'];
+
+        $test->save();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Test creado exitosamente.',
+                'test'    => $test
+            ]);
+        }
+
+        return redirect()->route('pruebas.index')->with('success', 'Test creado exitosamente.');
+    }
+
+    public function destroy($id)
+    {
+        $test = Test::find($id);
+
+        if (!$test) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Test no encontrado.'
+            ], 404);
+        }
+
+        try {
+            $test->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Test eliminado correctamente.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No se pudo eliminar el test. ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
     public function show($id)
     {
         $test = Test::findOrFail($id);
