@@ -18,7 +18,7 @@ use App\Http\Controllers\ResultadosController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('psicometricas')->group(function (){
+
 
     #ENDPOINTS PÚBLICOS
     Route::get('/', [HomeController::class, 'index'])->name('home.index');
@@ -29,12 +29,12 @@ Route::prefix('psicometricas')->group(function (){
 
     Route::get('/candidate', [CandidateController::class, 'index'])->name('candidate.index');
     Route::post('/candidate/validar-codigo', [CandidateController::class, 'validarCodigo'])->name('validar.codigo');
-    
+
     Route::get('register',  [AuthController::class, 'showRegisterForm'])->name('register.wizard');
     Route::post('register/wizard', [AuthController::class, 'registerFormStore'])->name('register.wizard.store');
 
     //Route::get('postal-codes/{postalCode}/{phoneNumber}', [PostalCodeGoogleApiController::class, 'getAddressByPostalCode']);
-
+Route::prefix('psicometricas')->group(function (){
     #ADMIN
     Route::group([
         'prefix' => 'admin',
