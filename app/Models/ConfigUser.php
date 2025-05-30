@@ -28,7 +28,7 @@ class ConfigUser extends Model
     }
 
     public function company(){
-        return $this->belongsTo(Company::class, 'company_id'); // Relación con el modelo Company
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     public function isTalentinaUser(){
