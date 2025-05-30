@@ -150,11 +150,6 @@
                                     <div data-i18n="Respuestas que existen">Respuestas que existen</div>
                                 </a>
                             </li>
-                            <li class="menu-item">
-                                <a href="{{ route('respuestas_correctas.index') }}" class="menu-link">
-                                    <div data-i18n="Solucionarios">Solucionarios</div>
-                                </a>
-                            </li>
                         </ul>
                     </li>
                 </ul>

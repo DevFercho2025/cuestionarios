@@ -124,4 +124,10 @@ class PreguntaController extends Controller
 
         return response()->json($types);
     }
+
+    public function preguntasBySection($sectionId)
+    {
+        $questions = Pregunta::where('section_id', $sectionId)->get();
+        return response()->json($questions);
+    }
 }

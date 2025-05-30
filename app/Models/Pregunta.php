@@ -18,7 +18,7 @@ class pregunta extends Model
 
     public function respuestas()
     {
-        return $this->hasMany(Respuesta::class, 'test_id', 'id');
+        return $this->hasMany(Respuesta::class, 'question_id', 'id');
     }
 
     public function seccion()

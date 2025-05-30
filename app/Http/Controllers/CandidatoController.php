@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccessCode;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Aplicacion;
@@ -122,11 +123,11 @@ class CandidatoController extends Controller
 
         $user->info()->updateOrCreate(
             [
-                'fecha_nacimiento' => $request->input('nacimiento'),
-                'genero'           => $request->input('genero_legal'),
-                'codigo_postal'    => $request->input('codigo_postal'),
-                'celular'          => $request->input('telefono'),
-                'pais'             => $request->input('pais'),
+                'date_of_birth' => $request->input('nacimiento'),
+                'gender'           => $request->input('genero_legal'),
+                'postal_code'    => $request->input('codigo_postal'),
+                'phone'          => $request->input('telefono'),
+                'country'             => $request->input('pais'),
                 'created_at'       => Carbon::now(),
             ]
         );
@@ -254,7 +255,7 @@ class CandidatoController extends Controller
 
             $codigo = strtoupper(Str::random(10));
 
-            $aplicacion = Aplicacion::create([
+            $aplicacion = AccessCode::create([
                 'user_id' => $request->user_id,
                 'vacante' => $request->vacante,
                 'codigo' => $codigo,

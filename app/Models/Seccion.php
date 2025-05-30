@@ -18,6 +18,11 @@ class Seccion extends Model
         return $this->belongsTo(Test::class, 'test_id');
     }
 
+    public function questions()
+    {
+        return $this->hasMany(Pregunta::class, 'section_id', 'id');
+    }
+
     public function getTiempoSeccionAttribute()
     {
         $tiempo = Carbon::parse($this->time_at);

@@ -64,6 +64,8 @@ Route::prefix('psicometricas')->group(function (){
         Route::delete('preguntas/{id}', [PreguntaController::class, 'destroy'])->name('preguntas.destroy');
         Route::get('preguntas/categorias', [PreguntaController::class, 'categorias'])->name('admin.preguntas.categorias');
         Route::get('question-types/all', [PreguntaController::class, 'allQuestionTypes'])->name('question_types.all');
+        Route::get('preguntas/by-section/{sectionId}', [PreguntaController::class, 'preguntasBySection']);
+
 
         // Rutas para Respuestas
         Route::get('respuestas', [RespuestaController::class, 'index'])->name('respuestas.index');
@@ -72,6 +74,7 @@ Route::prefix('psicometricas')->group(function (){
         Route::get('respuestas/{id}', [RespuestaController::class, 'show'])->name('respuestas.show');
         Route::put('respuestas/{id}', [RespuestaController::class, 'update'])->name('respuestas.update');
         Route::delete('respuestas/{id}', [RespuestaController::class, 'destroy'])->name('respuestas.destroy');
+        Route::get('/tests-with-all', [RespuestaController::class, 'obtenerPreguntasSeccionesPrueba'])->name('tests.withAll');
 
         // Rutas para Respuestas Correctas
         Route::get('respuestas_correctas', [RespuestaCorrectaController::class, 'index'])->name('respuestas_correctas.index');

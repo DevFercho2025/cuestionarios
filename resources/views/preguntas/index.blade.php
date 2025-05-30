@@ -607,7 +607,7 @@
 
                     // 1. Cargar la pregunta con sus datos completos
                     $.ajax({
-                        url: "{{ url('psicometricas/admin/preguntas') }}/" + preguntaId,
+                        url: "{{ url('psicometricas/admin/gpreguntas') }}/" + preguntaId,
                         type: 'GET',
                         dataType: 'json',
                         success: function(pregunta) {
@@ -808,10 +808,11 @@
                         cancelButtonColor: '#9e9e9e',
                         confirmButtonText: 'Sí, eliminar',
                         cancelButtonText: 'Cancelar',
+                        background: '#262b3c',
                     }).then((result) => {
                         if(result.isConfirmed){
                             $.ajax({
-                                url: `/admin/preguntas/${preguntaId}`,
+                                url: `/psicometricas/admin/preguntas/${preguntaId}`,
                                 type: "DELETE",
                                 data: { _token: '{{ csrf_token() }}' },
                                 success: function(response){
