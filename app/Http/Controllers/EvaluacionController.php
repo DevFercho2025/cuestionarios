@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categoria;
-use App\Models\usuarios_categoria;
+use App\Models\Test;
+use App\Models\User;
+use App\Models\userAssignedTest;
 use App\Models\ContadorEvaluacion;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -16,18 +17,31 @@ class EvaluacionController extends Controller
         return view('Evaluaciones.index'); // Asegúrate que la ruta del archivo sea esta
     }
 
-    public function listarCategorias()
+    public function listarCategorias(Request $request)
     {
-        $categorias = Categoria::select('id', 'titulo_cuestionario')->get();
-        return response()->json($categorias);
+        $request->validate([
+        'user_id' => 'required|exists:users,id',
+    ]);
+
+    $user = User::find($request->user_id);
+
+    $asignadas = $user->assignedTests()->pluck('test_id');
+
+    $pruebasDisponibles = Test::whereNotIn('id', $asignadas)
+                              ->select('id', 'test_title')
+                              ->get();
+
+    return response()->json($pruebasDisponibles);
+        $pruebas = Test::select('id', 'test_title')->get();
+        return response()->json($pruebas);
     }
 
     public function asignarCategorias(Request $request)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id', //usuario al que se le asignan evaluaciones
-            'categorias' => 'required|array',
-            'categorias.*' => 'exists:psico_alobri_categorias,id',
+            'pruebas' => 'required|array',
+            'pruebas.*' => 'exists:psico_alobri_tests,id',
         ]);
     
         try {
@@ -40,23 +54,26 @@ class EvaluacionController extends Controller
                 ], 400);
             }
 
-            if ($contador->pruebas_disponibles == 0) {
+            if ($contador->available_tests == 0) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No tienes pruebas disponibles para asignar evaluaciones. Adquiere más pruebas'
                 ], 403);
             }
 
-            foreach ($request->categorias as $categoriaId) {
-                Usuarios_categoria::firstOrCreate([
+            foreach ($request->pruebas as $pruebaId) {
+                $created = userAssignedTest::firstOrCreate([
                     'user_id' => $request->user_id,
-                    'categorias_id' => $categoriaId,
+                    'test_id' => $pruebaId,
                 ]);
+
+                #Actualiza el contador para el asignador de evaluaciones (el usuario logueado)
+                if ($created->wasRecentlyCreated) {
+                    $contador->decrement('available_tests');
+                    $contador->increment('used_tests');
+                }
             }
 
-            #Actualiza el contador para el asignador de evaluaciones (el usuario logueado)
-            $contador->decrement('pruebas_disponibles');
-            $contador->increment('pruebas_usadas');
             return response()->json(['success' => true, 'message' => 'Evaluaciones asignadas']);
 
         } catch (\Exception $e) {
@@ -70,10 +87,10 @@ class EvaluacionController extends Controller
 
     public function evaluacionesPorUsuario($user_id)
     {
-        $evaluaciones = Usuarios_categoria::where('user_id', $user_id)
-            ->with('categoria:id,titulo_cuestionario')
+        $evaluaciones = userAssignedTest::where('user_id', $user_id)
+            ->with('test:id,test_title')
             ->get()
-            ->pluck('categoria');
+            ->pluck('test');
 
         return response()->json($evaluaciones);
     }
@@ -86,7 +103,7 @@ class EvaluacionController extends Controller
             'categorias.*' => 'exists:psico_alobri_categorias,id',
         ]);
     
-        Usuarios_categoria::where('user_id', $request->user_id)
+        userAssignedTest::where('user_id', $request->user_id)
             ->whereIn('categorias_id', $request->categorias)
             ->delete();
     

@@ -2,6 +2,65 @@
 @section('title', 'Gestión de Evaluaciones')
 
 @section('content')
+<head>
+    <style>
+        .col-id, .col-user-id {
+            width: 11%;
+            text-align: center;
+        }
+
+        .btn-azul {
+            background-color: #05638d;
+            color: white;
+        }
+
+        .btn-azul:hover {
+            color: white;
+            background-color: #055d82;
+        }
+
+        .btn-naranja {
+            background-color: #d1850d;
+            color: white;
+        }
+
+        .btn-naranja:hover {
+            color: white;
+            background-color: #b47b1f;
+        }
+
+        .btn-rojo {
+            background-color: #a12e2e;
+            color: white;
+        }
+
+        .btn-rojo:hover {
+            color: white;
+            background-color: #8b1a1a;
+        }
+
+        /*select para elegir pruebas*/
+        .custom-option {
+            display: block;
+            margin-bottom: 8px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            background-color: #394263;
+            cursor: pointer;
+            user-select: none;
+            color: #fff;
+            text-align: left;
+        }
+
+        .custom-option:hover {
+            background-color: #55618c; /* más claro al pasar el mouse */
+        }
+
+        .custom-option input[type="checkbox"] {
+            margin-right: 8px;
+        }
+    </style>
+</head>
     <div class="container">
         <!-- emcabezado-->
             <div class="row">
@@ -24,7 +83,7 @@
                         <table id="aplicacionesTable" class="dt-responsive table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>ID de la Aplicación</th>
+                                    <th>ID de código</th>
                                     <th>ID de Usuario</th>
                                     <th>Nombre</th>
                                     <th>Email</th>
@@ -114,8 +173,8 @@
                         }
                     },
                     columns: [
-                        { data: 'id' },
-                        { data: 'user_id'},
+                        { data: 'id', className: 'col-id' },
+                        { data: 'user_id', className: 'col-user-id'},
                         { data: 'nombre' },
                         { data: 'email' },
                         { data: 'vacante' },
@@ -124,24 +183,28 @@
                             data: null,
                             render: function(data, type, row){
                                 return botones = `
-                                    <div class="action-buttons">
-                                        <button type="button" class="btn btn-success waves-effect waves-light asignar-evaluacion-btn tooltipped"
+                                    <div class="action-buttons" style="gap: 10px;">
+                                        <button type="button" class="btn btn-azul waves-effect waves-light asignar-evaluacion-btn tooltipped"
+                                            style="min-width: 50%; margin: 5px; margin-left:0px"
                                             data-position="top" title="Asignar Evaluaciones" data-id="${row.user_id}">
                                             <i class="ri-add-line"></i>
                                         </button>
-                                        <br>
+
                                         <button type="button" class="btn btn-secondary waves-effect waves-light ver-evaluaciones-btn tooltipped"
-                                            data-position="top" title="Ver evaluaciones asignadas para esta aplicación" data-id="${row.user_id}">
+                                            style="min-width: 30%; margin: 5px; margin-left:0px"
+                                            data-position="top" title="Ver evaluaciones asignadas para este código" data-id="${row.user_id}">
                                             <i class="ri-eye-fill"></i>
                                         </button>
-                                        <br>
-                                        <button type="button" class="btn btn-warning waves-effect waves-light configurar-btn tooltipped"
-                                            data-position="top" title="Configurar Evaluación" data-id="${row.id}">
+
+                                        <button type="button" class="btn btn-naranja waves-effect waves-light configurar-btn tooltipped"
+                                            style="min-width: 50%; margin: 5px; margin-left:0px"
+                                            data-position="top" title="Configurar permisos" data-id="${row.id}">
                                             <i class="ri-settings-3-line"></i>
                                         </button>
-                                        <br>
-                                        <button type="button" class="btn btn-danger waves-effect waves-light eliminar-aplicacion-btn tooltipped"
-                                            data-position="top" title="Eliminar Evaluación" data-id="${row.id}">
+
+                                        <button type="button" class="btn btn-rojo waves-effect waves-light eliminar-codigo-btn tooltipped"
+                                            style="min-width: 30%; margin: 5px; margin-left:0px"
+                                            data-position="top" title="Eliminar código" data-id="${row.id}">
                                             <i class="ri-delete-bin-6-line"></i>
                                         </button>
                                     </div>
@@ -150,7 +213,6 @@
                         }
                     ],
                     responsive: true,
-                    // Se elimina la opción de idioma para evitar textos extra de traducción
                     drawCallback: function () {
                         if (typeof M !== 'undefined') {
                             M.Tooltip.init(document.querySelectorAll('.tooltipped'));
@@ -163,45 +225,50 @@
 
                 // Función para recargar la tabla
                 function reloadTable() {
-                                table.ajax.reload(function () {
-                                    if (typeof M !== 'undefined') {
-                                        M.toast({
-                                            html: '<i class="material-icons left">refresh</i> Tabla actualizada',
-                                            classes: 'rounded'
-                                        });
-                                    }
-                                }, false);
-                            }
+                    table.ajax.reload(function () {
+                        if (typeof M !== 'undefined') {
+                            M.toast({
+                                html: '<i class="material-icons left">refresh</i> Tabla actualizada',
+                                classes: 'rounded'
+                            });
+                        }
+                    }, false);
+                }
 
-                            // Comprobar disponibilidad de SweetAlert2
-                            if (typeof Swal === 'undefined') {
-                                console.error('SweetAlert2 no está disponible.');
-                                var swalScript = document.createElement('script');
-                                swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
-                                document.body.appendChild(swalScript);
-                            }
+                // Comprobar disponibilidad de SweetAlert2
+                if (typeof Swal === 'undefined') {
+                     console.error('SweetAlert2 no está disponible.');
+                    var swalScript = document.createElement('script');
+                    swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+                    document.body.appendChild(swalScript);
+                }
 
                 //ver las evalauciones ya asignadas a un usuario
                 $(document).on('click', '.ver-evaluaciones-btn', function () {
                     const userId = $(this).data('id');
+                    setTimeout(() => {
+                        $('.waves-ripple').remove();
+                    }, 300);
 
-                    $.get(`/psicometricas/admin/evaluaciones/usuario/${userId}`, function (categorias) {
-                        if (!categorias || categorias.length === 0) {
+                    $.get(`/psicometricas/admin/evaluaciones/usuario/${userId}`, function (pruebas) {
+                        if (!pruebas || pruebas.length === 0) {
                             Swal.fire('Evaluaciones', 'Este usuario no tiene evaluaciones asignadas.', 'info');
                             return;
                         }
 
-                        const checkboxes = categorias.map(cat => `
+                        const checkboxes = pruebas.map(p => `
                             <div style="text-align:left;">
                                 <label>
-                                    <input type="checkbox" class="filled-in eval-checkbox" value="${cat.id}" />
-                                    <span>${cat.titulo_cuestionario}</span>
+                                    <input type="checkbox" class="filled-in eval-checkbox" value="${p.id}" />
+                                    <span>${p.test_title}</span>
                                 </label>
                             </div>
                         `).join('');
 
                         Swal.fire({
-                            title: 'Evaluaciones asignadas',
+                            title: 'Ver evaluaciones asignadas',
+                            background: '#262b3c',
+                            color: '#fff',
                             html: `
                                 <p>Selecciona las evaluaciones que deseas eliminar:</p>
                                 ${checkboxes}
@@ -209,6 +276,8 @@
                             showCancelButton: true,
                             confirmButtonText: 'Eliminar seleccionadas',
                             cancelButtonText: 'Cerrar',
+                            confirmButtonColor: '#d32f2f',
+                            cancelButtonColor: '#3d4e81',
                             preConfirm: () => {
                                 const seleccionadas = $('.eval-checkbox:checked').map(function () {
                                     return $(this).val();
@@ -249,49 +318,54 @@
                     });
                 });
 
-                //asignar una evaluación a una aplicacion
+                //asignar una evaluación a un código
                 $(document).on('click', '.asignar-evaluacion-btn', function () {
                     const userId = $(this).data('id');
+                    setTimeout(() => {
+                        $('.waves-ripple').remove();
+                    }, 300);
 
-                    $.get("{{ route('admin.categorias.listar') }}", function (categorias) {
-                        let opciones = categorias.map(cat => `<option value="${cat.id}">${cat.titulo_cuestionario}</option>`).join('');
+                    $.get("{{ route('admin.categorias.listar') }}", { user_id: userId }, function (pruebas) {
+                        let opciones = pruebas.map(p => `
+                        <label class="custom-option">
+                            <input type="checkbox" value="${p.id}" name="pruebas[]" />
+                            ${p.test_title}
+                        </label>
+                        `).join('');
 
                         Swal.fire({
                             title: 'Asignar Evaluaciones',
+                            background: '#262b3c',
+                            color: '#fff',
                             html: `
-                                <p>Selecciona una o varias categorías:</p>
-                                <select id="categoriasSelect" class="browser-default" multiple style="width:100%;height:150px;">
+                                <p>Selecciona una o varias pruebas:</p>
+                                <div id="pruebasSelect" style="max-height: 150px; overflow-y: auto;">
                                     ${opciones}
-                                </select>
+                                </div>
                             `,
                             showCancelButton: true,
                             confirmButtonText: 'Asignar',
                             cancelButtonText: 'Cancelar',
+                            confirmButtonColor: '#3d4e81',
+                            cancelButtonColor: '#d32f2f',
                             preConfirm: () => {
-                                const seleccionadas = $('#categoriasSelect').val();
+                                const seleccionadas = $('#pruebasSelect').val();
 
                                 if (!seleccionadas || seleccionadas.length === 0) {
-                                    Swal.showValidationMessage('Debes seleccionar al menos una categoría');
+                                    Swal.showValidationMessage('Debes seleccionar al menos una prueba para asignar');
                                     return false;
                                 }
 
-                                console.log({
-                                    user_id: userId,
-                                    categorias: seleccionadas
-                                });
-
-                                // Asegurarnos de que estamos manejando la respuesta como JSON
                                 return $.ajax({
                                     url: "{{ route('admin.evaluaciones.asignar') }}",
                                     type: 'POST',
                                     data: {
                                         user_id: userId,
-                                        categorias: seleccionadas,
+                                        pruebas: seleccionadas,
                                         _token: "{{ csrf_token() }}"
                                     },
-                                    dataType: 'json', // Asegurarnos de que la respuesta sea JSON
+                                    dataType: 'json', 
                                     success: function (response) {
-                                        console.log(response);  // Para ver la respuesta en consola
                                         if (response.success) {
                                             Swal.fire('¡Éxito!', response.message, 'success');
                                         } else {
@@ -299,7 +373,7 @@
                                         }
                                     },
                                     error: function (xhr, status, error) {
-                                        let msg = 'Hubo un problema al asignar las evaluaciones.'; // mensaje por defecto
+                                        let msg = 'Hubo un problema al asignar las evaluaciones.';
 
                                         if (xhr.responseJSON && xhr.responseJSON.message) {
                                             msg = xhr.responseJSON.message;
@@ -313,14 +387,19 @@
                     });
                 });
 
-                //configurar evaluacion
-               $(document).on('click', '.configurar-btn', function () {
+                //configurar un código (permisos de evaluación)
+                $(document).on('click', '.configurar-btn', function () {
                     const aplicacionId = $(this).data('id');
+                    setTimeout(() => {
+                        $('.waves-ripple').remove();
+                    }, 300);
 
                     // Obtener configuración actual antes de mostrar el modal
                     $.get(`{{ url('psicometricas/admin/aplicaciones') }}/${aplicacionId}/configuracion`, function(config) {
                         Swal.fire({
                             title: 'Configurar Aplicación',
+                            background: '#262b3c',
+                            color: '#fff',
                             html: `
                                 <div style="text-align:left">
                                     <label><strong>Cámara prendida:</strong></label>
@@ -344,6 +423,8 @@
                             showCancelButton: true,
                             confirmButtonText: 'Guardar configuración',
                             cancelButtonText: 'Cancelar',
+                            confirmButtonColor: '#3d4e81',
+                            cancelButtonColor: '#d32f2f',
                             preConfirm: () => {
                                 const camara = $('#camara').val();
                                 const ubicacion = $('#ubicacion').val();
@@ -376,34 +457,38 @@
                     });
                 });
 
-
-                //eliminar un registro con código/aplicación.
-                $(document).on('click', '.eliminar-aplicacion-btn', function () {
-                    const aplicacionId = $(this).data('id');
+                //eliminar un código de evaluación
+                $(document).on('click', '.eliminar-codigo-btn', function () {
+                    const codigoId = $(this).data('id');
+                    setTimeout(() => {
+                        $('.waves-ripple').remove();
+                    }, 300);
 
                     Swal.fire({
                         title: '¿Estás seguro?',
-                        text: "Esta acción eliminará la aplicación del candidato.",
+                        text: "Esta acción eliminará el acceso al candidato a la plataforma de evaluación. Si tiene evaluaciones incompletas, no podrá realizarlas.",
                         icon: 'warning',
+                        background: '#262b3c',
+                        color: '#fff',
                         showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
+                        confirmButtonColor: '#d32f2f',
+                        cancelButtonColor: '#373b95',
                         confirmButtonText: 'Sí, eliminar',
-                        cancelButtonText: 'Cancelar'
+                        cancelButtonText: 'Cancelar',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
-                                url: `/admin/aplicaciones/${aplicacionId}`,
+                                url: `/psicometricas/admin/aplicaciones/${codigoId}`,
                                 type: 'DELETE',
                                 data: {
                                     _token: "{{ csrf_token() }}"
                                 },
                                 success: function (response) {
-                                    Swal.fire('Eliminado', 'La aplicación ha sido eliminada.', 'success');
+                                    Swal.fire('Eliminado', 'Código de acceso eliminado', 'success');
                                     $('#aplicacionesTable').DataTable().ajax.reload();
                                     },
                                 error: function () {
-                                    Swal.fire('Error', 'No se pudo eliminar la aplicación.', 'error');
+                                    Swal.fire('Error', 'No se pudo eliminar el código de acceso.', 'error');
                                 }
                             });
                         }

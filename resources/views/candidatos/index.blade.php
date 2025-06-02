@@ -1,6 +1,52 @@
 @extends('layout.admin')
 @section('title', 'Gestión de Candidatos')
 @section('content')
+
+<head>
+    <style>
+        .btn-azul {
+            background-color: #8b8b8b;
+            color: white;
+        }
+
+        .btn-azul:hover {
+            color: white;
+            background-color: #6b6a6a;
+        }
+
+        .btn-codigo {
+            color: white;
+            background-color: #4b4fa9;
+        }
+
+        .btn-codigo:hover {
+            color: white;;
+            background-color: #666cff;
+        }
+
+        .btn-naranja {
+            background-color: #d1850d;
+            color: white;
+        }
+
+        .btn-naranja:hover {
+            color: white;
+            background-color: #b47b1f;
+        }
+
+        .btn-rojo {
+            background-color: #a12e2e;
+            color: white;
+        }
+
+        .btn-rojo:hover {
+            color: white;
+            background-color: #8b1a1a;
+        }
+
+    </style>
+</head>
+
     <div class="container">
         <input type="hidden" id="conVacante" value="{{ $conVacante }}">
         <!-- emcabezado-->
@@ -40,6 +86,9 @@
                                 <th>Fecha Registro</th>
                                 @if (auth()->user()?->config?->role?->isSuperAdmin())
                                     <th>Compañía</th>
+                                @endif
+                                @if ($conVacante == 1)
+                                    <th>Vacante</th>
                                 @endif
                                 <th>Acciones</th>
                             </tr>
@@ -115,6 +164,7 @@
 
                 function initializeDataTable(){
                     var userPermissions = @json($userPermissions);
+                    var conVacante = {{ $conVacante ?? 0 }};
                     try {
                        var columns = [
                             {data: 'id'},
@@ -160,7 +210,6 @@
                                     return data ? data : '-';
                                 }
                             },
-
                             // Solo mostrar columna compañía si es superAdmin
                             userPermissions.isSuperAdmin ? {
                                 data: 'company_name',
@@ -170,16 +219,25 @@
                                 }
                             } : null,
 
+                            //solo mostrar columna si es candidatos que tienen vacante
+                            conVacante == 1 ? {
+                                data: 'vacante',
+                                title: 'Vacante',
+                                render: function(data) {
+                                    return data ?? '-';
+                                }
+                            } : null,
+
                             {
                                 data: null,
                                 render: function(data, type, row){
                                     let botones = `
-                                        <div class="action-buttons">
-                                            <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
+                                        <div class="action-buttons" style="gap:5px">
+                                            <button type="button" class="btn btn-rojo waves-effect waves-light delete-btn tooltipped" style="margin=5px;"
                                                     data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
                                                 <i class="ri-delete-bin-6-line"></i>
                                             </button>
-                                            <button type="button" class="btn btn-info waves-effect waves-light ver-perfil-btn tooltipped"
+                                            <button type="button" class="btn btn-azul waves-effect waves-light ver-perfil-btn tooltipped" style="margin=5px;"
                                                     data-position="top" data-tooltip="Ver perfil" data-id="${row.id}">
                                                 <i class="ri-eye-line"></i>
                                             </button>
@@ -187,7 +245,7 @@
 
                                     if (userPermissions.isAuthenticated && userPermissions.isAdmin && !userPermissions.isSuperAdmin) {
                                         botones += `
-                                            <button type="button" class="btn btn-primary waves-effect waves-light generar-codigo-btn tooltipped" data-id="${row.id}" data-tooltip="Generar Código">
+                                            <button type="button" class="btn btn-codigo waves-effect waves-light generar-codigo-btn tooltipped" data-id="${row.id}" data-tooltip="Generar Código">
                                                 <i class="ri-key-fill"></i>
                                             </button>
                                         `;
@@ -271,7 +329,7 @@
 
                                     if (newValue !== original) {
                                         $.ajax({
-                                            url: `/admin/candidatos/${id}`,
+                                            url: `psicometricas/admin/candidatos/${id}`,
                                             method: 'PUT',
                                             data: {
                                                 _token: "{{ csrf_token() }}",
@@ -323,7 +381,7 @@
                             }).then((result) => {
                                 if (result.isConfirmed) {
                                     jQuery.ajax({
-                                        url: "/admin/candidatos/${id}" + id,
+                                        url: "/psicometricas/admin/candidatos/${id}" + id,
                                         method: "DELETE",
                                         data: {_token: '{{ csrf_token() }}'},
                                         dataType: "json",
@@ -369,7 +427,7 @@
                             window.location.href = "{{ route('candidatos.crear') }}";
                         });
 
-                        ////eliminar candidato
+                        //eliminar candidato
                         $(document).on('click', '.delete-btn', function () {
                             const id = $(this).data('id');
 
@@ -383,7 +441,7 @@
                             }).then(result => {
                                 if (result.isConfirmed) {
                                     $.ajax({
-                                        url: `/admin/candidatos/${id}`,
+                                        url: `/psicometricas/admin/candidatos/${id}`,
                                         method: 'DELETE',
                                         data: {
                                             _token: "{{ csrf_token() }}"
@@ -477,6 +535,7 @@
                                             });
                                         }
                                     });
+                                    reloadTable();
                                 }
                             });
                         });

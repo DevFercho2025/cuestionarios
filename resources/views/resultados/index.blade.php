@@ -52,8 +52,8 @@
                             <tr>
                                 <th>Id candidato</th>
                                 <th>Nombre candidato</th>
-                                <th>Cuestionario</th>
-                                <th>Secciones completadas</th>
+                                <th>Evaluación</th>
+                                <th>Secciones evaluadas</th>
                                 <th>token</th>
                                 <th>Estado</th>
                             </tr>

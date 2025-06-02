@@ -25,7 +25,7 @@ class CandidatoController extends Controller
     public function datatable(Request $request)
     {
         try {
-            $conVacante = filter_var($request->input('conVacante', 0), FILTER_VALIDATE_BOOLEAN);
+            $conVacante = (bool) $request->input('conVacante', 0);
             $companyId = Auth::user()->config->company_id;
             $user = Auth::user();
             $isSuperAdmin = $user->config->role->isSuperAdmin() ?? false;
@@ -39,14 +39,14 @@ class CandidatoController extends Controller
                     $q->where('company_id', $companyId);
                 });
             })
-            ->when($conVacante, function ($query) { #Si es true, muestra candidatos con aplicaciones
-                $query->whereHas('aplicaciones');
+            ->when($conVacante, function ($query) { #Si es true, muestra candidatos con códigos de acceso
+                $query->whereHas('userTestsAcessCodes');
             }, function ($query) {
-                $query->whereDoesntHave('aplicaciones');
+                $query->whereDoesntHave('userTestsAcessCodes');
             })
             ->get();
 
-            $candidatosData = $candidatos->map(function ($user) use ($isSuperAdmin) {
+            $candidatosData = $candidatos->map(function ($user) use ($isSuperAdmin, $conVacante) {
                  $data = [
                     'id' => $user->id,
                     'name' => $user->name,
@@ -60,6 +60,11 @@ class CandidatoController extends Controller
 
                 if ($isSuperAdmin) {
                     $data['company_name'] = $user->config->company->name ?? 'Sin compañía';
+                }
+
+                 if ($conVacante) {
+                    $vacante = $user->userTestsAcessCodes->pluck('vacancy')->join(', ');
+                    $data['vacante'] = $vacante;
                 }
                 return $data;
             });
@@ -215,13 +220,13 @@ class CandidatoController extends Controller
                 });
             })->findOrFail($id);
     
-            // Eliminar la información relacionada en la tabla UserInfo
-            $candidato->info()->delete(); // Elimina el registro relacionado en psico_alobri_users_info
+            // Eliminar la información del candidato (UserInfo)
+            $candidato->info()->delete(); 
     
-            // Eliminar la configuración relacionada en la tabla ConfigUser
-            $candidato->config()->delete(); // Elimina el registro relacionado en config_users
+            // Eliminar la configuración del usuario del candidato (config_users)
+            $candidato->config()->delete();
     
-            // Eliminar al usuario de la tabla users
+            // Eliminar al usuario del candidato
             $candidato->delete();
     
             return response()->json([
@@ -257,11 +262,11 @@ class CandidatoController extends Controller
 
             $aplicacion = AccessCode::create([
                 'user_id' => $request->user_id,
-                'vacante' => $request->vacante,
-                'codigo' => $codigo,
+                'vacancy' => $request->vacante,
+                'code' => $codigo,
             ]);
 
-            return response()->json(['code' => $aplicacion->codigo]);
+            return response()->json(['code' => $aplicacion->code]);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage(),
@@ -273,9 +278,9 @@ class CandidatoController extends Controller
 
     public function verPerfil($id){
 
-        $candidato = User::with(['info', 'config.company', 'config.role', 'aplicaciones']) // Agrega aquí todas las relaciones que necesites
+        $candidato = User::with(['info', 'config.company', 'config.role', 'userTestsAcessCode'])
         ->whereHas('config.role', function ($query) {
-            $query->whereNotIn('id', [1, 2]); // Excluye admins y superadmins
+            $query->where('id', 0); 
         })
         ->findOrFail($id);
 
