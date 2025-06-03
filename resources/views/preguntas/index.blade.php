@@ -11,7 +11,7 @@
                             <h4 class="white-text">Gestión de Preguntas</h4>
                         </div>
                         <div class="col s4 right-align">
-                            <a id="crearPreguntaBtn" class="btn btn-large gradient-btn pulse">
+                            <a id="crearPreguntaBtn" class="btn btn-large btn-primary gradient-btn pulse">
                                 Nueva pregunta
                             </a>
                         </div>

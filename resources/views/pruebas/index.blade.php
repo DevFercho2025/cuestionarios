@@ -11,7 +11,7 @@
                             <h4 class="white-text">Gestión de Pruebas</h4>
                         </div>
                         <div class="col s4 right-align">
-                            <a id="createTestBtn" class="btn btn-large gradient-btn pulse">
+                            <a id="createTestBtn" class="btn btn-large btn-primary gradient-btn pulse">
                                Crear una nueva Prueba
                             </a>
                         </div>

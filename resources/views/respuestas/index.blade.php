@@ -57,7 +57,7 @@
                             <h4 class="white-text">Gestión de Respuestas</h4>
                         </div>
                         <div class="col s4 right-align">
-                            <a id="createRespuestaBtn" class="btn btn-large gradient-btn pulse">
+                            <a id="createRespuestaBtn" class="btn btn-large btn-primary gradient-btn pulse">
                                Nueva Respuesta
                             </a>
                         </div>

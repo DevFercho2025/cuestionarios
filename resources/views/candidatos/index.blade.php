@@ -50,19 +50,18 @@
     <div class="container">
         <input type="hidden" id="conVacante" value="{{ $conVacante }}">
         <!-- emcabezado-->
-        <div class="row">
+        <div class="row" style="padding-bottom: 10px">
             <div class="col s12">
                 <div class="card-panel dark-gradient">
-                    <div class="row valign-wrapper mb-0">
-                        <div class="col s8">
-                            <h4 class="white-text">
-                                @if ($conVacante == 1)
-                                    Gestión de Candidatos con Vacante
-                                @else
-                                    Gestión de Candidatos sin Vacante
-                                @endif
-                            </h4>
-                        </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4 class="white-text mb-0" style="margin: 0;">
+                            @if ($conVacante == 1)
+                                Gestión de Candidatos con Vacante
+                            @else
+                                Gestión de Candidatos sin Vacante
+                            @endif
+                        </h4>
+                        <button class="btn btn-primary" style="white-space: nowrap; padding-right:20px; !important padding-left:20px; !important">Añadir un candidato</button>
                     </div>
                 </div>
             </div>
@@ -77,18 +76,18 @@
                             <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Email</th>
-                                <th>Fecha Nacimiento</th>
-                                <th>Género</th>
-                                <th>Código Postal</th>
-                                <th>Celular</th>
                                 <th>Fecha Registro</th>
+                                <th>Nombre</th>
+                                <th>Fecha Nacimiento</th>
+                                <th>Género legal</th>
+                                <th>Celular</th>
+                                <th>Email</th>
+                                
                                 @if (auth()->user()?->config?->role?->isSuperAdmin())
                                     <th>Compañía</th>
                                 @endif
                                 @if ($conVacante == 1)
-                                    <th>Vacante</th>
+                                    <th>Vacantes</th>
                                 @endif
                                 <th>Acciones</th>
                             </tr>
@@ -161,23 +160,22 @@
                     }
                 }
 
-
                 function initializeDataTable(){
                     var userPermissions = @json($userPermissions);
-                    var conVacante = {{ $conVacante ?? 0 }};
+                    var conVacante = @json($conVacante ? 1 : 0);
                     try {
                        var columns = [
                             {data: 'id'},
                             {
-                                data: 'name',
-                                render: function (data, type, row) {
-                                    return `<span class="editable" data-id="${row.id}" data-field="name">${data}</span>`;
+                                data: 'created_at',
+                                render: function (data) {
+                                    return data ? data : '-';
                                 }
                             },
                             {
-                                data: 'email',
+                                data: 'name',
                                 render: function (data, type, row) {
-                                    return `<span class="editable" data-id="${row.id}" data-field="email">${data}</span>`;
+                                    return `<span class="editable" data-id="${row.id}" data-field="name">${data}</span>`;
                                 }
                             },
                             {
@@ -193,21 +191,15 @@
                                 }
                             },
                             { 
-                                data: 'codigo_postal',
-                                render: function (data, type, row) {
-                                    return `<span class="editable" data-id="${row.id}" data-field="codigo_postal">${data ?? '-'}</span>`;
-                                }
-                            },
-                            { 
                                 data: 'celular',
                                 render: function (data, type, row) {
                                     return `<span class="editable" data-id="${row.id}" data-field="celular">${data ?? '-'}</span>`;
                                 }
                             },
                             {
-                                data: 'created_at',
-                                render: function (data) {
-                                    return data ? data : '-';
+                                data: 'email',
+                                render: function (data, type, row) {
+                                    return `<span class="editable" data-id="${row.id}" data-field="email">${data}</span>`;
                                 }
                             },
                             // Solo mostrar columna compañía si es superAdmin
@@ -227,11 +219,10 @@
                                     return data ?? '-';
                                 }
                             } : null,
-
                             {
                                 data: null,
                                 render: function(data, type, row){
-                                    let botones = `
+                                    return `
                                         <div class="action-buttons" style="gap:5px">
                                             <button type="button" class="btn btn-rojo waves-effect waves-light delete-btn tooltipped" style="margin=5px;"
                                                     data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
@@ -241,19 +232,11 @@
                                                     data-position="top" data-tooltip="Ver perfil" data-id="${row.id}">
                                                 <i class="ri-eye-line"></i>
                                             </button>
-                                    `;
-
-                                    if (userPermissions.isAuthenticated && userPermissions.isAdmin && !userPermissions.isSuperAdmin) {
-                                        botones += `
                                             <button type="button" class="btn btn-codigo waves-effect waves-light generar-codigo-btn tooltipped" data-id="${row.id}" data-tooltip="Generar Código">
                                                 <i class="ri-key-fill"></i>
                                             </button>
-                                        `;
-                                    }
-
-                                    botones += '</div>';
-
-                                    return botones;
+                                        </div>
+                                    `;
                                 }
                             }
                         ].filter(Boolean);

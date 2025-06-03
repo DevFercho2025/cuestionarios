@@ -14,8 +14,8 @@
                 <i class="tf-icons ri-menu-fill ri-24px align-middle"></i>
             </button>
             <!-- Mobile menu toggle: End-->
-            <a href="welcome.blade.php" class="app-brand-link">
-                <span class="app-brand-text demo menu-text fw-semibold ms-2 ps-1 text-primary">MPOnePlus</span>
+            <a href="{{ route('home.index') }}" class="app-brand-link">
+                <span class="app-brand-text demo menu-text fw-semibold ms-2 ps-1 text-primary"><img style="height: 35px" src="../../assets/img/Alobri/alobriLogo.png"></span>
             </a>
         </div>
         <!-- / Menu logo-->
@@ -106,6 +106,48 @@
           </div>
         </div>
       </section>
+<div class="row"></div>
+      <section id="landingFeatures" class="section-py landing-features">
+        <div class="container">
+
+          <h5 class="text-center mb-2">
+            <span class="display-5 fs-4 fw-bold">Evaluación psicométrica de clase mundial</span>
+          </h5>
+          <p class="text-center fw-medium mb-4 mb-md-12">
+            Nuestro sistema permite evaluar eficazmente las habilidades, aptitudes y rasgos de personalidad de candidatos y colaboradores <br> utilizando metodologías validadas científicamente y respaldadas por investigación internacional.
+          </p>
+          <div class="features-icon-wrapper row gx-0 gy-12 gx-sm-6 mt-n4 mt-sm-0">
+            <div class="col-lg-3 col-sm-6 text-center features-icon-box">
+                <div class="features-icon mb-4">
+                <i class="ri-check-double-line fs-3 lh-0"></i>
+                </div>
+                <h5 class="mb-2">99.8%</h5>
+                <p class="features-icon-description">Precisión</p>
+            </div>
+            <div class="col-lg-3 col-sm-6 text-center features-icon-box">
+                <div class="features-icon mb-4">
+                <i class="ri-time-line fs-3 lh-0"></i>
+                </div>
+                <h5 class="mb-2">24-48h</h5>
+                <p class="features-icon-description">Entrega</p>
+            </div>
+            <div class="col-lg-3 col-sm-6 text-center features-icon-box">
+                <div class="features-icon mb-4">
+                <i class="ri-award-line fs-3 lh-0"></i>
+                </div>
+                <h5 class="mb-2">ISO 9001</h5>
+                <p class="features-icon-description">Certificación</p>
+            </div>
+            <div class="col-lg-3 col-sm-6 text-center features-icon-box">
+                <div class="features-icon mb-4">
+                <i class="ri-global-line fs-3 lh-0"></i>
+                </div>
+                <h5 class="mb-2">12+</h5>
+                <p class="features-icon-description">Países</p>
+            </div>
+            </div>
+        </div>
+      </section>
 
     <!-- Page Header original
     <div class="row" id="header">
@@ -133,7 +175,7 @@
         </div>
     </div>-->
 
-    <!-- Overview Section -->
+    <!-- Overview Section 
     <div class="row" id="overview">
         <div class="col-12">
             <div class="card mb-4">
@@ -195,7 +237,8 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>-->
+
 
     <!-- Services Section -->
     <div class="row" id="services">
@@ -285,6 +328,28 @@
         </div>
     </div>
 
+    <div class="card h-100">
+                  <div class="card-body text-body d-flex flex-column justify-content-between text-center p-8">
+                    <div class="mb-4">
+                      <img src="../../assets/img/front-pages/branding/logo-4.png" alt="client logo" class="client-logo img-fluid">
+                    </div>
+                    <h6>
+                      “I've never used a theme as versatile and flexible as Vuexy. It's my go to for building dashboard
+                      sites on almost any project.”
+                    </h6>
+                    <div class="text-warning mb-4">
+                      <i class="tf-icons ri-star-fill ri-24px"></i>
+                      <i class="tf-icons ri-star-fill ri-24px"></i>
+                      <i class="tf-icons ri-star-fill ri-24px"></i>
+                      <i class="tf-icons ri-star-fill ri-24px"></i>
+                      <i class="tf-icons ri-star-fill ri-24px"></i>
+                    </div>
+                    <div>
+                      <h6 class="mb-0">Eugenia Moore</h6>
+                      <p class="mb-0 small">Founder of Hubspot</p>
+                    </div>
+                  </div>
+                </div>
     <!-- Process Section -->
     <div class="row" id="process">
         <div class="col-12">
@@ -695,4 +760,6 @@
             });
         });
 
+
+       
     </script>
