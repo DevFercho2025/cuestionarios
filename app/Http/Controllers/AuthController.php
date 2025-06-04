@@ -26,21 +26,15 @@ class AuthController extends Controller
     public function registerFormStore(Request $request)
     {
         $data = $request->validate([
-            // paso 1
             'firstname'           => 'required|string|max:50', #
             'lastname'            => 'required|string|max:50', #
             'email'               => 'required|email|unique:users,email', #
             'password'            => 'required|string|min:8', #
-            // paso 2
             'software_experience' => 'required|in:0,1',
-            // paso 3
             'servicio'            => 'nullable|string', // JSON
-            // paso 4
             'portal'              => 'nullable|string', // JSON
-            // paso 5 y 6
             'industry'            => 'required|string', #
             'employees_count'     => 'required|string', #
-            // paso 7
             'company_name'        => 'required|string|max:100', #
             'website'             => 'nullable|url', #
             'position'            => 'required|string', #
@@ -115,7 +109,8 @@ class AuthController extends Controller
 
         // 2) Intento de autenticación
         if (Auth::attempt($credentials)) {
-            /** @var \App\Models\User $user */
+            $request->session()->regenerate();
+
             $user   = Auth::user();
             $config = $user->config; // hasOne, no ->first()
 
@@ -141,24 +136,6 @@ class AuthController extends Controller
                 Auth::logout();
                 return back()->withErrors(['email' => 'Su cuenta está desactivada.']);
             }
-
-            /*// 5) Psico‑user (flag)
-            if ($config->is_psico_user) {
-                return redirect()->route('psico.dashboard');
-            }
-
-            // 6) Super‑admin (role_id = 1 o flag)
-            if ($config->role_id == 1 || $config->is_super_admin) {
-                return redirect()->route('superadmin.index');
-            }
-
-            // 7) Admin (role_id = 2 o flag)
-            if ($config->role_id == 2 || $config->is_admin) {
-                return redirect()->route('admin.index');
-            }
-
-            // 8) Usuario normal (role_id = 0 o cualquier otro caso)
-            return redirect()->route('home');*/
         }
 
         //credenciales inválidas
