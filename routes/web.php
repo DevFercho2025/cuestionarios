@@ -17,24 +17,22 @@ use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\ResultadosController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+#ENDPOINTS PÚBLICOS
+Route::get('/', [HomeController::class, 'index'])->name('home.index');
 
-
-
-    #ENDPOINTS PÚBLICOS
-    Route::get('/', [HomeController::class, 'index'])->name('home.index');
-
+Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
-    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+});
 
-    Route::get('/candidate', [CandidateController::class, 'index'])->name('candidate.index');
-    Route::post('/candidate/validar-codigo', [CandidateController::class, 'validarCodigo'])->name('validar.codigo');
+Route::get('/candidate', [CandidateController::class, 'index'])->name('candidate.index');
+Route::post('/candidate/validar-codigo', [CandidateController::class, 'validarCodigo'])->name('validar.codigo');
 
-    Route::get('register',  [AuthController::class, 'showRegisterForm'])->name('register.wizard');
-    Route::post('register/wizard', [AuthController::class, 'registerFormStore'])->name('register.wizard.store');
+Route::get('register', [AuthController::class, 'showRegisterForm'])->name('register.wizard');
+Route::post('register/wizard', [AuthController::class, 'registerFormStore'])->name('register.wizard.store');
 
-    //Route::get('postal-codes/{postalCode}/{phoneNumber}', [PostalCodeGoogleApiController::class, 'getAddressByPostalCode']);
-Route::prefix('psicometricas')->middleware(['psico.user'])->group(function (){
+//Route::get('postal-codes/{postalCode}/{phoneNumber}', [PostalCodeGoogleApiController::class, 'getAddressByPostalCode']);
+Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
     #ADMIN
     Route::group([
         'prefix' => 'admin',
@@ -157,7 +155,7 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function (){
     Route::group([
         'prefix' => 'candidate',
         'middleware' => ['auth', 'is_candidate']
-    ], function (){
+    ], function () {
         Route::get('/dashboard', [CandidateController::class, 'dashboard'])->name('candidate.dashboard');
         Route::get('/perfil', [CandidateController::class, 'perfil'])->name('candidate.perfil');
 

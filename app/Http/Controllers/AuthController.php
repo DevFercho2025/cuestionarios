@@ -109,7 +109,6 @@ class AuthController extends Controller
 
         // 2) Intento de autenticación
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
 
             $user   = Auth::user();
             $config = $user->config; // hasOne, no ->first()
