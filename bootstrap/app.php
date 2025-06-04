@@ -17,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_admin' => \App\Http\Middleware\IsAdmin::class,
             'is_super_admin' => \App\Http\Middleware\IsSuperAdmin::class,
             'is_candidate' => App\Http\Middleware\IsCandidate::class,
+            'psico.user' => \App\Http\Middleware\CheckPsicoUser::class,
+
         ]);
     })
 

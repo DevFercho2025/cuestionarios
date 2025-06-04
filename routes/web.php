@@ -34,7 +34,7 @@ use Illuminate\Support\Facades\Route;
     Route::post('register/wizard', [AuthController::class, 'registerFormStore'])->name('register.wizard.store');
 
     //Route::get('postal-codes/{postalCode}/{phoneNumber}', [PostalCodeGoogleApiController::class, 'getAddressByPostalCode']);
-Route::prefix('psicometricas')->group(function (){
+Route::prefix('psicometricas')->middleware(['psico.user'])->group(function (){
     #ADMIN
     Route::group([
         'prefix' => 'admin',
