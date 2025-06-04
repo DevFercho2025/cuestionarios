@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 #ENDPOINTS PÚBLICOS
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
 
-Route::middleware('guest')->group(function () {
+Route::middleware('check.user')->group(function () {
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
 });
