@@ -17,6 +17,8 @@ use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\ResultadosController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+
+
 #ENDPOINTS PÚBLICOS
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
 
@@ -24,6 +26,7 @@ Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
 });
+Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/candidate', [CandidateController::class, 'index'])->name('candidate.index');
 Route::post('/candidate/validar-codigo', [CandidateController::class, 'validarCodigo'])->name('validar.codigo');
