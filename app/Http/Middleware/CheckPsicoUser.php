@@ -19,7 +19,7 @@ class CheckPsicoUser
 
         $configUser = DB::table('config_users')
             ->where('user_id', $user->id)
-            ->where('is_psico_user', 1)
+            ->where('is_pisco_user', 1)
             ->where('active', 1)
             ->first();
 
