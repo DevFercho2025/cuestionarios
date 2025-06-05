@@ -21,8 +21,7 @@ class ResultadosController extends Controller
 
     public function verResultados($id)
     {
-        // TODO: Implementar vista de resultados
-        return view('resultados.ver', ['id' => $id]); // O simplemente un dump temporal
+        return view('resultados.ver', ['id' => $id]);
     }
 
     public function datatable(){
@@ -31,8 +30,17 @@ class ResultadosController extends Controller
             $user = Auth::user();
             $isSuperAdmin = $user->config->role->isSuperAdmin() ?? false;
 
-            $candidatos = User::with(['info', 'config.role', 'config.company', 'tokensEvaluaciones','assignedTests.sections','respuestasUsuario'])
-            ->whereHas('config.role', function ($q) {
+            $candidatos = User::with([
+                'info', 
+                'config.role', 
+                'config.company', 
+                'tokensEvaluaciones',
+                'assignedTests.sections',
+                'respuestasUsuario' => function($q) {
+                    $q->join('psico_alobri_questions', 'psico_alobri_user_answers.question_id', '=', 'psico_alobri_questions.id')
+                    ->select('psico_alobri_user_answers.*', 'psico_alobri_questions.section_id');
+                }
+            ])->whereHas('config.role', function ($q) {
                 $q->where('id','=', 0);
             })
             ->when(!$isSuperAdmin, function ($q) use ($companyId) {
@@ -49,15 +57,12 @@ class ResultadosController extends Controller
                 $token = $tokenEval?->token ?? 'Sin token';
                 $tokenId = $tokenEval?->id;
 
+                $respuestasDelToken = $user->respuestasUsuario->where('token_id', $tokenId);
+
                 foreach ($user->assignedTests as $test) {
                     if (!$test) continue;
 
-                    $seccionesCompletadasIds = Respuesta_Usuario::where('user_id', $user->id)
-                        ->where('token_id', $tokenId)
-                        ->join('psico_alobri_questions', 'psico_alobri_user_answers.question_id', '=', 'psico_alobri_questions.id')
-                        ->pluck('psico_alobri_questions.section_id')
-                        ->unique()
-                        ->toArray();
+                    $seccionesCompletadasIds = $respuestasDelToken->pluck('section_id')->unique()->toArray();
 
                     $secciones = $test->sections;
                     $totalSecciones = $secciones->count();
@@ -97,6 +102,7 @@ class ResultadosController extends Controller
     public function buscarResultados(Request $request)
     {
         $tokenStr = $request->input('token');
+        $evaluaciones = $request->input('evaluaciones', []); 
 
         $token = TokenEvaluacion::where('token', $tokenStr)->first();
         if (!$token) {

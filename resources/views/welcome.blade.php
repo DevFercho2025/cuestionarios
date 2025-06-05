@@ -82,6 +82,7 @@
       </div>
     </nav>
 
+
      <section id="landingHero" class="section-py landing-hero position-relative">
         <img alt="hero background" class="position-absolute top-0 start-0 w-100 h-100 z-n1" data-speed="1" data-app-light-img="front-pages/backgrounds/hero-bg-light.png" data-app-dark-img="front-pages/backgrounds/hero-bg-dark.png">
         <div class="container">
@@ -106,48 +107,51 @@
           </div>
         </div>
       </section>
-<div class="row"></div>
-      <section id="landingFeatures" class="section-py landing-features">
-        <div class="container">
 
-          <h5 class="text-center mb-2">
-            <span class="display-5 fs-4 fw-bold">Evaluación psicométrica de clase mundial</span>
-          </h5>
-          <p class="text-center fw-medium mb-4 mb-md-12">
-            Nuestro sistema permite evaluar eficazmente las habilidades, aptitudes y rasgos de personalidad de candidatos y colaboradores <br> utilizando metodologías validadas científicamente y respaldadas por investigación internacional.
-          </p>
-          <div class="features-icon-wrapper row gx-0 gy-12 gx-sm-6 mt-n4 mt-sm-0">
-            <div class="col-lg-3 col-sm-6 text-center features-icon-box">
-                <div class="features-icon mb-4">
-                <i class="ri-check-double-line fs-3 lh-0"></i>
+    <div class="row" id="overview">
+        <section id="landingFeatures" class="section-py landing-features">
+            <div class="container">
+
+            <h5 class="text-center mb-2">
+                <span class="display-5 fs-4 fw-bold">Evaluación psicométrica de clase mundial</span>
+            </h5>
+            <p class="text-center fw-medium mb-4 mb-md-12">
+                Nuestro sistema permite evaluar eficazmente las habilidades, aptitudes y rasgos de personalidad de candidatos y colaboradores <br> utilizando metodologías validadas científicamente y respaldadas por investigación internacional.
+            </p>
+            <div class="features-icon-wrapper row gx-0 gy-12 gx-sm-6 mt-n4 mt-sm-0">
+                <div class="col-lg-3 col-sm-6 text-center features-icon-box">
+                    <div class="features-icon mb-4">
+                    <i class="ri-check-double-line fs-3 lh-0"></i>
+                    </div>
+                    <h5 class="mb-2">99.8%</h5>
+                    <p class="features-icon-description">Precisión</p>
                 </div>
-                <h5 class="mb-2">99.8%</h5>
-                <p class="features-icon-description">Precisión</p>
-            </div>
-            <div class="col-lg-3 col-sm-6 text-center features-icon-box">
-                <div class="features-icon mb-4">
-                <i class="ri-time-line fs-3 lh-0"></i>
+                <div class="col-lg-3 col-sm-6 text-center features-icon-box">
+                    <div class="features-icon mb-4">
+                    <i class="ri-time-line fs-3 lh-0"></i>
+                    </div>
+                    <h5 class="mb-2">24-48h</h5>
+                    <p class="features-icon-description">Entrega</p>
                 </div>
-                <h5 class="mb-2">24-48h</h5>
-                <p class="features-icon-description">Entrega</p>
-            </div>
-            <div class="col-lg-3 col-sm-6 text-center features-icon-box">
-                <div class="features-icon mb-4">
-                <i class="ri-award-line fs-3 lh-0"></i>
+                <div class="col-lg-3 col-sm-6 text-center features-icon-box">
+                    <div class="features-icon mb-4">
+                    <i class="ri-award-line fs-3 lh-0"></i>
+                    </div>
+                    <h5 class="mb-2">ISO 9001</h5>
+                    <p class="features-icon-description">Certificación</p>
                 </div>
-                <h5 class="mb-2">ISO 9001</h5>
-                <p class="features-icon-description">Certificación</p>
-            </div>
-            <div class="col-lg-3 col-sm-6 text-center features-icon-box">
-                <div class="features-icon mb-4">
-                <i class="ri-global-line fs-3 lh-0"></i>
+                <div class="col-lg-3 col-sm-6 text-center features-icon-box">
+                    <div class="features-icon mb-4">
+                    <i class="ri-global-line fs-3 lh-0"></i>
+                    </div>
+                    <h5 class="mb-2">12+</h5>
+                    <p class="features-icon-description">Países</p>
                 </div>
-                <h5 class="mb-2">12+</h5>
-                <p class="features-icon-description">Países</p>
+                </div>
             </div>
-            </div>
-        </div>
-      </section>
+      </section>  
+    </div>
+      
 
     <!-- Page Header original
     <div class="row" id="header">

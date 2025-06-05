@@ -63,7 +63,7 @@
                     </li>
                     <li class="menu-item">
                         <a href="{{ route('resultados.index') }}" class="menu-link">
-                            <div data-i18n="Resultados">Ver resultados</div>
+                            <div data-i18n="Estatus de las evaluaciones">Ver resultados</div>
                         </a>
                     </li>
                 </ul>
@@ -77,29 +77,34 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
+                            <a href="{{ route('categoriasTipos.index') }}" class="menu-link">
+                                <div data-i18n="Categorías y tipos"></div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
                             <a href="{{ route('pruebas.index') }}" class="menu-link">
-                                <div data-i18n="Gestionar pruebas">Gestionar Pruebas</div>
+                                <div data-i18n="Pruebas"></div>
                             </a>
                         </li>
                         <li class="menu-item">
                             <a href="{{ route('secciones.index') }}" class="menu-link">
-                                <div data-i18n="Secciones">Secciones</div>
+                                <div data-i18n="Secciones"></div>
                             </a>
                         </li>
                         <li class="menu-item active open">
                             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                                <i class="menu-icon tf-icons ri-questionnaire-line"></i> 
-                                <div data-i18n="Preguntas">Preguntas</div>
+                                <i class="menu-icon tf-icons ri-questionnaire-line me-2"></i> 
+                                <div data-i18n="Preguntas"></div>
                             </a>
                             <ul class="menu-sub">
                                 <li class="menu-item">
                                     <a href="{{ route('preguntas.index') }}" class="menu-link">
-                                        <div data-i18n="Preguntas que existen">Preguntas que existen</div>
+                                        <div data-i18n="Preguntas que existen"></div>
                                     </a>
                                 </li>
                                 <li class="menu-item">
                                     <a href="{{ route('respuestas.index') }}" class="menu-link">
-                                        <div data-i18n="Respuestas que existen">Respuestas que existen</div>
+                                        <div data-i18n="Respuestas que existen"></div>
                                     </a>
                                 </li>
                             </ul>

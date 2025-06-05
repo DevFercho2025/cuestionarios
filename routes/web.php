@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\RespuestaController;
 use App\Http\Controllers\RespuestaCorrectaController;
+use App\Http\Controllers\CategoriasTiposEvController;
 use App\Http\Controllers\SeccionController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\CandidatoController;
@@ -44,38 +45,6 @@ Route::prefix('psicometricas')->group(function (){
         // Panel de administración principal
         Route::get('/', [AdminController::class, 'index'])->name('admin.index');
 
-        // Rutas para Secciones
-        Route::get('secciones', [SeccionController::class, 'index'])->name('secciones.index');
-        Route::post('secciones', [SeccionController::class, 'store'])->name('secciones.store');
-        Route::put('secciones/{id}', [SeccionController::class, 'update'])->name('secciones.update');
-        Route::delete('secciones/{id}', [SeccionController::class, 'destroy'])->name('secciones.destroy');
-        Route::get('secciones/datatable', [SeccionController::class, 'datatable'])->name('secciones.datatable');
-        Route::get('secciones/all', [SeccionController::class, 'all'])->name('secciones.all');
-        Route::get('tests/all', [TestController::class, 'all'])->name('tests.all');
-        Route::get('secciones/by-test/{testId}', [SeccionController::class, 'byTest']);
-
-
-        // Rutas para Preguntas
-        Route::get('preguntas', [PreguntaController::class, 'index'])->name('preguntas.index');
-        Route::post('preguntas', [PreguntaController::class, 'store'])->name('preguntas.store');
-        Route::get('preguntas/datatable', [PreguntaController::class, 'datatable'])->name('preguntas.datatable');
-        Route::get('preguntas/{id}', [PreguntaController::class, 'show'])->name('preguntas.show');
-        Route::put('preguntas/{id}', [PreguntaController::class, 'update'])->name('preguntas.update');
-        Route::delete('preguntas/{id}', [PreguntaController::class, 'destroy'])->name('preguntas.destroy');
-        Route::get('preguntas/categorias', [PreguntaController::class, 'categorias'])->name('admin.preguntas.categorias');
-        Route::get('question-types/all', [PreguntaController::class, 'allQuestionTypes'])->name('question_types.all');
-        Route::get('preguntas/by-section/{sectionId}', [PreguntaController::class, 'preguntasBySection']);
-
-
-        // Rutas para Respuestas
-        Route::get('respuestas', [RespuestaController::class, 'index'])->name('respuestas.index');
-        Route::post('respuestas', [RespuestaController::class, 'store'])->name('respuestas.store');
-        Route::get('respuestas/datatable', [RespuestaController::class, 'datatable'])->name('respuestas.datatable');
-        Route::get('respuestas/{id}', [RespuestaController::class, 'show'])->name('respuestas.show');
-        Route::put('respuestas/{id}', [RespuestaController::class, 'update'])->name('respuestas.update');
-        Route::delete('respuestas/{id}', [RespuestaController::class, 'destroy'])->name('respuestas.destroy');
-        Route::get('/tests-with-all', [RespuestaController::class, 'obtenerPreguntasSeccionesPrueba'])->name('tests.withAll');
-
         // Rutas para Respuestas Correctas
         Route::get('respuestas_correctas', [RespuestaCorrectaController::class, 'index'])->name('respuestas_correctas.index');
         Route::post('respuestas_correctas', [RespuestaCorrectaController::class, 'store'])->name('respuestas_correctas.store');
@@ -98,7 +67,7 @@ Route::prefix('psicometricas')->group(function (){
         Route::get('candidatos/perfil/{id}', [CandidatoController::class, 'verPerfil'])->name('candidatos.perfil');
         Route::post('/check-email', [CandidatoController::class, 'checkEmail'])->name('check.email');
 
-        // Rutas para evaluaciones
+        // Rutas para estado de evaluaciones y PDF
         Route::get('/evaluaciones', [EvaluacionController::class, 'index'])->name('evaluaciones.index');
         Route::get('/aplicaciones/datatable', [AplicacionController::class, 'datatable'])->name('admin.aplicaciones.datatable');
         Route::get('/categorias/listar', [EvaluacionController::class, 'listarCategorias'])->name('admin.categorias.listar');
@@ -109,7 +78,6 @@ Route::prefix('psicometricas')->group(function (){
         Route::post('/aplicaciones/configurar', [AplicacionController::class, 'configurar'])->name('admin.aplicaciones.configurar');
         Route::get('/aplicaciones/{id}/configuracion', [AplicacionController::class, 'obtenerConfiguracion'])->name('admin.aplicaciones.obtenerConfiguracion');
 
-
         Route::get('resultados', [ResultadosController::class, 'index'])->name('resultados.index');
         Route::get('/buscar-Resultados', [ResultadosController::class, 'buscarResultados'])->name('admin.buscar.resultados');
         Route::get('/resultados/datatable', [ResultadosController::class, 'datatable'])->name('resultados.datatable');
@@ -118,16 +86,6 @@ Route::prefix('psicometricas')->group(function (){
         Route::post('/exportar-pdf/{id}', [ResultadosController::class, 'recibirImagenes']);
         Route::get('/exportar-pdf/token-id/{id}', [ResultadosController::class, 'exportarPDF'])->name('admin.exportar.pdf');
 
-
-        Route::get('pruebas', [TestController::class, 'index'])->name('pruebas.index');
-        Route::get('/pruebas/datatable', [TestController::class, 'datatable'])->name('pruebas.datatable');
-        Route::get('/pruebas/categorias-tipos', [TestController::class, 'categoriaConTipos'])->name('pruebas.categorias.tipos');
-        Route::put('/pruebas/{id}', [TestController::class, 'update']);
-        Route::get('/pruebas/{id}', [TestController::class, 'show']);
-        Route::post('/pruebas', [TestController::class, 'store']);
-        Route::delete('/pruebas/{id}', [TestController::class, 'destroy']);
-
-
         // Select de usuarios y vacantes
         Route::get('usuarios/all', [AplicacionController::class, 'usuarios'])->name('usuarios.all');
         Route::get('vacantes/all', [AplicacionController::class, 'vacantes'])->name('vacantes.all');
@@ -135,6 +93,57 @@ Route::prefix('psicometricas')->group(function (){
 
         // Rutas para solo superadmin
         Route::group(['middleware' => 'is_super_admin'], function () {
+
+            // Rutas para gestión de categorías y tipos de pruebas
+            Route::get('categorias', [CategoriasTiposEvController::class, 'index'])->name('categoriasTipos.index');
+            Route::get('/categorias/datatable', [CategoriasTiposEvController::class, 'datatable'])->name('categorias.datatable');
+            Route::post('/categorias/store', [CategoriasTiposEvController::class, 'store'])->name('categorias.store');
+            Route::get('/categorias/{id}', [CategoriasTiposEvController::class, 'show']);
+            Route::put('/categorias/{id}', [CategoriasTiposEvController::class, 'update']);
+            Route::delete('/psicometricas/admin/categorias/{id}', [CategoriasTiposEvController::class, 'destroy'])->name('categorias.destroy');
+
+
+
+            // Rutas para gestión de pruebas (Evaluaciones)
+            Route::get('pruebas', [TestController::class, 'index'])->name('pruebas.index');
+            Route::get('/pruebas/datatable', [TestController::class, 'datatable'])->name('pruebas.datatable');
+            Route::get('/pruebas/categorias-tipos', [TestController::class, 'categoriaConTipos'])->name('pruebas.categorias.tipos');
+            Route::put('/pruebas/{id}', [TestController::class, 'update']);
+            Route::get('/pruebas/{id}', [TestController::class, 'show']);
+            Route::post('/pruebas', [TestController::class, 'store']);
+            Route::delete('/pruebas/{id}', [TestController::class, 'destroy']);
+
+            // Rutas para Secciones
+            Route::get('secciones', [SeccionController::class, 'index'])->name('secciones.index');
+            Route::post('secciones', [SeccionController::class, 'store'])->name('secciones.store');
+            Route::put('secciones/{id}', [SeccionController::class, 'update'])->name('secciones.update');
+            Route::delete('secciones/{id}', [SeccionController::class, 'destroy'])->name('secciones.destroy');
+            Route::get('secciones/datatable', [SeccionController::class, 'datatable'])->name('secciones.datatable');
+            Route::get('secciones/all', [SeccionController::class, 'all'])->name('secciones.all');
+            Route::get('tests/all', [TestController::class, 'all'])->name('tests.all');
+            Route::get('secciones/by-test/{testId}', [SeccionController::class, 'byTest']);
+
+            // Rutas para Preguntas
+            Route::get('preguntas', [PreguntaController::class, 'index'])->name('preguntas.index');
+            Route::post('preguntas', [PreguntaController::class, 'store'])->name('preguntas.store');
+            Route::get('preguntas/datatable', [PreguntaController::class, 'datatable'])->name('preguntas.datatable');
+            Route::get('preguntas/{id}', [PreguntaController::class, 'show'])->name('preguntas.show');
+            Route::put('preguntas/{id}', [PreguntaController::class, 'update'])->name('preguntas.update');
+            Route::delete('preguntas/{id}', [PreguntaController::class, 'destroy'])->name('preguntas.destroy');
+            Route::get('preguntas/categorias', [PreguntaController::class, 'categorias'])->name('admin.preguntas.categorias');
+            Route::get('question-types/all', [PreguntaController::class, 'allQuestionTypes'])->name('question_types.all');
+            Route::get('preguntas/by-section/{sectionId}', [PreguntaController::class, 'preguntasBySection']);
+
+            // Rutas para Respuestas
+            Route::get('respuestas', [RespuestaController::class, 'index'])->name('respuestas.index');
+            Route::post('respuestas', [RespuestaController::class, 'store'])->name('respuestas.store');
+            Route::get('respuestas/datatable', [RespuestaController::class, 'datatable'])->name('respuestas.datatable');
+            Route::get('respuestas/{id}', [RespuestaController::class, 'show'])->name('respuestas.show');
+            Route::put('respuestas/{id}', [RespuestaController::class, 'update'])->name('respuestas.update');
+            Route::delete('respuestas/{id}', [RespuestaController::class, 'destroy'])->name('respuestas.destroy');
+            Route::get('/tests-with-all', [RespuestaController::class, 'obtenerPreguntasSeccionesPrueba'])->name('tests.withAll');
+
+
             //gestionar compañías
             Route::get('companias', [CompanyController::class, 'index'])->name('companias.index');
             Route::post('companias', [CompanyController::class, 'store'])->name('companias.store');

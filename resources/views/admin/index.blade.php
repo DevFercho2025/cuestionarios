@@ -645,6 +645,22 @@
           .then(response => response.json()) // Parsear la respuesta JSON
           .then(data => {
             if (data.success) {
+              form.reset();
+              formData = {
+                genero_legal: null,
+                nacimiento: null,
+                pais: null,
+                codigo_postal: null,
+                telefono: null,
+                firstname: null,
+                lastname: null,
+                email: null,
+              };
+
+              // Reiniciar el stepper al primer paso si deseas
+              if (window.bsStepper) {
+                window.bsStepper.to(1);
+              }
               // Mostrar un mensaje de éxito con SweetAlert2
               Swal.fire({
                 icon: 'success',

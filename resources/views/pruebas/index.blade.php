@@ -27,7 +27,7 @@
                         <table id="testsTable" class="dt-responsive table table-bordered">
                             <thead>
                             <tr>
-                                <th>Título</th>
+                                <th>Título de Evaluación</th>
                                 <th>Tipo</th>
                                 <th>Categoria</th>
                                 <th>Total de Secciones</th>

@@ -20,6 +20,27 @@
         display: none !important;
     }
 
+    .form-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .form-flex p {
+        margin: 0;
+    }
+
+    table.dataTable > tbody > tr.selected > * {
+        /* Quitar el box-shadow agresivo */
+        box-shadow: none !important;
+
+        /* Usar un background más suave, con opacidad */
+        background-color: rgba(13, 110, 253, 0.3) !important;
+
+        /* Color de texto un poco más suave */
+        color: #f0f0f0 !important;
+    }
+
 </style>
     <!-- loader para cuando se exporta PDF-->
     <div id="loaderPDF" class="hidden">
@@ -28,21 +49,33 @@
     </div>
 
     <div class="container my-4">
+
+        <div class="row">
+            <div class="col s12">
+                <div class="card-panel dark-gradient">
+                    <div class="row valign-wrapper mb-0">
+                        <div class="col s8">
+                            <h4 class="white-text">Estatus de las evaluaciones</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="card shadow-lg">
             <div class="card-body">
                 <!-- Formulario para buscar resultados por token -->
-                <form id="buscarResultadosForm" class="mb-4">
+                <form id="buscarResultadosForm" class="mb-4 form-flex">
                     @csrf
-                    <div class="input-group">
-                        <input type="text" name="token" class="form-control" placeholder="Ingrese el token" required>
-                        <button type="submit" class="btn btn-primary">Obtener Resultados</button>
-                    </div>
+                    <p>Seleccione evaluaciones en la tabla, y luego de clic al botón para obtener sus resultados.</p>
+                    <!--<input type="text" name="token" class="form-control" placeholder="Ingrese el token" required>-->
+                    <button type="submit" class="btn btn-primary">Obtener Resultados</button>
                 </form>
                 <div id="resultadosContainer"></div>
             </div>
         </div>
         <br>
-                <!-- Tabla de tokens -->
+
+        <!-- Tabla de tokens -->
         <div class="row">
             <div class="col s12">
                 <div class="card dark-card z-depth-3">
@@ -54,8 +87,8 @@
                                 <th>Nombre candidato</th>
                                 <th>Evaluación</th>
                                 <th>Secciones evaluadas</th>
-                                <th>token</th>
                                 <th>Estado</th>
+                                <th>Seleccionar Evaluación</th>
                             </tr>
                             </thead>
                         </table>
@@ -99,7 +132,6 @@
             if (typeof M !== 'undefined') {
                 M.Modal.init(document.querySelectorAll('.modal'));
                 M.FormSelect.init(document.querySelectorAll('select'));
-                M.Tooltip.init(document.querySelectorAll('.tooltipped'));
             }
 
             // Inicialización de DataTable
@@ -165,33 +197,90 @@
                                 }).join('<br>');
                             }
                         },
+                        {data: 'estado'},
                         {data: 'token',
+                            className: 'select-checkbox',
                             render: function(data, type, row) {
                                 const tokenCorto = data.length > 10 ? data.substring(0, 10) + '...' : data;
                                 const idBtn = 'copyBtn-' + row.id_candidato + '-' + Math.floor(Math.random() * 10000);
 
                                 return  `
-                                    <div style="display: inline-flex; align-items: center; gap: 8px;">
-                                        <span id="tokenText-${idBtn}" style="white-space: nowrap;">${tokenCorto}</span>
-                                        <button class="btn btn-small copy-btn" data-token="${data}" id="${idBtn}" title="Copiar token">
-                                            <i class="ri-file-copy-line"></i>
-                                        </button>
-                                    </div>
+                                    <span id="tokenText-${idBtn}">
+                                        <i class="ri-checkbox-blank-line" data-token="${data}" style="font-size: 1.5rem;"></i>
+                                    </span>
                                 `;
                             }
-                        },
-                        {data: 'estado'}
+                        }
                     ],
+                    select: {
+                        style: 'multi',    // permite seleccionar varias filas
+                        selector: 'td.select-checkbox'  // solo selecciona con click en la columna checkbox
+                    },
                     responsive: true,
                     // Se elimina la opción de idioma para evitar textos extra de traducción
                     drawCallback: function () {
-                        if (typeof M !== 'undefined') {
-                            M.Tooltip.init(document.querySelectorAll('.tooltipped'));
-                        }
                     },
-                    initComplete: function () {
-                        console.log('DataTable inicializada completamente');
+                });
+
+                //seleccion de varias filas
+               table.on('select.dt deselect.dt', function (e, api, type, indexes) {
+                    if (type !== 'row') return;
+
+                    const isSelect = e.type === 'select';
+
+                    const selectedData = table.rows({ selected: true }).data().toArray();
+                    const idsCandidatos = selectedData.map(row => row.id_candidato);
+                    const uniqueIds = [...new Set(idsCandidatos)];
+
+                    // Revisión de múltiples candidatos seleccionados
+                    if (isSelect && uniqueIds.length > 1) {
+                        const lastChangedRow = table.row(indexes);
+                        lastChangedRow.deselect();
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Selección inválida',
+                            text: 'Las evaluaciones que selecciones para generar resultados deben pertenecer al mismo candidato.',
+                            background: '#262b3c',
+                            color: '#fff',
+                            confirmButtonColor: '#3d4e81'
+                        });
+
+                        return;
                     }
+
+                    indexes.forEach(index => {
+                        const rowNode = table.row(index).node();
+                        const rowData = table.row(index).data();
+                        const icon = $(rowNode).find(`i[data-token='${rowData.token}']`);
+
+                        // Cambiar ícono al seleccionar o deseleccionar
+                        if ($(rowNode).hasClass('selected')) {
+                            icon.removeClass('ri-checkbox-blank-line').addClass('ri-checkbox-fill text-primary');
+                        } else {
+                            icon.removeClass('ri-checkbox-fill text-primary').addClass('ri-checkbox-blank-line').removeClass('text-primary');
+                        }
+
+                        // Mostrar advertencia si evaluación está incompleta
+                        if (isSelect && rowData.estado && rowData.estado.toLowerCase().includes('pendiente')) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Evaluación incompleta',
+                                text: 'Este candidato aún no completa todas las secciones de su evaluación. Si genera un reporte de sus resultados, tenga en cuenta que será incompleto.',
+                                showCancelButton: true,
+                                confirmButtonText: 'Continuar',
+                                cancelButtonText: 'Cancelar',
+                                confirmButtonColor: '#f1c40f',
+                                cancelButtonColor: '#d33',
+                                background: '#2c2f38',
+                                color: '#ffffff',
+                            }).then((result) => {
+                                if (!result.isConfirmed) {
+                                    table.row(index).deselect();
+                                }
+                            });
+                        }
+                    });
                 });
 
                 // Función para recargar la tabla
@@ -206,52 +295,6 @@
                     }, false);
                 }
 
-                $('#tokensTable').on('click', '.copy-btn', function() {
-                    const token = $(this).data('token');
-                    const row = $(this).closest('tr');
-                    const estadoTexto = row.find('td').eq(5).text().trim(); //td 5 = columna de estado
-
-                    // Verificamos si el estado contiene la palabra "Pendiente"
-                    const esPendiente = estadoTexto.toLowerCase().includes('pendiente');
-
-                    if (esPendiente) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Evaluación incompleta',
-                            text: 'Este candidato aún no completa todas las secciones de su evaluación. Si genera un reporte de sus resultados, tenga en cuenta que será incompleto.',
-                            showCancelButton: true,
-                            confirmButtonText: 'Copiar de todas formas',
-                            cancelButtonText: 'Cancelar',
-                            confirmButtonColor: '#f1c40f',
-                            cancelButtonColor: '#d33'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                copiarToken(token);
-                            }
-                        });
-                    } else {
-                        copiarToken(token);
-                    }
-
-                   function copiarToken(token) {
-                        navigator.clipboard.writeText(token).then(() => {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Token copiado correctamente',
-                                text: 'Ahora puedes ver las respuestas de este candidato.',
-                                confirmButtonColor: '#3085d6',
-                                confirmButtonText: 'OK'
-                            });
-                        }).catch(() => {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error al copiar',
-                                text: 'No se pudo copiar el token. Intenta manualmente.',
-                            });
-                        });
-                    }
-                });
-
                 // Comprobar disponibilidad de SweetAlert2
                 if (typeof Swal === 'undefined') {
                     console.error('SweetAlert2 no está disponible.');
@@ -260,9 +303,6 @@
                     document.body.appendChild(swalScript);
                 }
 
-                if (typeof M !== 'undefined') {
-                    M.Tooltip.init(document.querySelectorAll('.tooltipped'));
-                }
             }catch (error) {
                 console.error('Error al inicializar la tabla:', error);
                 alert('Ocurrió un error al inicializar la aplicación: ' + error.message);
@@ -285,12 +325,36 @@
                 e.preventDefault();
                 clearDisplay();
 
-                let tokenInput = $(this).find("input[name='token']").val();
+                /*let tokenInput = $(this).find("input[name='token']").val();*/
+
+                let filasSeleccionadas = $('#tokensTable tbody tr.selected');
+                if (filasSeleccionadas.length === 0) {
+                    alert("Por favor selecciona al menos una evaluación para generar un PDF de resultados.");
+                    return;
+                }
+
+                let tabla = $('#tokensTable').DataTable();
+                let tokenSeleccionado = tabla.row(filasSeleccionadas.first()).data().token;
+                if (!tokenSeleccionado) {
+                    alert("No se pudo obtener el token de la selección.");
+                    return;
+                }
+
+                let evaluacionesSeleccionadas = [];
+                filasSeleccionadas.each(function() {
+                    let evaluacion = $(this).find('td').eq(2).text().trim(); //columna de evaluacion
+                    if (evaluacion && !evaluacionesSeleccionadas.includes(evaluacion)) {
+                        evaluacionesSeleccionadas.push(evaluacion);
+                    }
+                });
 
                 $.ajax({
                     url: "{{ route('admin.buscar.resultados') }}",
                     type: "GET",
-                    data: { token: tokenInput },
+                    data: { 
+                        token: tokenSeleccionado, 
+                        evaluaciones: evaluacionesSeleccionadas
+                    },
                     dataType: "json",
                     success: function(response) {
                         if(response.status === 'success'){

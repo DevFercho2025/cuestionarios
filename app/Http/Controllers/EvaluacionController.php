@@ -99,12 +99,12 @@ class EvaluacionController extends Controller
     {
         $request->validate([
             'user_id' => 'required|integer|exists:users,id',
-            'categorias' => 'required|array',
-            'categorias.*' => 'exists:psico_alobri_categorias,id',
+            'tests' => 'required|array',
+            'tests.*' => 'exists:psico_alobri_tests,id',
         ]);
     
         userAssignedTest::where('user_id', $request->user_id)
-            ->whereIn('categorias_id', $request->categorias)
+            ->whereIn('test_id', $request->tests)
             ->delete();
     
         return response()->json(['success' => true, 'message' => 'Evaluaciones eliminadas']);

@@ -63,17 +63,17 @@
 </head>
     <div class="container">
         <!-- emcabezado-->
-            <div class="row">
-                <div class="col s12">
-                    <div class="card-panel dark-gradient">
-                        <div class="row valign-wrapper mb-0">
-                            <div class="col s8">
-                                <h4 class="white-text">Gestión de Códigos y evaluaciones</h4>
-                            </div>
+        <div class="row">
+            <div class="col s12">
+                <div class="card-panel dark-gradient">
+                    <div class="row valign-wrapper mb-0">
+                        <div class="col s8">
+                            <h4 class="white-text">Gestión de Códigos y evaluaciones</h4>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
         <!-- Tabla de aplicaciones -->
         <div class="row">
@@ -252,7 +252,14 @@
 
                     $.get(`/psicometricas/admin/evaluaciones/usuario/${userId}`, function (pruebas) {
                         if (!pruebas || pruebas.length === 0) {
-                            Swal.fire('Evaluaciones', 'Este usuario no tiene evaluaciones asignadas.', 'info');
+                            Swal.fire({
+                                title: 'Evaluaciones',
+                                text: 'Este usuario no tiene evaluaciones asignadas.',
+                                icon: 'info',
+                                background: '#262b3c',
+                                color: '#fff',
+                                confirmButtonColor: '#3d4e81'
+                            });
                             return;
                         }
 
@@ -279,9 +286,9 @@
                             confirmButtonColor: '#d32f2f',
                             cancelButtonColor: '#3d4e81',
                             preConfirm: () => {
-                                const seleccionadas = $('.eval-checkbox:checked').map(function () {
-                                    return $(this).val();
-                                }).get();
+                                const seleccionadas = Array.from(
+                                    Swal.getPopup().querySelectorAll('.eval-checkbox:checked')
+                                ).map(checkbox => checkbox.value);
 
                                 if (seleccionadas.length === 0) {
                                     Swal.showValidationMessage('Debes seleccionar al menos una evaluación para eliminar.');
@@ -294,15 +301,18 @@
                                     method: 'POST',
                                     data: {
                                         user_id: userId,
-                                        categorias: seleccionadas,
+                                        tests: seleccionadas,
                                         _token: "{{ csrf_token() }}"
                                     }
                                 }).then(response => {
                                     Swal.hideLoading();
 
-                                    // Quitar checkboxes eliminados del DOM
+                                    // Elimina los checkboxes del popup
                                     seleccionadas.forEach(id => {
-                                        $(`.eval-checkbox[value="${id}"]`).closest('div').remove();
+                                        const checkbox = Swal.getPopup().querySelector(`.eval-checkbox[value="${id}"]`);
+                                        if (checkbox) {
+                                            checkbox.closest('div').remove();
+                                        }
                                     });
 
                                     return false; // No cerrar el modal
@@ -349,7 +359,9 @@
                             confirmButtonColor: '#3d4e81',
                             cancelButtonColor: '#d32f2f',
                             preConfirm: () => {
-                                const seleccionadas = $('#pruebasSelect').val();
+                                const seleccionadas = $('#pruebasSelect input[type="checkbox"]:checked').map(function () {
+                                        return $(this).val();
+                                    }).get();
 
                                 if (!seleccionadas || seleccionadas.length === 0) {
                                     Swal.showValidationMessage('Debes seleccionar al menos una prueba para asignar');
@@ -367,9 +379,23 @@
                                     dataType: 'json', 
                                     success: function (response) {
                                         if (response.success) {
-                                            Swal.fire('¡Éxito!', response.message, 'success');
+                                            Swal.fire({
+                                                title: '¡Éxito!',
+                                                text: response.message,
+                                                icon: 'success',
+                                                background: '#262b3c',
+                                                color: '#fff',
+                                                confirmButtonColor: '#3d4e81'
+                                            });
                                         } else {
-                                            Swal.fire('Error', response.message || 'No se pudieron asignar las evaluaciones.', 'error');
+                                            Swal.fire({
+                                                title: 'Error',
+                                                text: response.message || 'No se pudieron asignar las evaluaciones.',
+                                                icon: 'error',
+                                                background: '#262b3c',
+                                                color: '#fff',
+                                                confirmButtonColor: '#d32f2f'
+                                            });
                                         }
                                     },
                                     error: function (xhr, status, error) {
@@ -451,7 +477,14 @@
                             }
                         }).then(result => {
                             if (result.isConfirmed) {
-                                Swal.fire('¡Configurado!', 'La configuración fue guardada correctamente.', 'success');
+                                Swal.fire({
+                                    title: '¡Configurado!',
+                                    text: 'La configuración fue guardada correctamente.',
+                                    icon: 'success',
+                                    background: '#262b3c',
+                                    color: '#fff',
+                                    confirmButtonColor: '#3d4e81'
+                                });
                             }
                         });
                     });
@@ -484,7 +517,14 @@
                                     _token: "{{ csrf_token() }}"
                                 },
                                 success: function (response) {
-                                    Swal.fire('Eliminado', 'Código de acceso eliminado', 'success');
+                                    Swal.fire({
+                                        title: '¡Eliminado!',
+                                        text: 'Código de acceso eliminado',
+                                        icon: 'success',
+                                        background: '#262b3c',
+                                        color: '#fff',
+                                        confirmButtonColor: '#3d4e81'
+                                    });
                                     $('#aplicacionesTable').DataTable().ajax.reload();
                                     },
                                 error: function () {

@@ -45,8 +45,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.8/inputmask.min.js"></script>
 
-
-
 <script>
     if (typeof jQuery === 'undefined') {
         document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');

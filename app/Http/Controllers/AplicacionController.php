@@ -111,7 +111,7 @@ class AplicacionController extends Controller
     public function configurar(Request $request)
     {
         $request->validate([
-            'aplicacion_id' => 'required|exists:psico_alobri_aplicaciones,id',  // Ajusta si el nombre de tabla es distinto
+            'aplicacion_id' => 'required|exists:psico_alobri_application_access_codes,id',  // Ajusta si el nombre de tabla es distinto
             'camera' => 'required|boolean',
             'location' => 'required|boolean',
         ]);
