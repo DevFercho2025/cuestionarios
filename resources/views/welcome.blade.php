@@ -71,13 +71,27 @@
             </ul>
           </li>
           <!-- / Style Switcher-->
-
-          <li>
-            <a href="{{ route('register.wizard') }}" class="btn btn-secondary px-2 px-sm-4 px-lg-2 px-xl-4 waves-effect waves-light me-4" target="_blank"><span class="tf-icons ri-user-line me-md-1"></span><span class="d-none d-md-block">Registrarse</span></a>
-          </li>
-          <li>
-            <a href="{{ route('login') }}" class="btn btn-primary px-2 px-sm-4 px-lg-2 px-xl-4 waves-effect waves-light" target="_blank"><span class="ri-user-shared-2-fill me-md-1"></span><span class="d-none d-md-block">Iniciar Sesión</span></a>
-          </li>
+            @guest
+                <li>
+                    <a href="{{ route('register.wizard') }}" class="btn btn-secondary px-2 px-sm-4 px-lg-2 px-xl-4 waves-effect waves-light me-4" target="_blank">
+                        <span class="tf-icons ri-user-line me-md-1"></span>
+                        <span class="d-none d-md-block">Registrarse</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('login') }}" class="btn btn-primary px-2 px-sm-4 px-lg-2 px-xl-4 waves-effect waves-light" target="_blank">
+                        <span class="ri-user-shared-2-fill me-md-1"></span>
+                        <span class="d-none d-md-block">Iniciar Sesión</span>
+                    </a>
+                </li>
+            @else
+                <li>
+                    <a href="/psicometricas/admin" class="btn btn-primary px-2 px-sm-4 px-lg-2 px-xl-4 waves-effect waves-light">
+                        <span class="ri-dashboard-fill me-md-1"></span>
+                        <span class="d-none d-md-block">Panel de Control</span>
+                    </a>
+                </li>
+            @endguest
         </ul>
       </div>
     </nav>
@@ -179,7 +193,7 @@
         </div>
     </div>-->
 
-    <!-- Overview Section 
+    <!-- Overview Section
     <div class="row" id="overview">
         <div class="col-12">
             <div class="card mb-4">
@@ -720,7 +734,7 @@
     </div>
 
     <script src="../../assets/js/front-page-landing.js"></script>
-    
+
 @endsection
 
 @section('scripts')
@@ -765,5 +779,5 @@
         });
 
 
-       
+
     </script>
