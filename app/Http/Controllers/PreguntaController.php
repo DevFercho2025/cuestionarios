@@ -17,18 +17,19 @@ class PreguntaController extends Controller
 
     public function datatable(Request $request)
     {
-        $preguntas = Pregunta::with(['seccion','test'])->get()->map(function ($p) {
+        $preguntas = Pregunta::with(['seccion', 'test', 'questionType'])->get()->map(function ($p) {
             return [
                 'pregunta_id' => $p->id,
                 'question'    => $p->question,
                 'test_id'     => $p->test_id,
                 'test'        => [
-                    'titulo' => $p->test ? $p->test->test_title : null
+                    'titulo'=> $p->test ? $p->test->test_title : null
                 ],
                 'required'    => $p->required,
                 'seccion'     => [
                     'title' => $p->seccion ? $p->seccion->title : null
-                ]
+                ],
+                'tipo'        => $p->questionType ? $p->questionType->name : 'Sin tipo asignado'
             ];
         });
         Log::info('Preguntas para datatable:', $preguntas->toArray());

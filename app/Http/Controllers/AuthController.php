@@ -129,12 +129,6 @@ class AuthController extends Controller
             if ($config && $config->role && ($config->role->isAdmin() || $config->role->isSuperAdmin())) {
                 return redirect()->route('admin.index');
             }
-
-            // 4) Si la cuenta existe pero está desactivada
-            if (! $config->active) {
-                Auth::logout();
-                return back()->withErrors(['email' => 'Su cuenta está desactivada.']);
-            }
         }
 
         //credenciales inválidas

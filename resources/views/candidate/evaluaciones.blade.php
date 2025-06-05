@@ -17,53 +17,103 @@
         <!-- Tabla de Evaluaciones -->
         <div class="row">
             <div class="col s12">
-                @if ($categorias->isEmpty())
-                        <div class="center-align" style="margin-top: 40px;">
-                            <p class="flow-text grey-text text-darken-1">No tienes evaluaciones asignadas por el momento.</p>
-                        </div>
+                @if ($tests->isEmpty())
+                    <div class="center-align" style="margin-top: 40px;">
+                        <p class="flow-text grey-text text-darken-1">No tienes evaluaciones asignadas por el momento.</p>
+                    </div>
                 @else
-                    <div class="card dark-card z-depth-3">
+                <h5>Para la vacante: <span>{{ $aplicacion->vacancy ?? 'N/A' }}</span><br>Código: <span>{{ $aplicacion->code ?? 'N/A' }}</span></h5>
+                    @foreach ($tests as $test)
+                        <div class="card dark-card z-depth-3 mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">{{ $test->test_title }}</h5>
+                            </div>
+
+                            <div class="card-datatable table-responsive">
+                                <table class="dt-responsive table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Título de Sección</th>
+                                            <th>Tiempo máximo para realizarla</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($test->sections as $section)
+                                            <tr>
+                                                <td class="text-truncate">
+                                                    <span class="text-heading">{{ $section->title }}</span>
+                                                </td>
+                                                <td class="text-truncate">
+                                                    <span class="text-heading">{{ $section->tiempo_seccion }}</span>
+                                                </td>
+                                                <td class="text-truncate">
+                                                    @if (in_array($section->id, $seccionesCompletadas))
+                                                        <span class="badge" style="background-color: rgb(53 117 10)">Completada</span>
+                                                    @else
+                                                        <span class="badge" style="background-color: rgb(217 148 11)">Pendiente</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-truncate">
+                                                    @if (in_array($section->id, $seccionesCompletadas))
+                                                        <a class="btn btn-sm btn-secondary" tabindex="-1" aria-disabled="true" style="pointer-events: none; cursor: not-allowed;">
+                                                            Evaluación Completada
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('permisos-preliminares') }}?test_id={{ $test->id }}&section_id={{ $section->id }}" class="btn btn-sm" style="background-color: rgb(30, 102, 165); color: white">
+                                                            Iniciar Evaluación
+                                                        </a>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <!--<div class="card dark-card z-depth-3">
                         <div class="card-datatable table-responsive">
                             <table id="EvaluacionesTable" class="dt-responsive table table-bordered">
                                 <thead>
-                                <tr>
-                                    <th>Título</th>
-                                    <th>Cuestionario</th>
-                                    <th>Tiempo</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Evaluación</th>
+                                        <th>Tiempo</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($categorias as $categoria)
-                                        @foreach ($categoria->secciones as $seccion)
+                                    @foreach ($tests as $test)
+                                        @foreach ($test->sections as $section)
                                             <tr>
                                                 <td class="text-truncate">
-                                                    <span class="text-heading">{{ $seccion->titulo }}</span>
+                                                    <span class="text-heading">{{ $section->title }}</span>
                                                 </td>
                                                 <td class="text-truncate">
                                                     <i class="ri-question-answer-line me-2" width="22" height="22"></i>
-                                                    <span class="text-heading">{{ $categoria->titulo_cuestionario }}</span>
+                                                    <span class="text-heading">{{ $test->test_title }}</span>
                                                 </td>
                                                 <td class="text-truncate">
-                                                    <span class="text-heading">{{ $seccion->tiempo_evaluacion }}</span>
+                                                    <span class="text-heading">{{ $section->tiempo_seccion }}</span>
                                                 </td>
                                                 <td class="text-truncate">
-                                                    @if (in_array($seccion->id, $seccionesCompletadas))
+                                                    @if (in_array($section->id, $seccionesCompletadas))
                                                         <span class="badge bg-success">Completada</span>
                                                     @else
                                                         <span class="badge bg-warning">Pendiente</span>
                                                     @endif
                                                 </td>
                                                 <td class="text-truncate">
-                                                    @if (in_array($seccion->id, $seccionesCompletadas))
-                                                        <!-- Botón deshabilitado -->
+                                                    @if (in_array($section->id, $seccionesCompletadas))
                                                         <a class="btn btn-sm btn-secondary" tabindex="-1" aria-disabled="true" style="pointer-events: none; cursor: not-allowed;">
                                                             Evaluación Completada
                                                         </a>
                                                     @else
-                                                        <!-- Botón activo -->
-                                                        <a href="{{ route('permisos-preliminares') }}?categoria_id={{ $categoria->id }}&seccion_id={{ $seccion->id }}" class="btn btn-sm btn-primary">
+                                                        <a href="{{ route('permisos-preliminares') }}?test_id={{ $test->id }}&section_id={{ $section->id }}" class="btn btn-sm btn-primary">
                                                             Iniciar Evaluación
                                                         </a>
                                                     @endif
@@ -74,7 +124,7 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
+                    </div>-->
                 @endif
             </div>
         </div>

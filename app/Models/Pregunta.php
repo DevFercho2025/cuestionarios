@@ -30,4 +30,18 @@ class pregunta extends Model
     {
         return $this->belongsTo(Test::class, 'test_id');
     }
+
+    public function questionType()
+    {
+        return $this->belongsTo(QuestionType::class, 'question_type_id');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($pregunta) {
+            $pregunta->respuestas()->delete();//eliminar respuestas asociadas
+        });
+    }
 }

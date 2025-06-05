@@ -1,6 +1,45 @@
 @extends('layout.admin')
 @section('title', 'Gestión de Secciones')
 @section('content')
+
+<head>
+    <style>
+        .btn-azul {
+            background-color: #3d4e81;
+            color: white;
+        }
+
+        .btn-editar {
+            background-color: #05638d;
+            color: white;
+        }
+
+        .btn-azul:hover {
+            color: white;
+            background-color: #055d82;
+        }
+
+        .btn-naranja {
+            background-color: #d1850d;
+            color: white;
+        }
+
+        .btn-naranja:hover {
+            color: white;
+            background-color: #b47b1f;
+        }
+
+        .btn-rojo {
+            background-color: #a12e2e;
+            color: white;
+        }
+
+        .btn-rojo:hover {
+            color: white;
+            background-color: #8b1a1a;
+        }
+    </style>
+</head>
     <div class="container">
         <!-- Encabezado -->
         <div class="row">
@@ -11,9 +50,11 @@
                             <h4 class="white-text">Gestión de Secciones</h4>
                         </div>
                         <div class="col s4 right-align">
-                            <a id="createSeccionBtn" class="btn btn-large gradient-btn pulse">
-                               Nueva Sección
+                        <div style="text-align: right;">
+                            <a id="createSeccionBtn" class="btn btn-large gradient-btn pulse" style="color: white; display: inline-block; background-color:#4f52b5">
+                            Crear nueva Sección
                             </a>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -121,11 +162,11 @@
                         render: function (data, type, row) {
                             return `
                                 <div class="action-buttons">
-                                    <button type="button" class="btn btn-info waves-effect waves-light edit-btn tooltipped"
+                                    <button type="button" class="btn btn-azul waves-effect waves-light edit-btn tooltipped"
                                             data-position="top" data-tooltip="Editar" data-id="${row.id}">
                                         <i class="ri-pencil-line"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
+                                    <button type="button" class="btn btn-rojo waves-effect waves-light delete-btn tooltipped"
                                             data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
                                         <i class="ri-delete-bin-6-line"></i>
                                     </button>
@@ -439,7 +480,7 @@
 
                 Swal.fire({
                     title: '¿Eliminar Sección?',
-                    text: "Esta acción no se puede deshacer",
+                    text: "Esta acción no se puede deshacer. Si elimina una sección también elimina sus preguntas y las respuestas de estas.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d32f2f',

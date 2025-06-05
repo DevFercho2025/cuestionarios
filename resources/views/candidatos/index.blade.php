@@ -5,6 +5,8 @@
 <head>
     <style>
         .btn-azul {
+            margin: 5px;
+            margin-left: 0px;
             background-color: #8b8b8b;
             color: white;
         }
@@ -15,6 +17,8 @@
         }
 
         .btn-codigo {
+            margin: 5px;
+            margin-left: 0px;
             color: white;
             background-color: #4b4fa9;
         }
@@ -35,6 +39,8 @@
         }
 
         .btn-rojo {
+            margin: 5px;
+            margin-left: 0px;
             background-color: #a12e2e;
             color: white;
         }
@@ -56,12 +62,12 @@
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <h4 class="white-text mb-0" style="margin: 0;">
                             @if ($conVacante == 1)
-                                Gestión de Candidatos con Vacante
+                                Gestionar y ver información de Candidatos con Vacante
                             @else
-                                Gestión de Candidatos sin Vacante
+                                Gestionar y ver información de Candidatos sin Vacante
                             @endif
                         </h4>
-                        <button class="btn btn-primary" style="white-space: nowrap; padding-right:20px; !important padding-left:20px; !important">Añadir un candidato</button>
+                        <button class="btn" style="white-space: nowrap; padding-right:20px; !important padding-left:20px; !important; background-color: #3d4e81; color:white;">Añadir un candidato</button>
                     </div>
                 </div>
             </div>
@@ -223,16 +229,20 @@
                                 data: null,
                                 render: function(data, type, row){
                                     return `
-                                        <div class="action-buttons" style="gap:5px">
-                                            <button type="button" class="btn btn-rojo waves-effect waves-light delete-btn tooltipped" style="margin=5px;"
+                                        <div class="action-buttons">
+                                            <button type="button" class="btn btn-rojo waves-effect waves-light delete-btn tooltipped"
+                                                style="margin=8px; margin-left:0px"
                                                     data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
                                                 <i class="ri-delete-bin-6-line"></i>
                                             </button>
-                                            <button type="button" class="btn btn-azul waves-effect waves-light ver-perfil-btn tooltipped" style="margin=5px;"
+                                            <button type="button" class="btn btn-azul waves-effect waves-light ver-perfil-btn tooltipped"
+                                               style="margin=8px; margin-left:0px"
                                                     data-position="top" data-tooltip="Ver perfil" data-id="${row.id}">
                                                 <i class="ri-eye-line"></i>
                                             </button>
-                                            <button type="button" class="btn btn-codigo waves-effect waves-light generar-codigo-btn tooltipped" data-id="${row.id}" data-tooltip="Generar Código">
+                                            <button type="button" class="btn btn-codigo waves-effect waves-light generar-codigo-btn tooltipped"
+                                                style="margin=8px; margin-left:0px"
+                                                data-id="${row.id}" data-tooltip="Generar Código">
                                                 <i class="ri-key-fill"></i>
                                             </button>
                                         </div>

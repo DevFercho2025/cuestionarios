@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Aplicacion;
+use App\Models\AccessCode;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Respuesta_Usuario;
 
@@ -22,14 +22,14 @@ class CandidateController extends Controller
     
         $codigoIngresado = $request->codigo;
     
-        // Buscar la aplicación con el código
-        $aplicacion = Aplicacion::where('codigo', $codigoIngresado)->first();
+        // Buscar el código
+        $codigo = AccessCode::where('code', $codigoIngresado)->first();
     
-        if (!$aplicacion || !$aplicacion->usuario) {
+        if (!$codigo || !$codigo->user) {
             return back()->withErrors(['codigo' => 'El código ingresado no es válido.']);
         }
     
-        $usuario = $aplicacion->usuario;
+        $usuario = $codigo->user;
     
         // Verificar si es candidato (no admin)
         if ($usuario->is_admin || $usuario->is_super_admin) {
@@ -47,27 +47,25 @@ class CandidateController extends Controller
     {
         $user = Auth::user();
 
+        $aplicacion = AccessCode::where('user_id', $user->id)->first();
+
         $seccionesCompletadas = Respuesta_Usuario::where('user_id', $user->id)
-        ->join('psico_alobri_preguntas', 'psico_alobri_respuestas_usuario.pregunta_id', '=', 'psico_alobri_preguntas.pregunta_id')
-        ->pluck('psico_alobri_preguntas.seccion_id')
-        ->unique()
-        ->toArray();
-        //categorias asignadas al usuario
-        $categorias = $user->categorias;
-        //secciones que pertenecen a esa categoría
-        $secciones = $categorias->load('secciones');
+            ->join('psico_alobri_questions', 'psico_alobri_user_answers.question_id', '=', 'psico_alobri_questions.id')
+            ->pluck('psico_alobri_questions.section_id')
+            ->unique()
+            ->toArray();
 
-        //id de la seccion completada.
-        //$seccion_completada = session('seccion_completada', null);
+        $tests = $user->assignedTests;
+        $secciones = $tests->load('sections');
 
-        return view('candidate.evaluaciones', compact('user', 'categorias', 'secciones','seccionesCompletadas'));
+        return view('candidate.evaluaciones', compact('user', 'tests', 'secciones', 'seccionesCompletadas', 'aplicacion'));
     }
 
     public function perfil(){
         $user = Auth::user();
         
         $aplicacion = $user->aplicacion ?? null;
-        $aplicacion = Aplicacion::where('user_id', $user->id)->first();
+        $aplicacion = AccessCode::where('user_id', $user->id)->first();
 
         return view('candidate.perfil', compact('user', 'aplicacion'));
     }

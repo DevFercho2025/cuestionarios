@@ -3,6 +3,41 @@
 @section('content')
     <head>
         <style>
+            .btn-azul {
+                background-color: #3d4e81;
+                color: white;
+            }
+
+            .btn-editar {
+                background-color: #05638d;
+                color: white;
+            }
+
+            .btn-azul:hover {
+                color: white;
+                background-color: #055d82;
+            }
+
+            .btn-naranja {
+                background-color: #d1850d;
+                color: white;
+            }
+
+            .btn-naranja:hover {
+                color: white;
+                background-color: #b47b1f;
+            }
+
+            .btn-rojo {
+                background-color: #a12e2e;
+                color: white;
+            }
+
+            .btn-rojo:hover {
+                color: white;
+                background-color: #8b1a1a;
+            }
+
             .dataTables_wrapper .dataTables_length,
             .dataTables_wrapper .dataTables_filter {
                 display: inline-block;
@@ -57,9 +92,11 @@
                             <h4 class="white-text">Gestión de Respuestas</h4>
                         </div>
                         <div class="col s4 right-align">
-                            <a id="createRespuestaBtn" class="btn btn-large btn-primary gradient-btn pulse">
-                               Nueva Respuesta
+                        <div style="text-align: right;">
+                            <a id="createRespuestaBtn" class="btn btn-large gradient-btn pulse" style="color: white; display: inline-block; background-color:#4f52b5">
+                            Crear nueva respuesta
                             </a>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -201,12 +238,12 @@
                             render: function (data, type, row) {
                                 return `
                                     <div class="action-buttons">
-                                        <button type="button" class="btn btn-info waves-effect waves-light edit-btn tooltipped"
-                                                data-position="top" data-tooltip="Editar" data-id="${row.id}">
+                                        <button type="button" class="btn btn-azul waves-effect waves-light edit-btn tooltipped"
+                                                style="margin: 8px; margin-left:0px" data-position="top" data-tooltip="Editar" data-id="${row.id}">
                                             <i class="ri-pencil-line"></i>
                                         </button>
-                                        <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
-                                                data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
+                                        <button type="button" class="btn btn-rojo waves-effect waves-light delete-btn tooltipped"
+                                                style="margin: 8px; margin-left:0px" data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
                                             <i class="ri-delete-bin-6-line"></i>
                                         </button>
                                     </div>

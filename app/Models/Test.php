@@ -24,6 +24,11 @@ class Test extends Model
     {
         return $this->hasMany(Seccion::class, 'test_id');
     }
+    
+    public function assignedUsers()
+    {
+        return $this->belongsToMany(User::class, 'psico_alobri_user_assigned_tests', 'test_id', 'user_id');
+    }
 
     #time_at es la sumatoria de todos los tiempos de las secciones del test
     public function recalculateTotalTime()
@@ -41,8 +46,15 @@ class Test extends Model
         #sprintf asegura guardado con HH:MM:SS
     }
 
-    public function assignedUsers()
+    //cuando se elimina
+    protected static function boot()
     {
-        return $this->belongsToMany(User::class, 'psico_alobri_user_assigned_tests', 'test_id', 'user_id');
+        parent::boot();
+
+        static::deleting(function ($test) {
+            foreach ($test->sections as $section) {
+                $section->delete(); //eliminar sus secciones
+            }
+        });
     }
 }

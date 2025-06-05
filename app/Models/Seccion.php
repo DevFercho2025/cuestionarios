@@ -32,4 +32,13 @@ class Seccion extends Model
     
         return "{$minutos} minutos, {$segundos} segundos";
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($section) {
+            $section->questions()->delete(); //eliminar preguntas asociadas
+        });
+    }
 }

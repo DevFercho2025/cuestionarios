@@ -20,18 +20,18 @@ class EvaluacionController extends Controller
     public function listarCategorias(Request $request)
     {
         $request->validate([
-        'user_id' => 'required|exists:users,id',
-    ]);
+            'user_id' => 'required|exists:users,id',
+        ]);
 
-    $user = User::find($request->user_id);
+        $user = User::find($request->user_id);
 
-    $asignadas = $user->assignedTests()->pluck('test_id');
+        $asignadas = $user->assignedTests()->pluck('test_id');
 
-    $pruebasDisponibles = Test::whereNotIn('id', $asignadas)
-                              ->select('id', 'test_title')
-                              ->get();
+        $pruebasDisponibles = Test::whereNotIn('id', $asignadas)
+                                ->select('id', 'test_title')
+                                ->get();
 
-    return response()->json($pruebasDisponibles);
+        return response()->json($pruebasDisponibles);
         $pruebas = Test::select('id', 'test_title')->get();
         return response()->json($pruebas);
     }

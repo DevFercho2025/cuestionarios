@@ -1,6 +1,44 @@
 @extends('layout.admin')
 @section('title', 'Gestión de pruebas')
 @section('content')
+<head>
+    <style>
+        .btn-azul {
+            background-color: #3d4e81;
+            color: white;
+        }
+
+        .btn-editar {
+            background-color: #05638d;
+            color: white;
+        }
+
+        .btn-azul:hover {
+            color: white;
+            background-color: #055d82;
+        }
+
+        .btn-naranja {
+            background-color: #d1850d;
+            color: white;
+        }
+
+        .btn-naranja:hover {
+            color: white;
+            background-color: #b47b1f;
+        }
+
+        .btn-rojo {
+            background-color: #a12e2e;
+            color: white;
+        }
+
+        .btn-rojo:hover {
+            color: white;
+            background-color: #8b1a1a;
+        }
+    </style>
+</head>
     <div class="container">
         <!-- Encabezado -->
         <div class="row">
@@ -11,9 +49,11 @@
                             <h4 class="white-text">Gestión de Pruebas</h4>
                         </div>
                         <div class="col s4 right-align">
-                            <a id="createTestBtn" class="btn btn-large btn-primary gradient-btn pulse">
-                               Crear una nueva Prueba
+                        <div style="text-align: right;">
+                            <a id="createTestBtn" class="btn btn-large gradient-btn pulse" style="color: white; display: inline-block; background-color:#4f52b5">
+                            Crear una nueva Prueba
                             </a>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -125,12 +165,12 @@
                         render: function (data, type, row) {
                             return `
                                 <div class="action-buttons">
-                                    <button type="button" class="btn btn-info waves-effect waves-light edit-btn tooltipped"
-                                            data-position="top" data-tooltip="Editar" data-id="${row.id}">
+                                    <button type="button" class="btn btn-azul waves-effect waves-light edit-btn tooltipped"
+                                            style="margin: 8px; margin-left: 0px" data-position="top" data-tooltip="Editar" data-id="${row.id}">
                                         <i class="ri-pencil-line"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger waves-effect waves-light delete-btn tooltipped"
-                                            data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
+                                    <button type="button" class="btn btn-rojo waves-effect waves-light delete-btn tooltipped"
+                                            style="margin-right: 8px; margin-left: 0px" data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
                                         <i class="ri-delete-bin-6-line"></i>
                                     </button>
                                 </div>
@@ -170,7 +210,7 @@
                 document.body.appendChild(swalScript);
             }
 
-            // Crear nuevo test
+            // Crear nueva evaluación
             jQuery('#createTestBtn').on('click', function () {
                 if (typeof Swal === 'undefined') {
                     alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
@@ -327,7 +367,7 @@
                 });
             });
 
-            // Editar una prueba
+            // Editar una evaluación
             jQuery('#testsTable').on('click', '.edit-btn', function () {
                 if (typeof Swal === 'undefined') {
                     alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
@@ -475,6 +515,7 @@
                 });
             });
 
+            //Eliminar una evaluación
             jQuery('#testsTable').on('click', '.delete-btn', function () {
                 if (typeof Swal === 'undefined') {
                     alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
@@ -484,14 +525,14 @@
                 let table = jQuery('#testsTable').DataTable();
 
                 Swal.fire({
-                    title: '¿Eliminar Test?',
-                    text: "Esta acción no se puede deshacer",
+                    title: '<span style="color: white;">¿Eliminar evaluación?</span>',
+                    html: '<span style="color: #d32f2f;">Al eliminar esta evaluación, también se eliminarán todas las secciones, preguntas y respuestas asociadas. Los candidatos no podrán realizarla, y tampoco se podrá generar reportes de análisis de respuestas. <br><br> Esta acción no se puede deshacer.</span>',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d32f2f',
                     cancelButtonColor: '#4b5563',
-                    confirmButtonText: '<i class="material-icons left">delete</i> Sí, eliminar',
-                    cancelButtonText: '<i class="material-icons left">cancel</i> Cancelar',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
                     background: '#262b3c',
                     showClass: { popup: 'animate__animated animate__fadeIn' },
                     hideClass: { popup: 'animate__animated animate__fadeOut' }
@@ -505,7 +546,7 @@
                             success: function (response) {
                                 Swal.fire({
                                     icon: 'success',
-                                    title: '¡Eliminado!',
+                                    title: '<span style="color: white;">¡Eliminado!</span>',
                                     text: response.message,
                                     confirmButtonColor: '#3d4e81',
                                     timer: 2000,

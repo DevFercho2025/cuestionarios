@@ -10,7 +10,7 @@
       <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
         <div class="card mb-6">
             <h5 class="card-header">Evaluaciones Pendientes</h5>
-            @if ($categorias->isEmpty())
+            @if ($tests->isEmpty())
                 <p>No tienes evaluaciones asignadas por el momento.</p>
             @else
                 <div class="table-responsive table-border-bottom-0">
@@ -23,17 +23,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($categorias as $categoria)
+                            @foreach ($tests as $test)
                                 <tr>
                                     <td class="text-truncate">
-                                        <i class="ri-question-answer-line" class="me-2" width="22" height="22"></i>
-                                        <span class="text-heading">{{ $categoria->titulo_cuestionario }}</span>
+                                        <i class="ri-question-answer-line me-2" width="22" height="22"></i>
+                                        <span class="text-heading">{{ $test->test_title }}</span>
                                     </td>
                                     <td class="text-truncate">
                                         Pendiente
                                     </td>
                                     <td class="text-truncate">
-                                        <a href="{{ route('permisos-preliminares') }}?categoria_id={{ $categoria->id }}" class="btn btn-sm btn-primary">
+                                        <a href="{{ route('permisos-preliminares') }}?test_id={{ $test->id }}" class="btn btn-sm btn-primary">
                                             Iniciar Evaluación
                                         </a>
                                     </td>

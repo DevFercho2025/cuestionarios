@@ -102,9 +102,7 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
             Route::post('/categorias/store', [CategoriasTiposEvController::class, 'store'])->name('categorias.store');
             Route::get('/categorias/{id}', [CategoriasTiposEvController::class, 'show']);
             Route::put('/categorias/{id}', [CategoriasTiposEvController::class, 'update']);
-            Route::delete('/psicometricas/admin/categorias/{id}', [CategoriasTiposEvController::class, 'destroy'])->name('categorias.destroy');
-
-
+            Route::delete('/categorias/{id}', [CategoriasTiposEvController::class, 'destroy']);
 
             // Rutas para gestión de pruebas (Evaluaciones)
             Route::get('pruebas', [TestController::class, 'index'])->name('pruebas.index');

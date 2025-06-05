@@ -1,9 +1,47 @@
 @extends('layout.admin')
 @section('title', 'Gestión de Preguntas')
 @section('content')
+<head>
+    <style>
+        .btn-azul {
+            background-color: #3d4e81;
+            color: white;
+        }
+
+        .btn-editar {
+            background-color: #05638d;
+            color: white;
+        }
+
+        .btn-azul:hover {
+            color: white;
+            background-color: #055d82;
+        }
+
+        .btn-naranja {
+            background-color: #d1850d;
+            color: white;
+        }
+
+        .btn-naranja:hover {
+            color: white;
+            background-color: #b47b1f;
+        }
+
+        .btn-rojo {
+            background-color: #a12e2e;
+            color: white;
+        }
+
+        .btn-rojo:hover {
+            color: white;
+            background-color: #8b1a1a;
+        }
+    </style>
+</head>
     <div class="container">
        <!-- emcabezado-->
-       <div class="row">
+        <div class="row">
             <div class="col s12">
                 <div class="card-panel dark-gradient">
                     <div class="row valign-wrapper mb-0">
@@ -11,9 +49,11 @@
                             <h4 class="white-text">Gestión de Preguntas</h4>
                         </div>
                         <div class="col s4 right-align">
-                            <a id="crearPreguntaBtn" class="btn btn-large btn-primary gradient-btn pulse">
-                                Nueva pregunta
+                        <div style="text-align: right;">
+                            <a id="crearPreguntaBtn" class="btn btn-large gradient-btn pulse" style="color: white; display: inline-block; background-color:#4f52b5">
+                            Crear nueva pregunta
                             </a>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -30,7 +70,8 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Pregunta</th>
-                                <th>Cuestionario</th>
+                                <th>Tipo de pregunta</th>
+                                <th>Evaluación</th>
                                 <th>Sección</th>
                                 <th>Acciones</th>
                             </tr>
@@ -114,6 +155,7 @@
                     columns: [
                         { data: 'pregunta_id' },
                         { data: 'question' },
+                        { data: 'tipo'},
                         { data: 'test.titulo', defaultContent: '<span class="grey-text">Sin Test</span>' },
                         { data: 'seccion.title', defaultContent: '<span class="grey-text">Sin Sección</span>' },
                         {
@@ -121,12 +163,12 @@
                             render: function(data, type, row) {
                                 return `
                                     <div class="action-buttons">
-                                        <button type="button" class="btn btn-info waves-effect waves-light edit-btn tooltipped"
-                                                data-position="top" data-tooltip="Editar" data-id="${row.pregunta_id}">
+                                        <button type="button" class="btn btn-azul waves-effect waves-light edit-btn tooltipped"
+                                                style="margin: 8px; margin-left:0px" data-position="top" data-tooltip="Editar" data-id="${row.pregunta_id}">
                                             <i class="ri-pencil-line"></i>
                                         </button>
-                                        <button type="button" class="btn btn-danger waves-effect waves-light eliminar-pregunta-btn tooltipped"
-                                                data-position="top" data-tooltip="Eliminar" data-id="${row.pregunta_id}">
+                                        <button type="button" class="btn btn-rojo waves-effect waves-light eliminar-pregunta-btn tooltipped"
+                                                style="margin: 8px; margin-left:0px" data-position="top" data-tooltip="Eliminar" data-id="${row.pregunta_id}">
                                             <i class="ri-delete-bin-6-line"></i>
                                         </button>
                                     </div>
@@ -607,7 +649,7 @@
 
                     // 1. Cargar la pregunta con sus datos completos
                     $.ajax({
-                        url: "{{ url('psicometricas/admin/gpreguntas') }}/" + preguntaId,
+                        url: "{{ url('psicometricas/admin/preguntas') }}/" + preguntaId,
                         type: 'GET',
                         dataType: 'json',
                         success: function(pregunta) {
@@ -801,7 +843,7 @@
                     const preguntaId = $(this).data('id');
                     Swal.fire({
                         title: '¿Eliminar Pregunta?',
-                        text: "Esta acción no se puede deshacer",
+                        text: "Esta acción no se puede deshacer.",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#f44336',

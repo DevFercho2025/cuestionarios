@@ -68,7 +68,7 @@
                 <div class="card-panel dark-gradient">
                     <div class="row valign-wrapper mb-0">
                         <div class="col s8">
-                            <h4 class="white-text">Gestión de Códigos y evaluaciones</h4>
+                            <h4 class="white-text">Gestión de Códigos y configuración de evaluaciones</h4>
                         </div>
                     </div>
                 </div>

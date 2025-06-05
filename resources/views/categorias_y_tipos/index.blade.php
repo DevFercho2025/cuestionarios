@@ -38,11 +38,46 @@
             color: white;
             background-color: #8b1a1a;
         }
+
+        .categoria-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            height: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .categoria-text {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            white-space: nowrap;
+        }
+
+            
+        .categoria-buttons {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            align-items: flex-end;
+        }
+
+        .categoria-buttons > button {
+            width: 50px;
+            height: 32px;
+            font-size: 12px;
+            padding: 4px 8px;
+            box-sizing: border-box;
+        }
     </style>
 </head>
     <div class="container">
         <!-- Encabezado -->
-        <div class="row">
+         <div class="row">
             <div class="col s12">
                 <div class="card-panel dark-gradient">
                     <div class="row valign-wrapper mb-0">
@@ -50,14 +85,17 @@
                             <h4 class="white-text">Gestión de Categorías y Tipos de Pruebas</h4>
                         </div>
                         <div class="col s4 right-align">
-                            <a id="createCategoriaBtn" class="btn btn-large gradient-btn pulse">
-                               Nueva categoría
+                        <div style="text-align: right;">
+                            <a id="createCategoriaBtn" class="btn btn-large gradient-btn pulse" style="color: white; display: inline-block; background-color:#4f52b5">
+                            Crear una nueva Categoría
                             </a>
+                        </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <!-- Tabla de Categorias y sus tipos -->
         <div class="row">
             <div class="col s12">
@@ -70,7 +108,6 @@
                                 <th>Título de la Categoría</th>
                                 <th>Id de Tipo</th>
                                 <th>Tipo</th>
-                                <th>Acciones</th>
                             </tr>
                             </thead>
                         </table>
@@ -160,33 +197,25 @@
                         render: function (data, type, row) {
 
                             return `
-                                <div style="display: flex; flex-direction: column; align-items: start;">
-                                    <span style="margin-bottom: 6px;">${data}</span>
-                                    <button class="btn btn-sm btn-azul edit-btn" data-id="${row.category_id}" style="font-size: 12px;">
+                                <div class="categoria-grid">
+                                    <div class="categoria-text">${data}</div>
+                                    <div class="categoria-buttons">
+                                        <button class="btn btn-sm btn-azul waves-effect waves-light edit-btn tooltipped"
+                                                data-id="${row.category_id}" title="Editar esta categoría" style="font-size: 12px;">
                                         <i class="ri-edit-2-line" style="margin-right: 4px;"></i>
-                                    </button>
-                                </div> 
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-rojo waves-effect waves-light delete-btn tooltipped"
+                                                data-id="${row.category_id}" title="Eliminar esta categoría">
+                                        <i class="ri-delete-bin-6-line"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             `;
                         }
                     },
                     { data: 'type_id', title: 'Id de Tipo' },
                     { data: 'type_name', title: 'Tipo' },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `
-                                <div class="action-buttons">
-
-                                    <button type="button" class="btn btn-rojo waves-effect waves-light delete-btn tooltipped"
-                                            data-position="top" data-tooltip="Eliminar" data-id="${row.type_id}">
-                                        <i class="ri-delete-bin-6-line"></i>
-                                    </button>
-                                </div>
-                            `;
-                        },
-                        orderable: false,
-                        searchable: false
-                    }
                 ],
                 responsive: true,
                 drawCallback: function () {
@@ -198,8 +227,16 @@
                     api.column(0, { page: 'current' }).data().each(function(categoryId, i) {
                         if (last !== categoryId) {
                             if (last !== null) {
-                                $(rows).eq(i - rowspan).find('td').eq(0).attr('rowspan', rowspan).show();
-                                $(rows).eq(i - rowspan).find('td').eq(1).attr('rowspan', rowspan).show();
+                                // Medir altura combinada
+                                let combinedHeight = 0;
+                                for (let r = i - rowspan; r < i; r++) {
+                                    combinedHeight += $(rows).eq(r).height();
+                                }
+                                // Aplicar altura al td con rowspan
+                                let td0 = $(rows).eq(i - rowspan).find('td').eq(0);
+                                let td1 = $(rows).eq(i - rowspan).find('td').eq(1);
+                                td0.attr('rowspan', rowspan).show().css('height', combinedHeight + 'px');
+                                td1.attr('rowspan', rowspan).show().css('height', combinedHeight + 'px');
                             }
                             last = categoryId;
                             rowspan = 1;
@@ -212,9 +249,19 @@
 
                     // Último grupo
                     if (last !== null) {
-                        var count = api.rows({ page: 'current' }).count();
-                        $(rows).eq(count - rowspan).find('td').eq(0).attr('rowspan', rowspan).show();
-                        $(rows).eq(count - rowspan).find('td').eq(1).attr('rowspan', rowspan).show();
+                        let count = api.rows({ page: 'current' }).count();
+                        let combinedHeight = 0;
+                        for (let r = count - rowspan; r < count; r++) {
+                            combinedHeight += $(rows).eq(r).height();
+                        }
+                        let td0 = $(rows).eq(count - rowspan).find('td').eq(0);
+                        let td1 = $(rows).eq(count - rowspan).find('td').eq(1);
+                        td0.attr('rowspan', rowspan).show().css('height', combinedHeight + 'px');
+                        td1.attr('rowspan', rowspan).show().css('height', combinedHeight + 'px');
+                    }
+
+                    if (typeof M !== 'undefined') {
+                        M.Tooltip.init(document.querySelectorAll('.tooltipped'));
                     }
                 },
                 initComplete: function () {
