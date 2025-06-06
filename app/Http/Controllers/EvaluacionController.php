@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Test;
-use App\Models\User;
+use App\Models\Respuesta_Usuario;
+use App\Models\Pregunta;  
+use App\Models\UserTestRecord;
 use App\Models\userAssignedTest;
 use App\Models\ContadorEvaluacion;
 use Illuminate\Support\Facades\Auth;
@@ -21,32 +24,82 @@ class EvaluacionController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
+            'access_code_id' => 'required|integer',
         ]);
 
-        $user = User::find($request->user_id);
+        $userId = $request->user_id;
+        $accessCodeId = $request->access_code_id;
 
-        $asignadas = $user->assignedTests()->pluck('test_id');
+        #Buscar las evaluaciones ya asignadas al usuario en este código
+        $testsYaAsignados = userAssignedTest::where('user_id', $userId)
+            ->where('application_access_code_id', $accessCodeId)
+            ->pluck('test_id');
 
-        $pruebasDisponibles = Test::whereNotIn('id', $asignadas)
-                                ->select('id', 'test_title')
-                                ->get();
+        #Mostrar las evalauciones que aún no están asignadas en ese código
+        $testsDisponibles = Test::whereNotIn('id', $testsYaAsignados)
+            ->select('id', 'test_title')
+            ->get();
 
-        return response()->json($pruebasDisponibles);
-        $pruebas = Test::select('id', 'test_title')->get();
-        return response()->json($pruebas);
+        return response()->json($testsDisponibles);
     }
 
-    public function asignarCategorias(Request $request)
+    public function verificarEvaluacionesPrevias(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id', //usuario al que se le asignan evaluaciones
+            'user_id' => 'required|exists:users,id',
             'pruebas' => 'required|array',
             'pruebas.*' => 'exists:psico_alobri_tests,id',
         ]);
-    
+
+        $userId = $request->user_id;
+        $pruebas = $request->pruebas;
+
+        $hace6Meses = Carbon::now()->subMonths(6);
+        $testsRecientes = [];
+
+        foreach ($pruebas as $testId) {
+            $registroReciente = UserTestRecord::where('user_id', $userId)
+                ->where('test_id', $testId)
+                ->whereNotNull('finished_at')
+                ->where('finished_at', '>=', $hace6Meses)
+                ->first();
+
+            if ($registroReciente) {
+                $testsRecientes[] = [
+                    'test_title' => Test::find($testId)->test_title,
+                    'finished_at' => $registroReciente->finished_at->toDateTimeString(),
+                ];
+            }
+        }
+
+        if (count($testsRecientes) > 0) {
+            return response()->json([
+                'has_previous' => true,
+                'tests' => $testsRecientes,
+            ]);
+        } else {
+            return response()->json([
+                'has_previous' => false
+            ]);
+        }
+    }
+
+    public function asignarEvaluacion(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id', // usuario al que se le asignan evaluaciones
+            'pruebas' => 'required|array',
+            'pruebas.*' => 'exists:psico_alobri_tests,id',
+            'force' => 'sometimes|boolean|in:true,false,1,0,TRUE,FALSE',
+            'access_code_id' => 'required|exists:psico_alobri_application_access_codes,id',
+        ]);
+
         try {
-            $asignadorId = Auth::id();  //usuario que asigna las evaluaciones
+            $asignadorId = Auth::id();  // usuario que asigna las evaluaciones
+            $companyId = Auth::user()->config?->Company?->id;
+
             $contador = ContadorEvaluacion::where('user_id', $asignadorId)->first();
+
             if (!$contador) {
                 return response()->json([
                     'success' => false,
@@ -61,21 +114,50 @@ class EvaluacionController extends Controller
                 ], 403);
             }
 
-            foreach ($request->pruebas as $pruebaId) {
+            $userId = $request->user_id;
+            $pruebas = $request->pruebas;
+            $borrarRespuestas = $request->boolean('force', false);
+
+            foreach ($pruebas as $testId) {
+
+                //si se borran respuestas anteriores
+                if ($borrarRespuestas) {
+
+                    $preguntasIds = Pregunta::where('test_id', $testId)->pluck('id');
+                    $tokens = UserTestRecord::where('user_id', $userId)
+                        ->where('test_id', $testId)
+                        ->pluck('token_id');
+
+                    Respuesta_Usuario::where('user_id', $userId)
+                        ->whereIn('question_id', $preguntasIds)
+                        ->whereIn('token_id', $tokens)
+                        ->delete();
+
+                    UserTestRecord::where('user_id', $userId)
+                        ->where('test_id', $testId)
+                        ->delete();
+                }
+
+                // Asignar prueba
                 $created = userAssignedTest::firstOrCreate([
-                    'user_id' => $request->user_id,
-                    'test_id' => $pruebaId,
+                    'user_id' => $userId,
+                    'test_id' => $testId,
+                    'application_access_code_id' => $request->access_code_id,
+                    'company_id' => $companyId,
                 ]);
 
-                #Actualiza el contador para el asignador de evaluaciones (el usuario logueado)
                 if ($created->wasRecentlyCreated) {
                     $contador->decrement('available_tests');
                     $contador->increment('used_tests');
                 }
             }
 
-            return response()->json(['success' => true, 'message' => 'Evaluaciones asignadas']);
-
+            return response()->json([
+                'success' => true,
+                'message' => $borrarRespuestas
+                    ? 'Evaluaciones asignadas y respuestas anteriores eliminadas.'
+                    : 'Evaluaciones asignadas sin borrar respuestas anteriores.',
+            ]);
         } catch (\Exception $e) {
             Log::error('Error al asignar evaluaciones: ' . $e->getMessage(), [
                 'exception' => $e,
@@ -85,12 +167,20 @@ class EvaluacionController extends Controller
         }
     }
 
-    public function evaluacionesPorUsuario($user_id)
+    public function evaluacionesPorUsuario(Request $request, $user_id)
     {
-        $evaluaciones = userAssignedTest::where('user_id', $user_id)
-            ->with('test:id,test_title')
-            ->get()
-            ->pluck('test');
+        $request->validate([
+            'code_id' => 'required|exists:psico_alobri_application_access_codes,id',
+        ]);
+
+        $codeId = $request->input('code_id');
+
+         $evaluaciones = userAssignedTest::with('test')
+                ->where('user_id', $user_id)
+                ->where('application_access_code_id', $codeId)
+                ->with('test:id,test_title')
+                ->get()
+                ->pluck('test');
 
         return response()->json($evaluaciones);
     }

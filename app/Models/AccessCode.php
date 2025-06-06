@@ -14,4 +14,9 @@ class AccessCode extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function assignedTests()
+    {
+        return $this->hasMany(userAssignedTest::class, 'application_access_code_id');
+    }
 }

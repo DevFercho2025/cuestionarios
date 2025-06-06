@@ -19,10 +19,10 @@
             <div class="col s12">
                 @if ($tests->isEmpty())
                     <div class="center-align" style="margin-top: 40px;">
+                        <h5>Para la vacante: <span>{{ $aplicacion->vacancy}}</span><br>Código: <span>{{ $aplicacion->code}}</span></h5>
                         <p class="flow-text grey-text text-darken-1">No tienes evaluaciones asignadas por el momento.</p>
                     </div>
                 @else
-                <h5>Para la vacante: <span>{{ $aplicacion->vacancy ?? 'N/A' }}</span><br>Código: <span>{{ $aplicacion->code ?? 'N/A' }}</span></h5>
                     @foreach ($tests as $test)
                         <div class="card dark-card z-depth-3 mb-4">
                             <div class="card-header">

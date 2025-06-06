@@ -38,6 +38,7 @@ class CandidateController extends Controller
     
         // Autenticar al usuario
         Auth::login($usuario);
+        session(['codigo_actual_id' => $codigo->id]);
     
         // Redirigir al dashboard
         return redirect()->route('candidate.dashboard');
@@ -46,16 +47,19 @@ class CandidateController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
+        $codigoActualId = session('codigo_actual_id');
 
-        $aplicacion = AccessCode::where('user_id', $user->id)->first();
+        $aplicacion = AccessCode::find($codigoActualId);
 
         $seccionesCompletadas = Respuesta_Usuario::where('user_id', $user->id)
             ->join('psico_alobri_questions', 'psico_alobri_user_answers.question_id', '=', 'psico_alobri_questions.id')
             ->pluck('psico_alobri_questions.section_id')
             ->unique()
             ->toArray();
+        
+    
+        $tests = $user->assignedTestsPorCodigo($codigoActualId)->get();//aparece error de undefined method pero funciona correctamente
 
-        $tests = $user->assignedTests;
         $secciones = $tests->load('sections');
 
         return view('candidate.evaluaciones', compact('user', 'tests', 'secciones', 'seccionesCompletadas', 'aplicacion'));

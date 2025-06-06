@@ -63,6 +63,13 @@ class User extends Authenticatable
         return $this->belongsToMany(Test::class, 'psico_alobri_user_assigned_tests', 'user_id', 'test_id');
     }
 
+    public function assignedTestsPorCodigo($codigoId)
+    {
+        return $this->assignedTests()
+            ->withPivot(['application_access_code_id', 'company_id'])//trae info de la compañía
+            ->wherePivot('application_access_code_id', $codigoId);//filtra por código
+    }
+
     public function isTalentinaUser()
     {
         return $this->config && $this->config->is_talentina_user;

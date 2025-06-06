@@ -73,7 +73,8 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
         Route::get('/evaluaciones', [EvaluacionController::class, 'index'])->name('evaluaciones.index');
         Route::get('/aplicaciones/datatable', [AplicacionController::class, 'datatable'])->name('admin.aplicaciones.datatable');
         Route::get('/categorias/listar', [EvaluacionController::class, 'listarCategorias'])->name('admin.categorias.listar');
-        Route::post('/evaluaciones/asignar', [EvaluacionController::class, 'asignarCategorias'])->name('admin.evaluaciones.asignar');
+        Route::post('/evaluaciones/verificar', [EvaluacionController::class, 'verificarEvaluacionesPrevias'])->name('admin.evaluaciones.verificarPrevias');
+        Route::post('/evaluaciones/asignar', [EvaluacionController::class, 'asignarEvaluacion'])->name('admin.evaluaciones.asignar');
         Route::get('/evaluaciones/usuario/{user_id}', [EvaluacionController::class, 'evaluacionesPorUsuario']);
         Route::delete('/aplicaciones/{id}', [AplicacionController::class, 'destroy']);
         Route::post('/evaluaciones/eliminar', [EvaluacionController::class, 'eliminarAsignacion'])->name('admin.evaluaciones.eliminar');

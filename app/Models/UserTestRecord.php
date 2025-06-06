@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class UserTestRecord extends Model
+{
+    use HasFactory;
+    protected $table = 'psico_alobri_user_test_records';
+    protected $fillable = ['user_id', 'test_id','token_id','completed_sections','started_at','finished_at'];
+    public $timestamps = false;
+
+    #casts para que Laravel convierta datos en php
+    protected $casts = [
+        'started_at' => 'datetime',
+        'finished_at' => 'datetime',
+        'completed_sections' => 'array' //JSON, con id de las secciones
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function previouslyDonetest()
+    {
+        return $this->belongsTo(Test::class);
+    }
+
+    public function token()
+    {
+        return $this->belongsTo(TokenEvaluacion::class);
+    }
+}

@@ -186,13 +186,13 @@
                                     <div class="action-buttons" style="gap: 10px;">
                                         <button type="button" class="btn btn-azul waves-effect waves-light asignar-evaluacion-btn tooltipped"
                                             style="min-width: 50%; margin: 5px; margin-left:0px"
-                                            data-position="top" title="Asignar Evaluaciones" data-id="${row.user_id}">
+                                            data-position="top" title="Asignar Evaluaciones" data-user-id="${row.user_id}" data-code-id="${row.id}">
                                             <i class="ri-add-line"></i>
                                         </button>
 
                                         <button type="button" class="btn btn-secondary waves-effect waves-light ver-evaluaciones-btn tooltipped"
                                             style="min-width: 30%; margin: 5px; margin-left:0px"
-                                            data-position="top" title="Ver evaluaciones asignadas para este código" data-id="${row.user_id}">
+                                            data-position="top" title="Ver evaluaciones asignadas para este código" data-id="${row.user_id}" data-code-id="${row.id}">
                                             <i class="ri-eye-fill"></i>
                                         </button>
 
@@ -243,18 +243,176 @@
                     document.body.appendChild(swalScript);
                 }
 
-                //ver las evalauciones ya asignadas a un usuario
-                $(document).on('click', '.ver-evaluaciones-btn', function () {
-                    const userId = $(this).data('id');
+                //asignar una evaluación a un código
+                $(document).on('click', '.asignar-evaluacion-btn', function () {
+                    const userId = $(this).data('user-id');
+                    const accessCodeId = $(this).data('code-id');
+
                     setTimeout(() => {
                         $('.waves-ripple').remove();
                     }, 300);
 
-                    $.get(`/psicometricas/admin/evaluaciones/usuario/${userId}`, function (pruebas) {
+                    $.get("{{ route('admin.categorias.listar') }}", { user_id: userId, access_code_id: accessCodeId }, function (pruebas) {
+                        let opciones = pruebas.map(p => `
+                            <label class="custom-option">
+                                <input type="checkbox" value="${p.id}" name="pruebas[]" />
+                                ${p.test_title}
+                            </label>
+                        `).join('');
+
+                        Swal.fire({
+                            title: 'Asignar Evaluaciones',
+                            background: '#262b3c',
+                            color: '#fff',
+                            html: `
+                                <p>Selecciona una o varias pruebas:</p>
+                                <div id="pruebasSelect" style="max-height: 150px; overflow-y: auto;">
+                                    ${opciones}
+                                </div>
+                            `,
+                            showCancelButton: true,
+                            confirmButtonText: 'Asignar',
+                            cancelButtonText: 'Cancelar',
+                            confirmButtonColor: '#3d4e81',
+                            cancelButtonColor: '#d32f2f',
+                            preConfirm: () => {
+                                const seleccionadas = $('#pruebasSelect input[type="checkbox"]:checked').map(function () {
+                                    return $(this).val();
+                                }).get();
+
+                                if (!seleccionadas || seleccionadas.length === 0) {
+                                    Swal.showValidationMessage('Debes seleccionar al menos una prueba para asignar');
+                                    return false;
+                                }
+
+                                function verificarEvaluacionesPrevias(userId, pruebas) {
+                                    return $.ajax({
+                                        url: "{{ route('admin.evaluaciones.verificarPrevias') }}",
+                                        type: 'POST',
+                                        data: {
+                                            user_id: userId,
+                                            pruebas: pruebas,
+                                            _token: "{{ csrf_token() }}"
+                                        },
+                                        dataType: 'json'
+                                    });
+                                }
+
+                                function asignarEvaluaciones(pruebas, force) {
+                                    return $.ajax({
+                                        url: "{{ route('admin.evaluaciones.asignar') }}",
+                                        method: 'POST',
+                                        data: {
+                                            user_id: userId, 
+                                            pruebas: pruebas,
+                                            force: force ? 1 : 0,
+                                            access_code_id: accessCodeId,
+                                            _token: "{{ csrf_token() }}"
+                                        },
+                                        dataType: 'json'
+                                    });
+                                }
+
+                                // Primero verificamos si hay evaluaciones previas
+                                return verificarEvaluacionesPrevias(userId, seleccionadas).then(response => {
+                                    if (!response.has_previous) {
+                                        // No hay evaluaciones previas, asignar directo con force=false
+                                        return asignarEvaluaciones(seleccionadas, 0);
+                                    }
+
+                                    // Si hay evaluaciones previas, mostrar segundo Swal con advertencia
+                                    const testsHtml = response.tests.map(test => {
+                                        const fecha = new Date(test.finished_at);
+                                        const meses = [
+                                            "enero", "febrero", "marzo", "abril", "mayo", "junio",
+                                            "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+                                        ];
+                                        const dia = fecha.getDate();
+                                        const mes = meses[fecha.getMonth()];
+                                        const año = fecha.getFullYear();
+                                        const hora = fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                                        return `
+                                            <p><strong>Evaluación:</strong> ${test.test_title}</p>
+                                            <p><strong>Finalizada el:</strong> ${dia} de ${mes} de ${año}, a las ${hora}</p>
+                                            <br>
+                                            <p style="color: #e74c3c;">
+                                                ¿Quiere borrar las respuestas del candidato y requerir que realice la evaluación de nuevo?
+                                            </p>
+                                            <hr style="border-color: #444;">
+                                        `;
+                                    }).join('');
+
+                                    return Swal.fire({
+                                        title: 'Evaluaciones recientes detectadas',
+                                        html: `<p>Este candidato ya realizó algunas evaluaciones en los últimos 6 meses:</p>${testsHtml}`,
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        showDenyButton: true,
+                                        confirmButtonText: 'Sí, borrar respuestas y que haga la evaluación de nuevo',
+                                        denyButtonText: 'No, usar respuestas anteriores para el reporte de resultados',
+                                        cancelButtonText: 'Cancelar',
+                                        background: '#262b3c',
+                                        color: '#fff',
+                                        confirmButtonColor: '#d32f2f',
+                                        denyButtonColor: '#3d4e81',
+                                        cancelButtonColor: '#6c757d',
+                                    }).then(result => {
+                                        if (result.isConfirmed) {
+                                            // Asignar con force=true para borrar respuestas
+                                            return asignarEvaluaciones(seleccionadas, 1);
+                                        } else if (result.isDenied) {
+                                            // Asignar con force=false sin borrar respuestas
+                                            return asignarEvaluaciones(seleccionadas, 0);
+                                        } else {
+                                            // No asignar evaluaciones
+                                            return Promise.reject('cancelled');
+                                        }
+                                    });
+                                });
+                            }
+                        }).then(result => {
+                            // Resultado final de asignarEvaluaciones
+                            if (result && result.success) {
+                                Swal.fire({
+                                    title: '¡Éxito!',
+                                    text: result.message,
+                                    icon: 'success',
+                                    background: '#262b3c',
+                                    color: '#fff',
+                                    confirmButtonColor: '#3d4e81'
+                                });
+                            }
+                        }).catch(error => {
+                            if (error !== 'cancelled') {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: error.message || 'Hubo un problema al asignar las evaluaciones.',
+                                    icon: 'error',
+                                    background: '#262b3c',
+                                    color: '#fff',
+                                    confirmButtonColor: '#d32f2f'
+                                });
+                            }
+                        });
+                    });
+                });
+
+
+                //ver las evaluaciones ya asignadas a un usuario
+                $(document).on('click', '.ver-evaluaciones-btn', function () {
+                    const userId = $(this).data('id');
+                    const codeId = $(this).data('code-id');
+
+                    setTimeout(() => {
+                        $('.waves-ripple').remove();
+                    }, 300);
+
+                    $.get(`/psicometricas/admin/evaluaciones/usuario/${userId}?code_id=${codeId}`, function (pruebas) {
                         if (!pruebas || pruebas.length === 0) {
                             Swal.fire({
                                 title: 'Evaluaciones',
-                                text: 'Este usuario no tiene evaluaciones asignadas.',
+                                text: 'Este usuario no tiene evaluaciones asignadas para este código.',
                                 icon: 'info',
                                 background: '#262b3c',
                                 color: '#fff',
@@ -325,91 +483,6 @@
                         });
                     }).fail(function () {
                         Swal.fire('Error', 'No se pudo obtener la lista de evaluaciones.', 'error');
-                    });
-                });
-
-                //asignar una evaluación a un código
-                $(document).on('click', '.asignar-evaluacion-btn', function () {
-                    const userId = $(this).data('id');
-                    setTimeout(() => {
-                        $('.waves-ripple').remove();
-                    }, 300);
-
-                    $.get("{{ route('admin.categorias.listar') }}", { user_id: userId }, function (pruebas) {
-                        let opciones = pruebas.map(p => `
-                        <label class="custom-option">
-                            <input type="checkbox" value="${p.id}" name="pruebas[]" />
-                            ${p.test_title}
-                        </label>
-                        `).join('');
-
-                        Swal.fire({
-                            title: 'Asignar Evaluaciones',
-                            background: '#262b3c',
-                            color: '#fff',
-                            html: `
-                                <p>Selecciona una o varias pruebas:</p>
-                                <div id="pruebasSelect" style="max-height: 150px; overflow-y: auto;">
-                                    ${opciones}
-                                </div>
-                            `,
-                            showCancelButton: true,
-                            confirmButtonText: 'Asignar',
-                            cancelButtonText: 'Cancelar',
-                            confirmButtonColor: '#3d4e81',
-                            cancelButtonColor: '#d32f2f',
-                            preConfirm: () => {
-                                const seleccionadas = $('#pruebasSelect input[type="checkbox"]:checked').map(function () {
-                                        return $(this).val();
-                                    }).get();
-
-                                if (!seleccionadas || seleccionadas.length === 0) {
-                                    Swal.showValidationMessage('Debes seleccionar al menos una prueba para asignar');
-                                    return false;
-                                }
-
-                                return $.ajax({
-                                    url: "{{ route('admin.evaluaciones.asignar') }}",
-                                    type: 'POST',
-                                    data: {
-                                        user_id: userId,
-                                        pruebas: seleccionadas,
-                                        _token: "{{ csrf_token() }}"
-                                    },
-                                    dataType: 'json', 
-                                    success: function (response) {
-                                        if (response.success) {
-                                            Swal.fire({
-                                                title: '¡Éxito!',
-                                                text: response.message,
-                                                icon: 'success',
-                                                background: '#262b3c',
-                                                color: '#fff',
-                                                confirmButtonColor: '#3d4e81'
-                                            });
-                                        } else {
-                                            Swal.fire({
-                                                title: 'Error',
-                                                text: response.message || 'No se pudieron asignar las evaluaciones.',
-                                                icon: 'error',
-                                                background: '#262b3c',
-                                                color: '#fff',
-                                                confirmButtonColor: '#d32f2f'
-                                            });
-                                        }
-                                    },
-                                    error: function (xhr, status, error) {
-                                        let msg = 'Hubo un problema al asignar las evaluaciones.';
-
-                                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                                            msg = xhr.responseJSON.message;
-                                        }
-
-                                        Swal.fire('Error', msg, 'error');
-                                    }
-                                });
-                            }
-                        });
                     });
                 });
 
