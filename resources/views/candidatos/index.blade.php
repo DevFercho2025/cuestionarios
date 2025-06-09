@@ -67,10 +67,26 @@
                                 Gestionar y ver información de Candidatos sin Vacante
                             @endif
                         </h4>
-                        <button class="btn" style="white-space: nowrap; padding-right:20px; !important padding-left:20px; !important; background-color: #3d4e81; color:white;">Añadir un candidato</button>
+                        <button class="btn" id="btnAgregarCandidato" onclick="abrirModalCandidato()" style="white-space: nowrap; padding-right:20px; !important padding-left:20px; !important; background-color: #3d4e81; color:white;">Añadir un candidato</button>
                     </div>
                 </div>
             </div>
+        </div>
+
+
+        <!--Modal para insertar formulario de creación de candidatos-->
+        <!-- Modal -->
+        <div class="modal fade" id="modalCandidato" tabindex="-1" aria-labelledby="modalCandidatoLabel">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    @include('partials.form_crear_candidato')
+                </div>
+            </div>
+        </div>
         </div>
 
         <!-- Tabla de candidatos -->
@@ -543,6 +559,16 @@
                         alert('Ocurrió un error al inicializar la aplicación: ' + error.message);
                     }
                 }
+
         </script>
     @endpush
+
+    <script>
+    document.addEventListener('shown.bs.modal', function (e) {
+        if (e.target.id === 'modalCandidato') {
+        const selects = e.target.querySelectorAll('select');
+        M.FormSelect.init(selects);
+        }
+    });
+    </script>
 @endsection
