@@ -107,11 +107,17 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
+        $user = User::where('email', $request->email)->first();
+
+        if (!Hash::check($request->password, $user->password)) {
+            Log::error('El password no coincide.');
+            return back()->withErrors(['email' => 'Contraseña incorrecta.']);
+        }
         // 2) Intento de autenticación
         if (Auth::attempt($credentials)) {
 
             $user   = Auth::user();
-            $config = $user->config; // hasOne, no ->first()
+            $config = $user->config;
 
             //Si no hay configuración en config_users
             if (! $config) {
@@ -127,15 +133,16 @@ class AuthController extends Controller
 
 
             if ($config && $config->role && ($config->role->isAdmin() || $config->role->isSuperAdmin())) {
-                return redirect()->route('admin.index');
+                 Log::info('Usuario tiene el rol correcto:', ['rol' => $config->role->name]);
+                 return redirect()->route('admin.index');
             }
         }
 
-        //credenciales inválidas
-        Auth::logout();
-        return back()->withErrors([
-            'email' => 'Credenciales Incorrectas.',
-        ]);
+            //credenciales inválidas
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Credenciales Incorrectas.',
+            ]);
     }
 
 

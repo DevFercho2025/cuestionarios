@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class IsAdmin
 {
@@ -20,6 +20,7 @@ class IsAdmin
         if (!$request->user()) {
             abort(403, 'Acceso no autorizado.');
         }
+        
 
         $user = $request->user();
         $user->load('config');
@@ -30,6 +31,7 @@ class IsAdmin
             abort(403, 'Acceso no autorizado.');
         }
 
+        Log::info('Usuario permitido, continuando.');
         return $next($request);
     }
 }

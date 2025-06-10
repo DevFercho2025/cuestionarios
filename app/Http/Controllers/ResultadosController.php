@@ -35,6 +35,7 @@ class ResultadosController extends Controller
                 'config.role', 
                 'config.company', 
                 'tokensEvaluaciones',
+                'userTestsAcessCodes',
                 'assignedTests.sections',
                 'respuestasUsuario' => function($q) {
                     $q->join('psico_alobri_questions', 'psico_alobri_user_answers.question_id', '=', 'psico_alobri_questions.id')
@@ -63,7 +64,7 @@ class ResultadosController extends Controller
                     if (!$test) continue;
 
                     $seccionesCompletadasIds = $respuestasDelToken->pluck('section_id')->unique()->toArray();
-
+                    $accessCode = $test->pivot->application_access_code_id ?? 'Sin código';
                     $secciones = $test->sections;
                     $totalSecciones = $secciones->count();
 
@@ -81,6 +82,7 @@ class ResultadosController extends Controller
                         'nombre' => $user->name,
                         'cuestionario' => $test->test_title,
                         'secciones_completadas' => $seccionesCompletadasNombres,
+                        'access_code' => $accessCode ?? 'Sin código de acceso', 
                         'token' => $token,
                         'estado' => $estado,
                     ];

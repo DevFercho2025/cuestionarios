@@ -60,7 +60,7 @@ class User extends Authenticatable
 
     public function assignedTests()
     {
-        return $this->belongsToMany(Test::class, 'psico_alobri_user_assigned_tests', 'user_id', 'test_id');
+        return $this->belongsToMany(Test::class, 'psico_alobri_user_assigned_tests', 'user_id', 'test_id')->withPivot(['application_access_code_id']);
     }
 
     public function assignedTestsPorCodigo($codigoId)
@@ -70,14 +70,14 @@ class User extends Authenticatable
             ->wherePivot('application_access_code_id', $codigoId);//filtra por código
     }
 
-    public function isTalentinaUser()
-    {
-        return $this->config && $this->config->is_talentina_user;
-    }
-
     public function userTestsAcessCodes()
     {
         return $this->hasMany(AccessCode::class);
+    }
+
+    public function isTalentinaUser()
+    {
+        return $this->config && $this->config->is_talentina_user;
     }
     
     #cambiar a userTokens()

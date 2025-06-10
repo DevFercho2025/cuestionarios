@@ -87,6 +87,7 @@
                                 <th>Nombre candidato</th>
                                 <th>Evaluación</th>
                                 <th>Secciones evaluadas</th>
+                                <th>ID de Codigo de acceso</th>
                                 <th>Estado</th>
                                 <th>Seleccionar Evaluación</th>
                             </tr>
@@ -197,6 +198,7 @@
                                 }).join('<br>');
                             }
                         },
+                        {  data: 'access_code'},
                         {data: 'estado'},
                         {data: 'token',
                             className: 'select-checkbox',
