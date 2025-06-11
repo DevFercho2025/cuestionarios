@@ -27,12 +27,10 @@
         let rangoInicio = {{ $rango_inicio }};
         let rangoFin = {{ $rango_fin }};
 
-        let seccionId = @json($seccion_id);
+        let seccionId = @json($section_id);
 
         let cameraRequired = {{ $cameraRequired }};
         let locationRequired = {{ $locationRequired }};
-        console.log(`Verificando si se pasó correctamente configuración. Camara: ${cameraRequired}, Ubicacion: ${locationRequired}`);
-
     </script>
     
     <script>
@@ -158,7 +156,7 @@
 
         <script>
             function cargarForm(seccionId) {
-                let url = "{{ route('candidate.cargar.formulario') }}?seccion_id=" + seccionId + "&cameraRequired=" + cameraRequired 
+                let url = "{{ route('candidate.cargar.formulario') }}?section_id=" + seccionId + "&cameraRequired=" + cameraRequired 
               + "&locationRequired=" + locationRequired;
 
                 fetch(url)

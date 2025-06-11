@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccessCode;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ImagenUsuario;
 use App\Models\Respuesta_Usuario;
@@ -27,14 +28,14 @@ class FormularioController extends Controller
     public function mostrarPermisos(Request $request)
     {
         $categoria_id = $request->query('categoria_id'); 
-        $seccion_id = $request->query('seccion_id'); 
+        $section_id = $request->query('section_id'); 
         
         $user = Auth::user();
-        $aplicacion = Aplicacion::where('user_id', $user->id)->first();
+        $aplicacion = AccessCode::where('user_id', $user->id)->first();
         $cameraRequired = $aplicacion->camera;
         $locationRequired = $aplicacion->location;
         
-        return view('candidate.permisos', compact('categoria_id', 'seccion_id', 'cameraRequired', 'locationRequired'));
+        return view('candidate.permisos', compact('categoria_id', 'section_id', 'cameraRequired', 'locationRequired'));
     }
 
     public function guardarCandidato(Request $request)
@@ -45,14 +46,13 @@ class FormularioController extends Controller
     public function cargarFormulario(Request $request)
     {
         try {
-            
             $user = Auth::user();
             
             if (!$user) {
                 return response()->json(['error' => 'Usuario no autenticado'], 401); // Si no está autenticado, retorna un error
             }
 
-            $seccion_id = $request->query('seccion_id');
+            $seccion_id = $request->query('section_id');
             if (!$seccion_id) {
                 return response()->json(['error' => 'El parámetro seccion_id es obligatorio'], 400);
             }
@@ -60,37 +60,39 @@ class FormularioController extends Controller
             $cameraRequired = $request->query('cameraRequired');
             $locationRequired = $request->query('locationRequired');
 
-            /*$preguntas = Pregunta::with([
-                'respuestas' => function ($query) {
-                    $query->select('respuesta_id', 'pregunta_id', 'respuesta', 'opcion');
-                }
-            ])
-            ->where('seccion_id', $seccion_id)
-            ->get()
-            ->shuffle();*/
-
-            $preguntas = Pregunta::select('pregunta_id', 'seccion_id', 'pregunta', 'cuestionario', 'required')
-            ->with([
-                'respuestas:respuesta_id,pregunta_id,respuesta,opcion',
-                'seccion:id,categoria_id,titulo,time_at,bloque'
-            ])
-            ->where('seccion_id', $seccion_id)
-            ->get()
-            ->shuffle();
-
-            $cantidadRepeticiones = min(intval($preguntas->count() * 0.06), 5);
-            $preguntasRepetidas = $preguntas->random($cantidadRepeticiones);
-    
-            $preguntas = $preguntas->concat($preguntasRepetidas)->shuffle();
-    
-            $secciones = Seccion::find($seccion_id);
-    
-            foreach ($preguntas as $pregunta) {
-                $pregunta->tiempoRestante = gmdate("i:s", strtotime($pregunta->seccion->time_at) - strtotime('00:00:00'));
+             // Obtener la sección con preguntas, respuestas, y tipo de pregunta
+        $seccion = Seccion::with([
+            'test:id,test_title',
+            'questions' => function ($query) {
+                $query->select('id', 'section_id', 'question', 'test_id', 'required', 'question_type_id')
+                ->with([
+                    'respuestas:id,question_id,answer,option,is_correct',
+                    'questionType:id,name,slug'
+                ]);
             }
-    
-            $candidato = $user;
-            return view('candidate.formulario.parcial', compact('preguntas', 'secciones', 'candidato', 'seccion_id', 'cameraRequired', 'locationRequired'));
+        ])->findOrFail($seccion_id);
+
+        // Obtener preguntas y aplicar lógica de repetición aleatoria
+        $preguntas = $seccion->questions->shuffle();
+        $cantidadRepetidas = min(intval($preguntas->count() * 0.06), 5);
+        $preguntasRepetidas = $preguntas->random($cantidadRepetidas);
+        $preguntas = $preguntas->concat($preguntasRepetidas)->shuffle();
+
+        // Agregar campo de tiempo restante para cada pregunta (con base en la sección)
+        $tiempoSeccion = strtotime($seccion->time_at) - strtotime('00:00:00');
+        foreach ($preguntas as $pregunta) {
+            $pregunta->tiempoRestante = gmdate("i:s", $tiempoSeccion);
+        }
+
+        return view('candidate.formulario.parcial', [
+            'preguntas' => $preguntas,
+            'seccion' => $seccion,
+            'testTitulo' => $seccion->test->test_title,
+            'candidato' => $user,
+            'seccion_id' => $seccion_id,
+            'cameraRequired' => $cameraRequired,
+            'locationRequired' => $locationRequired
+        ]);
     
         } catch (\Exception $e) {
             Log::error("Error en cargarFormulario: " . $e->getMessage(), [

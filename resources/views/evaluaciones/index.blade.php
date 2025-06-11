@@ -382,12 +382,26 @@
                                     color: '#fff',
                                     confirmButtonColor: '#3d4e81'
                                 });
+                            } else if (result && result.success === false) {
+                                Swal.fire({
+                                    title: 'No se pudo asignar',
+                                    text: result.message || 'No fue posible completar la asignación.',
+                                    icon: 'warning',
+                                    background: '#262b3c',
+                                    color: '#fff',
+                                    confirmButtonColor: '#d32f2f'
+                                });
                             }
                         }).catch(error => {
                             if (error !== 'cancelled') {
+                                let msg = 'Hubo un problema al asignar las evaluaciones.';
+                                if (error && error.responseJSON && error.responseJSON.message) {
+                                    msg = error.responseJSON.message;
+                                }
+
                                 Swal.fire({
                                     title: 'Error',
-                                    text: error.message || 'Hubo un problema al asignar las evaluaciones.',
+                                    text: msg,
                                     icon: 'error',
                                     background: '#262b3c',
                                     color: '#fff',

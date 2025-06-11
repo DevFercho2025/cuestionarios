@@ -164,6 +164,11 @@ class EvaluacionController extends Controller
                 'user_id' => Auth::id(),
                 'request_data' => $request->all(),
             ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrió un error inesperado al asignar las evaluaciones. Por favor, intenta nuevamente o contacta a soporte.'
+            ], 500);
         }
     }
 

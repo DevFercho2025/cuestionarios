@@ -152,7 +152,7 @@
 
     <div class="barra-Superior d-flex align-items-center justify-content-between">
         <div class="barra-titulo-cuestionario flex-grow-1 text-center">
-            <h1 style="color: rgba(51,58,153,255);">{{ $preguntas->first()->cuestionario }}</h1>
+            <h1 style="color: rgba(51,58,153,255);">{{ $preguntas->first()->test->test_title }}</h1>
 
             <!--@ foreach ($ preguntas a s $ pregunta)
                 @ if ($ loop- >f irst)
@@ -207,7 +207,7 @@
                 @php $numPregunta = 0; @endphp
 
                 @foreach ($preguntas as $pregunta)
-
+                    <pre>{{ $pregunta->questionType->slug ?? 'SIN SLUG' }}</pre>
                     <div class="pregunta" id="pregunta-{{ $numPregunta }}" style="display: {{ $numPregunta == 0 ? 'block' : 'none' }};">
                         <div class="card shadow rounded p-3 m-4">
                             <div class="card-body">
@@ -221,18 +221,10 @@
                                 <div class="d-flex" id="Respuestas">
                                     <div class="form-check d-block">
                                         @if (!empty($pregunta->respuestas) && is_iterable($pregunta->respuestas))
-                                            @foreach ($pregunta->respuestas as $respuesta)
-                                                <div class="form-check">
-                                                    <input class="form-check-input respuesta" type="radio"
-                                                        name="respuestas[{{$pregunta->pregunta_id}}]"
-                                                        value="{{ $respuesta->respuesta_id }}"
-                                                        data-pregunta="{{ $numPregunta }}"
-                                                        @if($pregunta->required) required @endif>
-                                                    <label class="form-check-label">
-                                                        {{ $respuesta->opcion }}&#41; {{ $respuesta->respuesta }}
-                                                    </label>
-                                                </div>
-                                            @endforeach
+                                           @includeIf('question_types.' . $pregunta->questionType->slug, [
+                                                'pregunta' => $pregunta,
+                                                'numPregunta' => $numPregunta
+                                            ])
                                         @elseif($pregunta->required)
                                             <div class="alert alert-danger">Esta pregunta es requerida.</div>
                                         @endif

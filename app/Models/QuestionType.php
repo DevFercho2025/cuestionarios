@@ -10,7 +10,7 @@ class QuestionType extends Model
 
     #define qué tabla es preguntas
     protected $table = "psico_alobri_question_types";
-    protected $fillable = ["name", "description"];
+    protected $fillable = ["name", "description", "slug"];
 
     public $timestamps = false;
 

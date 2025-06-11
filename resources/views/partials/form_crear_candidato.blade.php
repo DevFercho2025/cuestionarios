@@ -270,6 +270,8 @@
         </div>
         
 <script>
+
+    let modalCandidato;
     let formData = {
         //info adicional candidato
         genero_legal: null,
@@ -327,12 +329,12 @@
 
             fetch(form.action, {
                 method: 'POST',
-                body: formDataObj, // Enviar los datos del formulario
+                body: formDataObj,
                 headers: {
-                    'Accept': 'application/json', // Esperamos una respuesta JSON
+                    'Accept': 'application/json', //Esperar una respuesta JSON
                 }
             })
-                .then(response => response.json()) // Parsear la respuesta JSON
+                .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         form.reset();
@@ -347,9 +349,14 @@
                             email: null,
                         };
 
-                        // Reiniciar el stepper al primer paso si deseas
+                        // Reiniciar el stepper al primer paso
                         if (window.bsStepper) {
                             window.bsStepper.to(1);
+                        }
+                        const modalEl = document.getElementById('modalCandidato');
+                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                        if (modalInstance) {
+                            modalInstance.hide();
                         }
                         // Mostrar un mensaje de éxito con SweetAlert2
                         Swal.fire({
@@ -513,7 +520,7 @@
         console.error('Modal no encontrado');
         return;
     }
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
+    const modalCandidato = new bootstrap.Modal(modalElement);
+    modalCandidato.show();
     };
 </script>
