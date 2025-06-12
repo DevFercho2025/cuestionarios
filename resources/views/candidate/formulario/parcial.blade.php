@@ -263,18 +263,5 @@
                 </div>
             @endif
         </div>
-        <div class="progreso-Seccion">
-            <div class="circulo-Progreso">
-                <span class="valor-Progreso">0%</span>
-            </div>
-            @php
-                $idSeccionActual = $preguntas->first()->seccion->id;
-            @endphp
-
-            <div class="texto-Progreso" style="text-align: center" data-id-seccion="{{ $idSeccionActual }}">
-                {{ $preguntas->first()->seccion->titulo }}
-            </div>
-        </div>
-
     </div>
 </div>

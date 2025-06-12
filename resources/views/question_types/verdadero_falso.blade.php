@@ -6,7 +6,7 @@
             data-pregunta="{{ $numPregunta }}"
             @if($pregunta->required) required @endif>
         <label class="form-check-label">
-            {{ $respuesta->opyion }}&#41; {{ $respuesta->answer }}
+            {{ $respuesta->option }}&#41; {{ $respuesta->answer }}
         </label>
     </div>
 @endforeach
