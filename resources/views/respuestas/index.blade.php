@@ -92,11 +92,12 @@
                             <h4 class="white-text">Gestión de Respuestas</h4>
                         </div>
                         <div class="col s4 right-align">
-                        <div style="text-align: right;">
-                            <a id="createRespuestaBtn" class="btn btn-large gradient-btn pulse" style="color: white; display: inline-block; background-color:#4f52b5">
-                            Crear nueva respuesta
-                            </a>
-                        </div>
+                            <div style="text-align: right;">
+                                <a id="createRespuestaBtn" class="btn btn-large gradient-btn pulse"
+                                   style="color: white; display: inline-block; background-color:#4f52b5">
+                                    Crear nueva respuesta
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -127,13 +128,13 @@
         </div>
     </div>
 
-        <!-- jQuery y Scripts adicionales -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery y Scripts adicionales -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-        
+
         const pruebas = @json($pruebas);
-            
+
         if (typeof jQuery === 'undefined') {
             document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
         }
@@ -211,7 +212,7 @@
                                 return `<span data-id="${row.id}" data-field="question">${data ?? '-'}</span>`;
                             }
                         },
-                        { data: 'id' },
+                        {data: 'id'},
                         {
                             data: 'answer',
                             render: function (data, type, row) {
@@ -224,10 +225,10 @@
                                 return `<span class="editable" data-id="${row.id}" data-field="option">${data ?? '-'}</span>`;
                             }
                         },
-                        
+
                         {
                             data: 'is_correct',
-                            render: function(data, type, row) {
+                            render: function (data, type, row) {
                                 const icon = data ? '<i class="ri-check-line"></i>' : '<i class="ri-close-large-line"></i>';
                                 return `<span class="editable" data-id="${row.id}" data-field="is_correct" data-value="${data}">${icon}</span>`;
                             }
@@ -252,24 +253,24 @@
                             }
                         }
                     ],
-                    
+
                     responsive: true,
                     drawCallback: function () {
                         if (typeof M !== 'undefined') {
                             M.Tooltip.init(document.querySelectorAll('.tooltipped'));
                         }
                         var api = this.api();
-                        var rows = api.rows({ page: 'current' }).nodes();
+                        var rows = api.rows({page: 'current'}).nodes();
                         var preguntasProcesadas = {};
 
-                        api.column(0, { page: 'current' }).nodes().each(function (cell, i) {
+                        api.column(0, {page: 'current'}).nodes().each(function (cell, i) {
                             var pregunta = api.cell(cell).data();
 
                             if (pregunta && preguntasProcesadas[pregunta]) {
                                 cell.style.display = 'none'; // Oculta las preguntas repetidas
                             } else {
-                                var count = api.column(0, { page: 'current' }).data().filter((data) => data === pregunta).length;
-                                
+                                var count = api.column(0, {page: 'current'}).data().filter((data) => data === pregunta).length;
+
                                 if (pregunta) {
                                     cell.rowSpan = count;
                                     preguntasProcesadas[pregunta] = true;//Marca la pregunta como procesada
@@ -278,10 +279,10 @@
                         });
                     },
                     initComplete: function () {
-                        
+
                         $('#filtroPruebaContainer').remove();
 
-                       const pruebas = @json($pruebas);
+                        const pruebas = @json($pruebas);
 
                         let options = '<option value="">Todos</option>';
                         pruebas.forEach(p => {
@@ -329,16 +330,16 @@
                             }
                         });
 
-                        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
                             const rowNode = table.row(dataIndex).node(); // Obtiene el nodo de la fila
                             const isCorrect = $(rowNode).find('td span[data-field="is_correct"]').attr('data-value'); // Obtiene el valor oculto
-                            
+
                             return $('#filtrarCorrectas').is(':checked') ? isCorrect === '1' : true;
                         });
 
                         // Evento para activar/desactivar el filtro
                         $('#filtrarCorrectas').on('change', function () {
-                            
+
                             table.draw();
                         });
                     },
@@ -372,9 +373,9 @@
                                 <option value="0">❌ Incorrecto</option>
                             </select>
                         `);
-                        
+
                         // Ajustar valor inicial detectando el ícono existente
-                        const isChecked = originalHTML.includes('ri-check-line'); 
+                        const isChecked = originalHTML.includes('ri-check-line');
                         editor.val(isChecked ? '1' : '0');
                     } else {
                         editor = $('<input type="text" class="inline-input"/>')
@@ -401,7 +402,7 @@
                         // Si no hay cambios, restaurar contenido original con íconos
                         if ((field === 'is_correct' && ((originalHTML.includes('ri-check-line') ? '1' : '0') === newValue)) ||
                             (field !== 'is_correct' && newValue === span.text().trim())) {
-                            
+
                             const restored = $('<span>')
                                 .addClass('editable')
                                 .attr('data-id', id)
@@ -424,7 +425,7 @@
                             .html(updatedHTML);
 
                         editor.replaceWith(restored);
-                    
+
 
                         // Enviar AJAX
                         $.ajax({
@@ -487,7 +488,7 @@
 
 
                 //crear una respuesta
-                $("#createRespuestaBtn").click(function() {
+                $("#createRespuestaBtn").click(function () {
                     if (typeof Swal === 'undefined') {
                         alert('Falta SweetAlert2');
                         return;
@@ -497,7 +498,7 @@
                         url: "{{ route('tests.withAll') }}",
                         type: "GET",
                         dataType: "json",
-                        success: function(tests) {
+                        success: function (tests) {
                             if (!Array.isArray(tests) || tests.length === 0) {
                                 Swal.fire('Error', 'No hay tests disponibles para seleccionar.', 'error');
                                 return;
@@ -542,8 +543,8 @@
                             let questionOptions = selectedSectionId ? makeQuestionOptions(selectedTestId, selectedSectionId) : '<option value="" disabled selected>No hay preguntas</option>';
 
                             let firstQuestionId = tests[0]?.sections[0]?.questions[0]?.id;
-                            let firstQuestionType = getQuestionType(firstQuestionId, tests);
-                            
+                            let firstQuestionType = firstQuestionId ? getQuestionType(firstQuestionId, tests) : 1; // Default a 1
+
                             Swal.fire({
                                 html: `
                                     <div class="col-md mb-6 mb-md-0">
@@ -573,17 +574,17 @@
                                                     <label>Respuestas</label>
                                                      ${generateRespuestaHTML(firstQuestionType)}
                                                 </div>
-                                                ${firstQuestionType === "10" ? '' : `
-                                                    <button type="button" id="add-respuesta-btn" class="btn btn-azul mt-2" style="width:100%;">
-                                                        + Añadir respuesta
-                                                    </button>
-                                                `}
+                                            ${firstQuestionType === 10 ? '' : `
+                                                <button type="button" id="add-respuesta-btn" class="btn btn-azul mt-2" style="width:100%;">
+                                                    + Añadir respuesta
+                                                </button>
+                                            `}
                                             </div>
                                         </div>
                                     </div>
                                 `,
-                                showClass: { popup: 'animate__animated animate__fadeInDown' },
-                                hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+                                showClass: {popup: 'animate__animated animate__fadeInDown'},
+                                hideClass: {popup: 'animate__animated animate__fadeOutUp'},
                                 focusConfirm: false,
                                 confirmButtonText: 'Crear',
                                 confirmButtonColor: '#3d4e81',
@@ -596,7 +597,7 @@
                                     const test_id = document.getElementById('swal-test_id').value;
                                     const section_id = document.getElementById('swal-section_id').value;
                                     const question_id = document.getElementById('swal-question_id').value;
-                                    
+
                                     const questionType = parseInt(document.getElementById('add-respuesta-btn').dataset.questionType || '1');
                                     const respuestas = [];
 
@@ -606,11 +607,11 @@
                                         const is_correct = input.querySelector('.is-correct').checked ? 1 : 0;
 
                                         if (questionType === 10) {
-                                            if (answer) respuestas.push({ answer });
+                                            if (answer) respuestas.push({answer});
                                         } else if (questionType === 3) {
-                                            if (answer && option) respuestas.push({ answer, option });
+                                            if (answer && option) respuestas.push({answer, option});
                                         } else {
-                                            if (answer && option) respuestas.push({ answer, option, is_correct });
+                                            if (answer && option) respuestas.push({answer, option, is_correct});
                                         }
                                     });
 
@@ -631,7 +632,7 @@
                                 didOpen: () => {
                                     const container = document.getElementById('respuestas-container');
                                     const addBtn = document.getElementById('add-respuesta-btn');
-                                    
+
                                     // Obtener tipo de la pregunta actual
                                     const questionSelect = document.getElementById('swal-question_id');
                                     const selectedQuestionId = parseInt(questionSelect.value);
@@ -643,7 +644,7 @@
                                     //ajustar forma de agregar respuesta según tipo
                                     container.innerHTML = generateRespuestaHTML(questionType);
                                     updateRemoveButtons();
-                                    
+
 
                                     addBtn.onclick = () => {
                                         const tipo = parseInt(addBtn.dataset.questionType);
@@ -660,7 +661,7 @@
                                         type: "POST",
                                         data: result.value,
                                         dataType: "json",
-                                        success: function(response) {
+                                        success: function (response) {
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: '¡Éxito!',
@@ -672,7 +673,7 @@
                                             });
                                             reloadTable();
                                         },
-                                        error: function(xhr) {
+                                        error: function (xhr) {
                                             let errorMsg = 'No se pudo crear la respuesta.';
                                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                                 errorMsg = xhr.responseJSON.message;
@@ -690,32 +691,32 @@
                             });
 
                             function getQuestionType(questionId, tests) {
-                                        for (const test of tests) {
-                                            for (const section of test.sections) {
-                                                const question = section.questions.find(q => q.id === questionId);
-                                                if (question) return parseInt(question.question_type_id);
-                                            }
-                                        }
-                                        return 1; // Default
+                                for (const test of tests) {
+                                    for (const section of test.sections) {
+                                        const question = section.questions.find(q => q.id === questionId);
+                                        if (question) return parseInt(question.question_type_id);
+                                    }
+                                }
+                                return 1; // Default
                             }
 
                             function generateRespuestaHTML(questionType) {
-                                        if (questionType === 3) {
-                                            return `
+                                if (questionType === 3) {
+                                    return `
                                                 <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                                                     <input type="text" class="form-control answer-text" placeholder="Elemento A" required style="flex:2;">
                                                     <input type="text" class="form-control option-text" placeholder="Elemento B" required style="flex:2;">
                                                     <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar par">×</button>
                                                 </div>
                                             `;
-                                        } else if (questionType === 10) {
-                                            return  `
+                                } else if (questionType === 10) {
+                                    return `
                                                 <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                                                     <input type="text" class="form-control answer-text" value="Respuesta abierta" disabled style="flex:4;">
                                                 </div>
                                             `;
-                                        } else {
-                                            return `
+                                } else {
+                                    return `
                                                 <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                                                     <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
                                                     <input type="text" class="form-control option-text" placeholder="Opción" required style="flex:2;">
@@ -723,13 +724,13 @@
                                                     <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
                                                 </div>
                                             `;
-                                        }
+                                }
                             }
 
                             function updateRemoveButtons() {
                                 const container = document.getElementById('respuestas-container');
                                 const removeBtns = container.querySelectorAll('.remove-respuesta');
-                                    removeBtns.forEach(btn => {
+                                removeBtns.forEach(btn => {
                                     btn.onclick = function () {
                                         if (container.querySelectorAll('.respuesta-input').length > 1) {
                                             btn.parentElement.remove();
@@ -739,7 +740,7 @@
                             }
 
                             // Cambiar secciones y preguntas al cambiar test
-                            $(document).off('change', '#swal-test_id').on('change', '#swal-test_id', function() {
+                            $(document).off('change', '#swal-test_id').on('change', '#swal-test_id', function () {
                                 let testId = $(this).val();
                                 let newSectionOptions = makeSectionOptions(testId);
                                 $('#swal-section_id').html(newSectionOptions);
@@ -751,7 +752,7 @@
                             });
 
                             // Cambiar preguntas al cambiar sección
-                            $(document).off('change', '#swal-section_id').on('change', '#swal-section_id', function() {
+                            $(document).off('change', '#swal-section_id').on('change', '#swal-section_id', function () {
                                 let sectionId = $(this).val();
                                 let testId = $('#swal-test_id').val();
                                 let newQuestionOptions = makeQuestionOptions(testId, sectionId);
@@ -759,20 +760,20 @@
                             });
 
                             // cambiar respuestas al cambiar pregunta
-                            $(document).off('change', '#swal-question_id').on('change', '#swal-question_id', function() {
+                            $(document).off('change', '#swal-question_id').on('change', '#swal-question_id', function () {
                                 const selectedQuestionId = parseInt($(this).val());
                                 const questionType = getQuestionType(selectedQuestionId, tests);
 
                                 const addBtn = document.getElementById('add-respuesta-btn');
                                 addBtn.dataset.questionType = questionType;
                                 addBtn.style.display = (questionType === 10) ? 'none' : 'block';
-                                
+
                                 const container = document.getElementById('respuestas-container');
                                 container.innerHTML = generateRespuestaHTML(questionType);
                                 updateRemoveButtons();
                             });
                         },
-                        error: function() {
+                        error: function () {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -850,8 +851,8 @@
                                                 </div>
                                             </div>
                                         `,
-                                        showClass: { popup: 'animate__animated animate__fadeInDown' },
-                                        hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+                                        showClass: {popup: 'animate__animated animate__fadeInDown'},
+                                        hideClass: {popup: 'animate__animated animate__fadeOutUp'},
                                         focusConfirm: false,
                                         confirmButtonText: 'Actualizar',
                                         confirmButtonColor: '#3d4e81',
@@ -933,7 +934,7 @@
                                     // Actualizar respuestas al cambiar pregunta
                                     $(document).off('change', '#swal-question_id').on('change', '#swal-question_id', function () {
                                         let selectedQuestionId = $(this).val();
-                                        
+
                                         let currentQuestionId = $('#swal-question_id').val();
                                         let question = questions.find(q => q.id == currentQuestionId);
 
@@ -987,7 +988,7 @@
                 });
 
                 // Eliminar Respuesta
-                $('#respuestasTable').on('click', '.delete-btn', function() {
+                $('#respuestasTable').on('click', '.delete-btn', function () {
                     const id = $(this).data('id');
 
                     Swal.fire({
@@ -1005,9 +1006,9 @@
                             $.ajax({
                                 url: `/psicometricas/admin/respuestas/${id}`,
                                 type: "DELETE",
-                                data: { _token: '{{ csrf_token() }}' },
+                                data: {_token: '{{ csrf_token() }}'},
                                 dataType: "json",
-                                success: function(response) {
+                                success: function (response) {
                                     Swal.fire({
                                         icon: 'success',
                                         title: '¡Respuesta eliminada!',
@@ -1018,7 +1019,7 @@
                                     });
                                     reloadTable();
                                 },
-                                error: function(xhr) {
+                                error: function (xhr) {
                                     let errorMsg = 'No se pudo eliminar la respuesta.';
                                     if (xhr.responseJSON && xhr.responseJSON.message) {
                                         errorMsg = xhr.responseJSON.message;
@@ -1037,8 +1038,8 @@
 
                 // Reinicializar tooltips
                 if (typeof M !== 'undefined') {
-                        M.Tooltip.init(document.querySelectorAll('.tooltipped'));
-                    }
+                    M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+                }
             } catch (error) {
                 console.error('Error al inicializar la tabla:', error);
                 alert('Ocurrió un error al inicializar la aplicación: ' + error.message);
