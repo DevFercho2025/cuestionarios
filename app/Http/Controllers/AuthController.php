@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -45,11 +46,12 @@ class AuthController extends Controller
         $company = new Company();
         $company->fill([
             'name'            => $data['company_name'],
-            'description'     => null,
+            'description'     => 'No proporcionada',
             'logo'            => null,
             'active'          => 1,
             'is_pisco_alobri' => 0,
-            'slug'            => null,
+            'is_pisco_psico'  => 1,
+            'slug'            => Str::slug($data['company_name']),
         ]);
         $company->save();
 
@@ -66,10 +68,10 @@ class AuthController extends Controller
         // 3) Configuración del usuario
         $user->config()->create([
             'company_id'         => $company->id,
-            'role_id'            => 1,
+            'role_id'            => 2,
             'is_talentina_user'  => 0,
             'user_id'            => $user->id,
-            'is_psico_user'       => 1,
+            'is_pisco_user'       => 1,
             'active'             => 1,
         ]);
 
@@ -89,8 +91,8 @@ class AuthController extends Controller
         // 5) Registrar el contador de evaluaciones predeterminado.
         ContadorEvaluacion::create([
             'user_id'            => $user->id,
-            'pruebas_disponibles'=> 3,
-            'pruebas_usadas'     => 0,
+            'available_tests'=> 3,
+            'used_tests'     => 0,
         ]);
 
         // Finalmente, loguea al usuario o rediríge

@@ -193,7 +193,7 @@
                                 </div>
 
                                 <!-- Paso 2: Experiencia con software de reclutamiento -->
-                                    <div id="experiencia-software" class="content">
+                                <div id="experiencia-software" class="content">
                                         <div class="row g-5">
                                             <div class="col-12">
                                                 <h3 class="mb-0 fw-bold">¿Has utilizado un software para reclutar y
@@ -264,7 +264,7 @@
                                                 </button>
                                             </div>
                                         </div>
-                                    </div>
+                                </div>
 
                                 <!-- Paso 3: Selección de servicios -->
                                 <div id="servicios-seleccion" class="content">
@@ -1033,9 +1033,8 @@
         </div>
     </div>
     </form>
+    
     <!-- Scripts del wizard -->
-
-
     <script>
         // Variables para almacenar los datos del formulario
         let formData = {

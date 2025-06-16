@@ -14,10 +14,9 @@ class ConfigUser extends Model
         'role_id',
         'is_talentina_user',
         'user_id',
-        'is_psico_ser',
+        'is_pisco_ser',
         'active',
     ];
-    public $timestamps = false;
 
     public function user(){
         return $this->belongsTo(User::class);

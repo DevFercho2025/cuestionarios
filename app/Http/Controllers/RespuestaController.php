@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Respuesta;
+use App\Models\Pregunta;
 use App\Models\Test;
 use Illuminate\Http\Request;
 
@@ -95,7 +96,6 @@ class RespuestaController extends Controller
         ]);
     }
 
-
     public function obtenerPreguntasSeccionesPrueba()
     {
         $tests = Test::with(['sections' => function($query) {
@@ -104,4 +104,20 @@ class RespuestaController extends Controller
 
         return response()->json($tests);
     }
+
+    public function conRespuestas($id)
+    {
+        $pregunta = Pregunta::with('respuestas')->findOrFail($id);
+        return response()->json([
+            'pregunta' => $pregunta,
+            'respuestas' => $pregunta->respuestas,
+        ]);
+    }
+
+    public function actualizarRespuestas(Request $request, $id)
+    {
+        
+        return response()->json(['message' => 'Respuestas actualizadas correctamente.']);
+    }
+
 }

@@ -143,7 +143,8 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
             Route::put('respuestas/{id}', [RespuestaController::class, 'update'])->name('respuestas.update');
             Route::delete('respuestas/{id}', [RespuestaController::class, 'destroy'])->name('respuestas.destroy');
             Route::get('/tests-with-all', [RespuestaController::class, 'obtenerPreguntasSeccionesPrueba'])->name('tests.withAll');
-
+            Route::get('/preguntas/{id}/respuestas', [RespuestaController::class, 'conRespuestas']);
+            Route::put('/preguntas/{id}/respuestas', [RespuestaController::class, 'actualizarRespuestas']);
 
             //gestionar compañías
             Route::get('companias', [CompanyController::class, 'index'])->name('companias.index');

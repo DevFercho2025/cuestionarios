@@ -89,6 +89,10 @@
                                     <th>Email</th>
                                     <th>Vacante</th>
                                     <th>Código</th>
+                                    @if (auth()->user()?->config?->role?->isSuperAdmin())
+                                        <th>Compañía</th>
+                                        <th>Asignado por</th>
+                                    @endif
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -104,7 +108,15 @@
     <script src="{{ asset('js/tables-datatables-advanced.js') }}"></script>
 
     @push('scripts')
+        @php
+            $userPermissions = [
+                'isAuthenticated' => auth()->check(),
+                'isAdmin' => auth()->user()?->config?->role?->isAdmin() ?? false,
+                'isSuperAdmin' => auth()->user()?->config?->role?->isSuperAdmin() ?? false,
+            ];
+        @endphp
     <script>
+        
         if (typeof jQuery === 'undefined') {
             document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
         }
@@ -155,7 +167,71 @@
         }
 
         function initializeDataTable(){
+            var userPermissions = @json($userPermissions);
             try {
+                var columns = [
+                    { data: 'id', className: 'col-id' },
+                    { data: 'user_id', className: 'col-user-id' },
+                    { data: 'nombre' },
+                    { data: 'email' },
+                    { data: 'vacante' },
+                    { data: 'codigo' },
+                ];
+
+                // Agrega si es superadmin
+                if (userPermissions.isSuperAdmin) {
+                    columns.push(
+                        {
+                            data: 'company_name',
+                            title: 'Compañía',
+                            render: function(data) {
+                                return data ?? 'Sin compañía';
+                            }
+                        },
+                        {
+                            data: 'asignado_por',
+                            title: 'Asignado por',
+                            render: function(data) {
+                                return data ?? 'Usuario no disponible';
+                            }
+                        }
+                    );
+                }
+
+                columns.push(
+                    {
+                        data: null,
+                        render: function(data, type, row){
+                            return botones = `
+                                <div class="action-buttons" style="gap: 10px;">
+                                    <button type="button" class="btn btn-azul waves-effect waves-light asignar-evaluacion-btn tooltipped"
+                                        style="min-width: 50%; margin: 5px; margin-left:0px"
+                                        data-position="top" title="Asignar Evaluaciones" data-user-id="${row.user_id}" data-code-id="${row.id}">
+                                        <i class="ri-add-line"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-secondary waves-effect waves-light ver-evaluaciones-btn tooltipped"
+                                        style="min-width: 30%; margin: 5px; margin-left:0px"
+                                        data-position="top" title="Ver evaluaciones asignadas para este código" data-id="${row.user_id}" data-code-id="${row.id}">
+                                        <i class="ri-eye-fill"></i>
+                                    </button>
+
+                                    <button type="button" class="btn btn-naranja waves-effect waves-light configurar-btn tooltipped"
+                                        style="min-width: 50%; margin: 5px; margin-left:0px"
+                                        data-position="top" title="Configurar permisos" data-id="${row.id}">
+                                        <i class="ri-settings-3-line"></i>
+                                    </button>
+
+                                    <button type="button" class="btn btn-rojo waves-effect waves-light eliminar-codigo-btn tooltipped"
+                                        style="min-width: 30%; margin: 5px; margin-left:0px"
+                                        data-position="top" title="Eliminar código" data-id="${row.id}">
+                                        <i class="ri-delete-bin-6-line"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                );
+
                 var table = jQuery('#aplicacionesTable').DataTable({
                     ajax: {
                         url: "{{ route('admin.aplicaciones.datatable')}}",
@@ -172,46 +248,7 @@
                             }
                         }
                     },
-                    columns: [
-                        { data: 'id', className: 'col-id' },
-                        { data: 'user_id', className: 'col-user-id'},
-                        { data: 'nombre' },
-                        { data: 'email' },
-                        { data: 'vacante' },
-                        { data: 'codigo' },
-                        {
-                            data: null,
-                            render: function(data, type, row){
-                                return botones = `
-                                    <div class="action-buttons" style="gap: 10px;">
-                                        <button type="button" class="btn btn-azul waves-effect waves-light asignar-evaluacion-btn tooltipped"
-                                            style="min-width: 50%; margin: 5px; margin-left:0px"
-                                            data-position="top" title="Asignar Evaluaciones" data-user-id="${row.user_id}" data-code-id="${row.id}">
-                                            <i class="ri-add-line"></i>
-                                        </button>
-
-                                        <button type="button" class="btn btn-secondary waves-effect waves-light ver-evaluaciones-btn tooltipped"
-                                            style="min-width: 30%; margin: 5px; margin-left:0px"
-                                            data-position="top" title="Ver evaluaciones asignadas para este código" data-id="${row.user_id}" data-code-id="${row.id}">
-                                            <i class="ri-eye-fill"></i>
-                                        </button>
-
-                                        <button type="button" class="btn btn-naranja waves-effect waves-light configurar-btn tooltipped"
-                                            style="min-width: 50%; margin: 5px; margin-left:0px"
-                                            data-position="top" title="Configurar permisos" data-id="${row.id}">
-                                            <i class="ri-settings-3-line"></i>
-                                        </button>
-
-                                        <button type="button" class="btn btn-rojo waves-effect waves-light eliminar-codigo-btn tooltipped"
-                                            style="min-width: 30%; margin: 5px; margin-left:0px"
-                                            data-position="top" title="Eliminar código" data-id="${row.id}">
-                                            <i class="ri-delete-bin-6-line"></i>
-                                        </button>
-                                    </div>
-                                `;
-                            }
-                        }
-                    ],
+                    columns: columns,
                     responsive: true,
                     drawCallback: function () {
                         if (typeof M !== 'undefined') {

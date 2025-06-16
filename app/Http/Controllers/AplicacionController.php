@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AccessCode;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AplicacionController extends Controller
 {
@@ -17,19 +18,41 @@ class AplicacionController extends Controller
     // DataTable
     public function datatable()
     {
-         $codes = AccessCode::with('user')->get();
+        $user = Auth::user();
+        $companyId = $user->config->company_id;
+        $isSuperAdmin = $user->config->role->isSuperAdmin() ?? false;
 
-        $data = $codes->map(function ($code) {
-            return [
-                'id' => $code->id,
+        if ($isSuperAdmin) {
+            $codes = AccessCode::with('user')->get();
+        } else {
+            $codes = AccessCode::with([
+                'user',
+                'company',
+                'assignedTests.companyUser',
+            ])->get();
+        }
+
+        $data = $codes->map(function ($code) use ($isSuperAdmin) {
+            $data = [
+                'id'      => $code->id,
                 'user_id' => $code->user_id,
-                'nombre' => $code->user->name,
-                'email' => $code->user->email,
+                'nombre'  => $code->user->name,
+                'email'   => $code->user->email,
                 'vacante' => $code->vacancy,
-                'codigo' => $code->code,
+                'codigo'  => $code->code,
             ];
-        });
 
+            if ($isSuperAdmin) {
+
+            $data['company_name'] = $code->company->name ?? 'Sin compañía';
+
+            $asignador = optional($code->assignedTests->first()?->companyUser)->name;
+
+            $data['asignado_por'] = $asignador;
+        }
+
+        return $data;
+        });
         return response()->json(['data' => $data]);
     }
 

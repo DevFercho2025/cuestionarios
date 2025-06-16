@@ -58,8 +58,8 @@ class CandidateController extends Controller
             ->toArray();
         
     
-        $tests = $user->assignedTestsPorCodigo($codigoActualId)->get();//aparece error de undefined method pero funciona correctamente
-
+        $tests = $user->assignedTestsPorCodigo($codigoActualId)->get();
+        
         $secciones = $tests->load('sections');
 
         return view('candidate.evaluaciones', compact('user', 'tests', 'secciones', 'seccionesCompletadas', 'aplicacion'));

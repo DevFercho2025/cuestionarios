@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ImagenUsuario;
 use App\Models\Respuesta_Usuario;
 use App\Models\pregunta;
-use App\Models\Aplicacion;
 use App\Models\Seccion;
 use App\Models\TokenEvaluacion;
 use Illuminate\Support\Facades\Log;

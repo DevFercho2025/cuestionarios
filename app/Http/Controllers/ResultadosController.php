@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Models\Respuesta_Usuario;
 use App\Models\TokenEvaluacion;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
-use App\Models\Aplicacion;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 

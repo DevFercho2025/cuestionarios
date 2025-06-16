@@ -57,6 +57,12 @@
                                 <h4 class="mb-2">Bienvenido 👋</h4>
                                 <p class="mb-4">Inicia sesión en tu cuenta para continuar</p>
 
+                                @if(session('error'))
+                                    <div class="alert alert-danger">
+                                        {{ session('error') }}
+                                    </div>
+                                @endif
+
                                 @if ($errors->any())
                                     <div class="alert alert-danger mb-3">
                                         <ul class="mb-0">

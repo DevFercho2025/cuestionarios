@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class userAssignedTest extends Model
 {
+    //tabla donde se registra quiénes asignan tests, a qué candidatos y con qué código.
     use HasFactory;
     protected $table = 'psico_alobri_user_assigned_tests';
-    protected $fillable = ['user_id', 'test_id','application_access_code_id','company_id'];
+    protected $fillable = ['user_id', 'test_id','application_access_code_id','company_user_id','test_record_id'];
     public $timestamps = false;
 
     public function user()
@@ -27,9 +28,14 @@ class userAssignedTest extends Model
         return $this->belongsTo(AccessCode::class, 'application_access_code_id');
     }
 
-    public function company()
+    public function companyUser()
     {
-        return $this->belongsTo(Company::class, 'company_id');
+        return $this->belongsTo(User::class, 'company_user_id');
+    }
+
+    public function testRecord()
+    {
+        return $this->beloingsTo(UserTestRecord::class, 'test_record_id');
     }
 
 }

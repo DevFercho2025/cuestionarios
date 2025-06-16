@@ -60,14 +60,12 @@ class User extends Authenticatable
 
     public function assignedTests()
     {
-        return $this->belongsToMany(Test::class, 'psico_alobri_user_assigned_tests', 'user_id', 'test_id')->withPivot(['application_access_code_id']);
+        return $this->belongsToMany(Test::class, 'psico_alobri_user_assigned_tests', 'user_id', 'test_id')->withPivot(['application_access_code_id','company_user_id', 'test_record_id']);
     }
 
     public function assignedTestsPorCodigo($codigoId)
     {
-        return $this->assignedTests()
-            ->withPivot(['application_access_code_id', 'company_id'])//trae info de la compañía
-            ->wherePivot('application_access_code_id', $codigoId);//filtra por código
+        return  $this->assignedTests()->wherePivot('application_access_code_id', $codigoId);
     }
 
     public function userTestsAcessCodes()

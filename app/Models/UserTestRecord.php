@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class UserTestRecord extends Model
 {
+    //tabla de registro del progreso de los candidatos en cada evaluacion
     use HasFactory;
-    protected $table = 'psico_alobri_user_test_records';
+    protected $table = 'psico_alobri_candidate_test_records';
     protected $fillable = ['user_id', 'test_id','token_id','completed_sections','started_at','finished_at'];
     public $timestamps = false;
 

@@ -16,7 +16,9 @@ class Company extends Model
         'description',
         'logo',
         'active',
-        'is_pisco_alobri'
+        'is_pisco_alobri',
+        'is_pisco_psico',
+        'slug'
     ];
 
     public function users()

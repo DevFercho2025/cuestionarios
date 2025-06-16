@@ -79,6 +79,63 @@
             #respuestasTable td[rowspan] {
                 vertical-align: top;
             }
+
+            #respuestasTable {
+                table-layout: fixed;
+            }
+
+            #respuestasTable th,
+            #respuestasTable td {
+                word-wrap: break-word;
+            }
+
+            .pregunta-wrapper {
+                position: relative;
+                height: 100%;
+            }
+
+            .pregunta-grid {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                height: 100%;
+                min-height: 100px;
+                padding: 8px;
+                box-sizing: border-box;
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .pregunta-text {
+                display: block;
+                white-space: normal;
+                overflow-wrap: break-word;
+                word-break: break-word;
+            }
+
+            .pregunta-buttons {
+                position: absolute;
+                top: 0;
+                right: 10px;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: flex-end;
+                padding: 8px 0;
+            }
+
+            .pregunta-buttons > button {
+                width: 50px;
+                height: 32px;
+                font-size: 12px;
+                padding: 4px 8px;
+                box-sizing: border-box;
+            }
+
+            .swal-wide {
+                width: 90% !important;
+                max-width: 1000px !important;
+            }
         </style>
     </head>
 
@@ -118,7 +175,6 @@
                                 <th>Respuesta</th>
                                 <th>Opción</th>
                                 <th>Respuesta correcta</th>
-                                <th>Acciones</th>
                             </tr>
                             </thead>
                         </table>
@@ -134,6 +190,7 @@
     <script>
 
         const pruebas = @json($pruebas);
+        let idPreguntaAnterior = null;
 
         if (typeof jQuery === 'undefined') {
             document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
@@ -184,9 +241,33 @@
         function initializeDataTable() {
             try {
                 var table = jQuery('#respuestasTable').DataTable({
+                    order: [[1, 'asc']],
                     ajax: {
                         url: "{{ route('respuestas.datatable') }}",
-                        dataSrc: '',
+                        dataSrc: function(json) {
+                            let groupedData = [];
+                            let preguntaMap = {}; 
+
+                            json.forEach(row => {
+                                if (!preguntaMap[row.pregunta.question]) {
+                                    preguntaMap[row.pregunta.question] = {
+                                        pregunta: row.pregunta.question,
+                                        respuestas: []
+                                    };
+                                    groupedData.push(preguntaMap[row.pregunta.question]);
+                                }
+                                preguntaMap[row.pregunta.question].respuestas.push(row);
+                            });
+
+                            return groupedData.flatMap(group => {
+                                return group.respuestas.map((row, index) => {
+                                    row.isFirstRow = index === 0;
+                                    row.rowspan = group.respuestas.length;
+                                    row.preguntaTexto = group.pregunta;
+                                    return row;
+                                });
+                            });
+                        },
                         error: function (xhr, error, thrown) {
                             console.error('Error en la carga de datos:', error, thrown);
                             if (typeof M !== 'undefined') {
@@ -209,7 +290,25 @@
                             data: 'pregunta.question',
                             defaultContent: '<span class="grey-text">Sin Pregunta</span>',
                             render: function (data, type, row) {
-                                return `<span data-id="${row.id}" data-field="question">${data ?? '-'}</span>`;
+                                 const questionId = row.pregunta?.id || '';
+                                return`
+                                    <div class="pregunta-wrapper">
+                                        <div class="pregunta-grid">
+                                            <div class="pregunta-text" data-question-id="${row.pregunta?.id}" data-field="question">${data ?? '-'}</div>
+                                            <div class="pregunta-buttons">
+                                                <button class="btn btn-sm btn-azul waves-effect waves-light edit-btn tooltipped"
+                                                        data-question-id="${questionId}" title="Editar las respuestas de esta pregunta" style="font-size: 12px;">
+                                                <i class="ri-edit-2-line" style="margin-right: 4px;"></i>
+                                                </button>
+                                                <button type="button"
+                                                        class="btn btn-rojo waves-effect waves-light delete-btn tooltipped"
+                                                        data-question-id="${questionId}" title="Eliminar las respuestas de esta pregunta">
+                                                <i class="ri-delete-bin-6-line"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
                             }
                         },
                         {data: 'id'},
@@ -225,58 +324,20 @@
                                 return `<span class="editable" data-id="${row.id}" data-field="option">${data ?? '-'}</span>`;
                             }
                         },
-
                         {
                             data: 'is_correct',
                             render: function (data, type, row) {
                                 const icon = data ? '<i class="ri-check-line"></i>' : '<i class="ri-close-large-line"></i>';
                                 return `<span class="editable" data-id="${row.id}" data-field="is_correct" data-value="${data}">${icon}</span>`;
                             }
-                        },
-                        {
-                            data: null,
-                            orderable: false,
-                            searchable: false,
-                            render: function (data, type, row) {
-                                return `
-                                    <div class="action-buttons">
-                                        <button type="button" class="btn btn-azul waves-effect waves-light edit-btn tooltipped"
-                                                style="margin: 8px; margin-left:0px" data-position="top" data-tooltip="Editar" data-id="${row.id}">
-                                            <i class="ri-pencil-line"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-rojo waves-effect waves-light delete-btn tooltipped"
-                                                style="margin: 8px; margin-left:0px" data-position="top" data-tooltip="Eliminar" data-id="${row.id}">
-                                            <i class="ri-delete-bin-6-line"></i>
-                                        </button>
-                                    </div>
-                                `;
-                            }
                         }
                     ],
-
                     responsive: true,
                     drawCallback: function () {
+                        
                         if (typeof M !== 'undefined') {
                             M.Tooltip.init(document.querySelectorAll('.tooltipped'));
                         }
-                        var api = this.api();
-                        var rows = api.rows({page: 'current'}).nodes();
-                        var preguntasProcesadas = {};
-
-                        api.column(0, {page: 'current'}).nodes().each(function (cell, i) {
-                            var pregunta = api.cell(cell).data();
-
-                            if (pregunta && preguntasProcesadas[pregunta]) {
-                                cell.style.display = 'none'; // Oculta las preguntas repetidas
-                            } else {
-                                var count = api.column(0, {page: 'current'}).data().filter((data) => data === pregunta).length;
-
-                                if (pregunta) {
-                                    cell.rowSpan = count;
-                                    preguntasProcesadas[pregunta] = true;//Marca la pregunta como procesada
-                                }
-                            }
-                        });
                     },
                     initComplete: function () {
 
@@ -317,7 +378,6 @@
                             if (instance) instance.destroy(); // destruir si ya existe
                             M.FormSelect.init(select);
                             $('#respuestasTable_filter').append($('#myCustomFilter'));
-                            table.order([1, 'asc']).draw();
                         }, 100);
 
                         // Filtro por columna oculta (test_id)
@@ -572,13 +632,8 @@
 
                                                 <div id="respuestas-container">
                                                     <label>Respuestas</label>
-                                                     ${generateRespuestaHTML(firstQuestionType)}
+                                                    ${generateRespuestaHTML(firstQuestionType, idPreguntaAnterior)}
                                                 </div>
-                                            ${firstQuestionType === 10 ? '' : `
-                                                <button type="button" id="add-respuesta-btn" class="btn btn-azul mt-2" style="width:100%;">
-                                                    + Añadir respuesta
-                                                </button>
-                                            `}
                                             </div>
                                         </div>
                                     </div>
@@ -631,28 +686,33 @@
                                 },
                                 didOpen: () => {
                                     const container = document.getElementById('respuestas-container');
-                                    const addBtn = document.getElementById('add-respuesta-btn');
 
                                     // Obtener tipo de la pregunta actual
                                     const questionSelect = document.getElementById('swal-question_id');
                                     const selectedQuestionId = parseInt(questionSelect.value);
                                     let questionType = getQuestionType(selectedQuestionId, tests);
 
-                                    addBtn.style.display = (questionType === 10) ? 'none' : 'block';
-                                    addBtn.dataset.questionType = questionType;
-
                                     //ajustar forma de agregar respuesta según tipo
-                                    container.innerHTML = generateRespuestaHTML(questionType);
+                                    container.innerHTML = generateRespuestaHTML(questionType, selectedQuestionId);
+                                    const addBtn = document.getElementById('add-respuesta-btn');
+                                    if (addBtn) {
+                                        addBtn.dataset.questionType = firstQuestionType;
+                                        addBtn.onclick = () => {
+                                            const tipo = parseInt(addBtn.dataset.questionType);
+                                            container.insertAdjacentHTML('beforeend', generateRespuestaHTML(tipo));
+                                            updateRemoveButtons();
+                                        };
+                                    }
+                                    if (questionType === 2) setupLikertButtonListener();
+                                    
                                     updateRemoveButtons();
-
-
-                                    addBtn.onclick = () => {
+                
+                                    /*addBtn.onclick = () => {
                                         const tipo = parseInt(addBtn.dataset.questionType);
                                         console.log(tipo)
                                         container.insertAdjacentHTML('beforeend', generateRespuestaHTML(tipo));
                                         updateRemoveButtons();
-                                    };
-
+                                    };*/
                                 }
                             }).then((result) => {
                                 if (result.isConfirmed) {
@@ -700,33 +760,129 @@
                                 return 1; // Default
                             }
 
-                            function generateRespuestaHTML(questionType) {
-                                if (questionType === 3) {
-                                    return `
+                            
+                            function generateRespuestaHTML(questionType, questionId) {
+                                const alreadyHasAddButton = !!document.getElementById('add-respuesta-btn');
+                                let html = '';
+
+                                switch (questionType) {
+                                    case 2:
+                                        // Escala tipo Likert (1 a 5)
+                                            return `
+                                                <div class="respuesta-input" id="likert-config" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                                    <label style="font-weight: bold;">Tamaño de la escala:</label>
+                                                    <select id="likert-scale-size" class="form-control" style="width: 200px;">
+                                                        <option value="">Seleccione</option>
+                                                        <option value="4">Escala de 4 puntos</option>
+                                                        <option value="5">Escala de 5 puntos</option>
+                                                    </select>
+                                                    <button type="button" class="ver-likert btn btn-azul btn-sm" title="Ver las opciones de esta escala"> ? </button>
+                                                </div>
+                                                <div id="likert-options-container" style="margin-top: 10px;"></div>
+                                            `;
+                                        break;
+                                    case 3:
+                                        //Pareamiento forzado
+                                            html = `
+                                                        <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                                            <input type="text" class="form-control answer-text" placeholder="Elemento A" required style="flex:2;">
+                                                            <input type="text" class="form-control option-text" placeholder="Elemento B" required style="flex:2;">
+                                                            <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar par">×</button>
+                                                        </div>
+                                                    `;
+
+                                            if (!alreadyHasAddButton) {
+                                                html += `
+                                                    <button type="button" id="add-respuesta-btn" class="btn btn-azul mt-2" style="width:100%;">
+                                                        + Añadir respuesta
+                                                    </button>
+                                                `;
+                                            }
+                                            return html;
+                                        break;
+                                    case 5:
+                                        //Verdadero o Falso
+                                            return `
                                                 <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                                                    <input type="text" class="form-control answer-text" placeholder="Elemento A" required style="flex:2;">
-                                                    <input type="text" class="form-control option-text" placeholder="Elemento B" required style="flex:2;">
-                                                    <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar par">×</button>
+                                                    <input type="text" class="form-control answer-text" value="Verdadero" disabled required style="flex:2;">
+                                                    <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
+                                                </div>
+                                                <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                                    <input type="text" class="form-control answer-text" value="Falso" disabled required style="flex:2;">
+                                                    <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                                                 </div>
                                             `;
-                                } else if (questionType === 10) {
-                                    return `
+                                        break;
+                                    case 10:
+                                        //Pregunta Abierta
+                                            return `
                                                 <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                                                     <input type="text" class="form-control answer-text" value="Respuesta abierta" disabled style="flex:4;">
                                                 </div>
                                             `;
-                                } else {
-                                    return `
-                                                <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                                                    <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
-                                                    <input type="text" class="form-control option-text" placeholder="Opción" required style="flex:2;">
-                                                    <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
-                                                    <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
-                                                </div>
-                                            `;
+                                        break;
+                                    default:
+                                        //Selección múltiple(1), doble opción(4), reacción forzada(8)
+                                            html = `
+                                                        <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                                            <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
+                                                            <input type="text" class="form-control option-text" placeholder="Opción" required style="flex:2;">
+                                                            <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
+                                                            <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
+                                                        </div>
+                                                    `;
+                                            
+                                            if (!alreadyHasAddButton && (questionId !== idPreguntaAnterior)) {
+                                                html += `
+                                                    <button type="button" id="add-respuesta-btn" class="btn btn-azul mt-2" style="width:100%;">
+                                                        + Añadir respuesta
+                                                    </button>
+                                                `;
+                                                console.log(idPreguntaAnterior);
+                                                idPreguntaAnterior = questionId;
+                                                console.log(idPreguntaAnterior);
+                                            }
+                                            return html;
+                                        break;
                                 }
                             }
 
+                            //Insertar escalas de likert si la respuesta es tipo likert
+                            function setupLikertButtonListener() {
+                                const btn = document.querySelector('.ver-likert');
+                                if (!btn) return;
+
+                                btn.addEventListener('click', () => {
+                                    const select = document.getElementById('likert-scale-size');
+                                    const container = document.getElementById('likert-options-container');
+
+                                    if (!select || !container) return;
+
+                                    const value = parseInt(select.value);
+                                    container.innerHTML = '';
+
+                                    if (![4, 5].includes(value)) {
+                                        container.innerHTML = '<p style="color: red;">Seleccione una escala válida.</p>';
+                                        return;
+                                    }
+
+                                    const labels = {
+                                        4: ['Totalmente en desacuerdo', 'En desacuerdo', 'De acuerdo', 'Totalmente de acuerdo'],
+                                        5: ['Totalmente en desacuerdo', 'En desacuerdo', 'Neutral', 'De acuerdo', 'Totalmente de acuerdo']
+                                    };
+
+                                    labels[value].forEach(label => {
+                                        const html = `
+                                            <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                                <input type="text" class="form-control answer-text" value="${label}" disabled style="flex:4;">
+                                            </div>
+                                        `;
+                                        container.insertAdjacentHTML('beforeend', html);
+                                    });
+                                });
+                            }
+
+                            //Quitar una respuesta
                             function updateRemoveButtons() {
                                 const container = document.getElementById('respuestas-container');
                                 const removeBtns = container.querySelectorAll('.remove-respuesta');
@@ -764,12 +920,35 @@
                                 const selectedQuestionId = parseInt($(this).val());
                                 const questionType = getQuestionType(selectedQuestionId, tests);
 
-                                const addBtn = document.getElementById('add-respuesta-btn');
-                                addBtn.dataset.questionType = questionType;
-                                addBtn.style.display = (questionType === 10) ? 'none' : 'block';
-
                                 const container = document.getElementById('respuestas-container');
-                                container.innerHTML = generateRespuestaHTML(questionType);
+
+                            
+                                container.innerHTML = generateRespuestaHTML(questionType, selectedQuestionId);
+                                
+                                const addBtn = document.getElementById('add-respuesta-btn');
+
+                                if (addBtn) {
+                                    addBtn.dataset.questionType = questionType;
+                                    const tiposSinBoton = [2, 10, 5]; 
+
+                                    if (tiposSinBoton.includes(questionType)) {
+                                        addBtn.style.display = 'none';
+                                        addBtn.onclick = null;
+                                    } else {
+                                        addBtn.style.display = 'block';
+                                        addBtn.dataset.questionType = questionType;
+
+                                        // Asignar de nuevo el evento click
+                                        addBtn.onclick = () => {
+                                            const tipo = parseInt(addBtn.dataset.questionType);
+                                            container.insertAdjacentHTML('beforeend', generateRespuestaHTML(tipo));
+                                            updateRemoveButtons();
+                                        };
+                                    }
+                                }
+
+                                if (questionType === 2) setupLikertButtonListener();
+                                
                                 updateRemoveButtons();
                             });
                         },
@@ -784,75 +963,94 @@
                     });
                 });
 
-                //editar a qué pregunta, sección y test pertenece la respuesta
+                //editar respuestas de una pregunta
                 $('#respuestasTable').on('click', '.edit-btn', function () {
-                    const id = $(this).data('id');
+                    const questionId = $(this).data('question-id');
 
-                    // Obtener la respuesta actual
+                    if (!questionId) {
+                        Swal.fire('Error', 'No se encontró el ID de la pregunta.', 'error');
+                        return;
+                    }
+
+                    // Obtener la pregunta con sus respuestas
                     $.ajax({
-                        url: `/psicometricas/admin/respuestas/${id}`,
+                        url: `/psicometricas/admin/preguntas/${questionId}/respuestas`,
                         type: "GET",
                         dataType: "json",
-                        success: function (respuesta) {
+                        success: function (data) {
+                            const { pregunta, respuestas } = data;
+
+                            // Obtener todos los tests, secciones y preguntas
                             $.ajax({
                                 url: "{{ route('tests.withAll') }}",
                                 type: "GET",
                                 dataType: "json",
                                 success: function (tests) {
-                                    // Construir options para tests
                                     let testOptions = tests.map(t => {
-                                        const selected = t.id == respuesta.pregunta.test_id ? 'selected' : '';
+                                        const selected = t.id == pregunta.test_id ? 'selected' : '';
                                         return `<option value="${t.id}" ${selected}>${t.test_title || t.title || t.name}</option>`;
                                     }).join('');
 
-                                    // Obtener secciones del test seleccionado
-                                    let selectedTest = tests.find(t => t.id == respuesta.pregunta.test_id);
+                                    let selectedTest = tests.find(t => t.id == pregunta.test_id);
                                     let sections = selectedTest ? selectedTest.sections : [];
 
                                     let sectionOptions = sections.map(s => {
-                                        const selected = s.id == respuesta.pregunta.section_id ? 'selected' : '';
+                                        const selected = s.id == pregunta.section_id ? 'selected' : '';
                                         return `<option value="${s.id}" ${selected}>${s.title}</option>`;
                                     }).join('');
 
-                                    // Obtener preguntas de la sección seleccionada
-                                    let selectedSection = sections.find(s => s.id == respuesta.pregunta.section_id);
+                                    let selectedSection = sections.find(s => s.id == pregunta.section_id);
                                     let questions = selectedSection ? selectedSection.questions : [];
 
                                     let questionOptions = questions.map(q => {
-                                        const selected = q.id == respuesta.question_id ? 'selected' : '';
+                                        const selected = q.id == pregunta.id ? 'selected' : '';
                                         return `<option value="${q.id}" ${selected}>${q.question}</option>`;
                                     }).join('');
 
                                     Swal.fire({
                                         html: `
-                                            <div class="col-md mb-6 mb-md-0">
-                                                <div class="card">
-                                                    <h2 class="card-header">Editar a qué prueba pertenece esta respuesta/h2>
-                                                    <div class="card-body">
-                                                        <div class="form-floating form-floating-outline mb-6">
-                                                            <select id="swal-test_id" class="form-select" required>
-                                                                ${testOptions}
-                                                            </select>
-                                                            <label for="swal-test_id">Test (Cuestionario)</label>
+                                            <div class="row">
+                                                <!-- Columna 1: Selección de test/ sección/ pregunta -->
+                                                <div class="col-md-6 mb-6 mb-md-0">
+                                                    <div class="card h-100">
+                                                        <h2 class="card-header">Editar a qué prueba pertenecen estas respuestas</h2>
+                                                        <div class="card-body">
+                                                            <div class="form-floating form-floating-outline mb-6">
+                                                                <select id="swal-test_id" class="form-select" required>
+                                                                    ${testOptions}
+                                                                </select>
+                                                                <label for="swal-test_id">Test (Cuestionario)</label>
+                                                            </div>
+                                                            <div class="form-floating form-floating-outline mb-6">
+                                                                <select id="swal-section_id" class="form-select" required>
+                                                                    ${sectionOptions}
+                                                                </select>
+                                                                <label for="swal-section_id">Sección</label>
+                                                            </div>
+                                                            <div class="form-floating form-floating-outline mb-6">
+                                                                <select id="swal-question_id" class="form-select" required>
+                                                                    ${questionOptions}
+                                                                </select>
+                                                                <label for="swal-question_id">Pregunta</label>
+                                                            </div>
                                                         </div>
-                                                        <div class="form-floating form-floating-outline mb-6">
-                                                            <select id="swal-section_id" class="form-select" required>
-                                                                ${sectionOptions}
-                                                            </select>
-                                                            <label for="swal-section_id">Sección</label>
-                                                        </div>
-                                                        <div class="form-floating form-floating-outline mb-6">
-                                                            <select id="swal-question_id" class="form-select" required>
-                                                                ${questionOptions}
-                                                            </select>
-                                                            <label for="swal-question_id">Pregunta</label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Columna 2: Edición de respuestas -->
+                                                <div class="col-md-6 mb-6 mb-md-0">
+                                                    <div class="card h-100">
+                                                        <h2 class="card-header">Editar respuestas</h2>
+                                                        <div class="card-body">
+                                                            <div id="respuestas-container" class="mt-3"></div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         `,
-                                        showClass: {popup: 'animate__animated animate__fadeInDown'},
-                                        hideClass: {popup: 'animate__animated animate__fadeOutUp'},
+                                        customClass: { popup: 'swal-wide' },
+                                        showClass: { popup: 'animate__animated animate__fadeInDown' },
+                                        hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                                         focusConfirm: false,
                                         confirmButtonText: 'Actualizar',
                                         confirmButtonColor: '#3d4e81',
@@ -862,15 +1060,29 @@
                                         buttonsStyling: true,
                                         background: '#262b3c',
                                         preConfirm: () => {
+                                            let respuestas = [];
+                                            $('#respuestas-container .respuesta-input').each(function () {
+                                                let answerText = $(this).find('.answer-text').val();
+                                                let optionText = $(this).find('.option-text').val() || null;
+                                                let isCorrect = $(this).find('.is-correct').is(':checked');
+
+                                                respuestas.push({
+                                                    text: answerText,
+                                                    option: optionText,
+                                                    is_correct: isCorrect
+                                                });
+                                            });
+
                                             return {
                                                 question_id: $('#swal-question_id').val(),
+                                                respuestas: respuestas,
                                                 _token: '{{ csrf_token() }}'
                                             };
                                         }
                                     }).then(result => {
                                         if (result.isConfirmed) {
                                             $.ajax({
-                                                url: `/psicometricas/admin/respuestas/${id}`,
+                                                url: `/psicometricas/admin/preguntas/${questionId}/respuestas`,
                                                 type: "PUT",
                                                 data: result.value,
                                                 dataType: "json",
@@ -903,7 +1115,42 @@
                                         }
                                     });
 
-                                    // Actualizar secciones y preguntas cuando cambia el test
+                                    // Renderizar respuestas
+                                    setTimeout(() => {
+                                        let container = document.getElementById('respuestas-container');
+                                        container.innerHTML = '';
+
+                                        respuestas.forEach(r => {
+                                            const div = document.createElement('div');
+                                            div.className = 'respuesta-input';
+                                            div.style.cssText = 'display:flex; gap:10px; margin-bottom:10px; align-items:center;';
+
+                                            let html = '';
+                                            switch (parseInt(pregunta.question_type_id)) {
+                                                case 3: // Emparejamiento
+                                                    html = `
+                                                        <input type="text" class="form-control answer-text" placeholder="Elemento A" value="${r.answer || ''}" required style="flex:2;">
+                                                        <input type="text" class="form-control option-text" placeholder="Elemento B" value="${r.option || ''}" required style="flex:2;">`;
+                                                    break;
+                                                case 10: // Abierta
+                                                    html = `
+                                                        <input type="text" class="form-control answer-text" placeholder="Respuesta abierta" value="${r.answer || ''}" required style="flex:4;">`;
+                                                    break;
+                                                default:
+                                                    html = `
+                                                        <input type="text" class="form-control answer-text" placeholder="Respuesta" value="${r.answer || ''}" required style="flex:4;">
+                                                        <input type="text" class="form-control option-text" placeholder="Opción" value="${r.option || ''}" required style="flex:0.5; max-width: 40px;"">
+                                                        <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?" ${r.is_correct ? 'checked' : ''}>`;
+                                                    break;
+                                            }
+
+                                            html += `<button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>`;
+                                            div.innerHTML = html;
+                                            container.appendChild(div);
+                                        });
+                                    }, 100);
+
+                                    // Cambios en test y sección
                                     $(document).off('change', '#swal-test_id').on('change', '#swal-test_id', function () {
                                         let testId = $(this).val();
                                         let test = tests.find(t => t.id == testId);
@@ -912,17 +1159,14 @@
                                         let newSectionOptions = newSections.map(s => `<option value="${s.id}">${s.title}</option>`).join('');
                                         $('#swal-section_id').html(newSectionOptions);
 
-                                        // Actualizar preguntas para la primera sección
                                         let firstSectionId = newSections.length ? newSections[0].id : null;
                                         let newQuestions = firstSectionId ? (test.sections.find(s => s.id == firstSectionId)?.questions || []) : [];
                                         let newQuestionOptions = newQuestions.map(q => `<option value="${q.id}">${q.question}</option>`).join('');
                                         $('#swal-question_id').html(newQuestionOptions);
                                     });
 
-                                    // Actualizar preguntas cuando cambia la sección
                                     $(document).off('change', '#swal-section_id').on('change', '#swal-section_id', function () {
                                         let sectionId = $(this).val();
-                                        // Buscar la sección dentro del test actual seleccionado
                                         let currentTestId = $('#swal-test_id').val();
                                         let test = tests.find(t => t.id == currentTestId);
                                         let section = test ? test.sections.find(s => s.id == sectionId) : null;
@@ -931,50 +1175,6 @@
                                         $('#swal-question_id').html(questionOptions);
                                     });
 
-                                    // Actualizar respuestas al cambiar pregunta
-                                    $(document).off('change', '#swal-question_id').on('change', '#swal-question_id', function () {
-                                        let selectedQuestionId = $(this).val();
-
-                                        let currentQuestionId = $('#swal-question_id').val();
-                                        let question = questions.find(q => q.id == currentQuestionId);
-
-                                        let questionType = parseInt(question.question_type_id);
-                                        $('#add-respuesta-btn').data('questionType', questionType);
-
-                                        const container = document.getElementById('respuestas-container');
-                                        container.innerHTML = '';
-
-                                        const div = document.createElement('div');
-                                        div.className = 'respuesta-input';
-                                        div.style.cssText = 'display:flex; gap:10px; margin-bottom:10px; align-items:center;';
-
-                                        if (questionType === 3) {
-                                            return `
-                                                <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                                                    <input type="text" class="form-control answer-text" placeholder="Elemento A" required style="flex:2;">
-                                                    <input type="text" class="form-control option-text" placeholder="Elemento B" required style="flex:2;">
-                                                    <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar par">×</button>
-                                                </div>
-                                            `;
-                                        } else if (questionType === 10) {
-                                            return `
-                                                <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                                                    <input type="text" class="form-control answer-text" placeholder="Respuesta abierta" required style="flex:4;">
-                                                    <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
-                                                </div>
-                                            `;
-                                        } else {
-                                            return `
-                                                <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                                                    <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
-                                                    <input type="text" class="form-control option-text" placeholder="Opción" required style="flex:2;">
-                                                    <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
-                                                    <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
-                                                </div>
-                                            `;
-                                        }
-                                        container.appendChild(div);
-                                    });
                                 },
                                 error: function () {
                                     Swal.fire('Error', 'No se pudieron cargar los tests.', 'error');
@@ -982,10 +1182,11 @@
                             });
                         },
                         error: function () {
-                            Swal.fire('Error', 'No se pudo obtener la respuesta.', 'error');
+                            Swal.fire('Error', 'No se pudo obtener la pregunta.', 'error');
                         }
                     });
                 });
+
 
                 // Eliminar Respuesta
                 $('#respuestasTable').on('click', '.delete-btn', function () {
