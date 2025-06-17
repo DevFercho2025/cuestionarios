@@ -132,8 +132,12 @@
                 'isAdmin' => auth()->user()?->config?->role?->isAdmin() ?? false,
                 'isSuperAdmin' => auth()->user()?->config?->role?->isSuperAdmin() ?? false,
             ];
+            $companyId = Auth()->user()->config->Company->id;
+            
         @endphp
         <script>
+            const posiciones = @json($positions);
+            const companyId = {{ $companyId }};
             
             if (typeof jQuery === 'undefined') {
                 document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
@@ -186,7 +190,7 @@
                     var userPermissions = @json($userPermissions);
                     var conVacante = @json($conVacante ? 1 : 0);
                     try {
-                       var columns = [
+                        var columns = [
                             {data: 'id'},
                             {
                                 data: 'created_at',
@@ -481,12 +485,27 @@
                                 html: `
                                     <p>Introduce el nombre de la vacante para este candidato:</p>
                                     <input id="vacanteInput" class="swal2-input" placeholder="Vacante">
+
+                                    ${
+                                        companyId === 1
+                                            ? `<p style="margin-top: 1rem;">O selecciona una posición existente:</p>
+                                            <select id="positionSelect" class="swal2-input">
+                                                <option value="">-- Ninguna --</option>
+                                                ${posiciones.map(pos => `<option value="${pos.name}">${pos.name}</option>`).join('')}
+                                            </select>`
+                                            : ''
+                                    }
                                 `,
                                 showCancelButton: true,
                                 confirmButtonText: 'Generar',
                                 cancelButtonText: 'Cancelar',
                                 preConfirm: () => {
-                                    const vacante = $('#vacanteInput').val().trim();
+                                    let vacante = $('#vacanteInput').val().trim();
+                                    const vacanteSeleccionada = $('#positionSelect').val();
+
+                                    vacante = vacanteSeleccionada || vacanteManual;
+
+
                                     if (!vacante) {
                                         Swal.showValidationMessage('La vacante es obligatoria');
                                         return false;
@@ -495,6 +514,7 @@
                                     return $.post("{{ route('guardar.codigo') }}", {
                                         user_id: userId,
                                         vacante: vacante,
+                                        company_id: companyId,
                                         _token: "{{ csrf_token() }}"
                                     })
                                     .then(response => {

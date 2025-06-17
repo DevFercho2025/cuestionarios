@@ -46,7 +46,7 @@ class AplicacionController extends Controller
 
             $data['company_name'] = $code->company->name ?? 'Sin compañía';
 
-            $asignador = optional($code->assignedTests->first()?->companyUser)->name;
+            $asignador = $code->userCompany->name;
 
             $data['asignado_por'] = $asignador;
         }

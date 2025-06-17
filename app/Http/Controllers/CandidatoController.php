@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AccessCode;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Aplicacion;
+use App\Models\Position;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -19,7 +19,9 @@ class CandidatoController extends Controller
     { 
         $conVacante = filter_var($request->input('conVacante', 0), FILTER_VALIDATE_BOOLEAN);
 
-        return view('candidatos.index', compact('conVacante'));
+        $companyId = Auth::user()->config->Company->id;
+        $positions = Position::with('post')->where('company_id', $companyId)->get();
+        return view('candidatos.index', compact('conVacante', 'positions'));
     }
 
     public function datatable(Request $request)
@@ -263,6 +265,8 @@ class CandidatoController extends Controller
             $aplicacion = AccessCode::create([
                 'user_id' => $request->user_id,
                 'vacancy' => $request->vacante,
+                'company_id' => $request->company_id,
+                'user_company_id' => Auth::user()->id,
                 'code' => $codigo,
             ]);
 

@@ -2,16 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+
+use App\Models\SubArea;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+//se Illuminate\Http\Request;
+//use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
-        $company = $user->company;
-        return view('admin.index', compact('user', 'company'));
+
+        $companyId = $user->config->Company->id;
+
+        $subareas = SubArea::with('areas')
+            ->withCount(['positionPosts' => function ($query) use ($companyId) {
+                $query->where('company_id', $companyId);
+            }])
+            ->where('company_id', $companyId)
+            ->get();
+
+        return view('admin.index', compact('user', 'subareas'));
     }
 }

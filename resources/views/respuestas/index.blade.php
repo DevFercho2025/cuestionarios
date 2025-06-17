@@ -764,6 +764,7 @@
                             function generateRespuestaHTML(questionType, questionId) {
                                 const alreadyHasAddButton = !!document.getElementById('add-respuesta-btn');
                                 let html = '';
+                                
 
                                 switch (questionType) {
                                     case 2:
@@ -783,7 +784,14 @@
                                         break;
                                     case 3:
                                         //Pareamiento forzado
-                                            html = `
+                                            if (!alreadyHasAddButton) {
+                                                html = `
+                                                    <button type="button" id="add-respuesta-btn" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px">
+                                                        + Añadir respuesta
+                                                    </button>
+                                                `;
+                                            }
+                                            html += `
                                                         <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                                                             <input type="text" class="form-control answer-text" placeholder="Elemento A" required style="flex:2;">
                                                             <input type="text" class="form-control option-text" placeholder="Elemento B" required style="flex:2;">
@@ -791,14 +799,26 @@
                                                         </div>
                                                     `;
 
-                                            if (!alreadyHasAddButton) {
-                                                html += `
-                                                    <button type="button" id="add-respuesta-btn" class="btn btn-azul mt-2" style="width:100%;">
-                                                        + Añadir respuesta
-                                                    </button>
-                                                `;
-                                            }
+                                            
                                             return html;
+                                        break;
+                                    case 4:
+                                        //doble opción
+                                        return `
+                                                <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                                    <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
+                                                    <input type="text" class="form-control option-text" placeholder="Opción" value="a" required style="flex:2;">
+                                                    <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
+                                                    <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
+                                                </div>
+                                                <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                                    <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
+                                                    <input type="text" class="form-control option-text" placeholder="Opción" value="b" required style="flex:2;">
+                                                    <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
+                                                    <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
+                                                </div>
+                                            `;
+
                                         break;
                                     case 5:
                                         //Verdadero o Falso
@@ -822,8 +842,17 @@
                                             `;
                                         break;
                                     default:
-                                        //Selección múltiple(1), doble opción(4), reacción forzada(8)
-                                            html = `
+                                        //Selección múltiple(1), reacción forzada(8)
+                                            if (!alreadyHasAddButton && (questionId !== idPreguntaAnterior)) {
+                                                html += `
+                                                    <button type="button" id="add-respuesta-btn" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
+                                                        + Añadir respuesta
+                                                    </button>
+                                                `;
+                                                idPreguntaAnterior = questionId;
+                                            }
+
+                                            html += `
                                                         <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                                                             <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
                                                             <input type="text" class="form-control option-text" placeholder="Opción" required style="flex:2;">
@@ -831,17 +860,6 @@
                                                             <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
                                                         </div>
                                                     `;
-                                            
-                                            if (!alreadyHasAddButton && (questionId !== idPreguntaAnterior)) {
-                                                html += `
-                                                    <button type="button" id="add-respuesta-btn" class="btn btn-azul mt-2" style="width:100%;">
-                                                        + Añadir respuesta
-                                                    </button>
-                                                `;
-                                                console.log(idPreguntaAnterior);
-                                                idPreguntaAnterior = questionId;
-                                                console.log(idPreguntaAnterior);
-                                            }
                                             return html;
                                         break;
                                 }

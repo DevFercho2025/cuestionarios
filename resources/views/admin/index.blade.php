@@ -116,91 +116,40 @@
               </div>
             </div>
             <div class="d-flex justify-content-between p-4 border-bottom">
-              <p class="mb-0 fs-xsmall">Vacante</p>
-              <p class="mb-0 fs-xsmall">Cantidad de Postulados</p>
+              <p class="mb-0 fs-xsmall">Sub Áreas</p>
+              <p class="mb-0 fs-xsmall">Cantidad de vacantes</p>
             </div>
             <div class="card-body">
               <ul class="p-0 m-0">
-                <li class="d-flex align-items-center mb-6">
-                  <div class="avatar avatar-md flex-shrink-0 me-4">
-                    <div class="avatar-initial bg-light-gray rounded-3">
-                      <div>
-                        <img src="../../assets/img/icons/misc/3d-illustration.png" alt="User" class="h-25">
+
+                @if($subareas->isNotEmpty())
+                  @foreach ($subareas as $subarea)
+                    <li class="d-flex align-items-center mb-6">
+                      <div class="avatar avatar-md flex-shrink-0 me-4">
+                        <div class="avatar-initial bg-light-gray rounded-3">
+                          <div>
+                            <img src="../../assets/img/icons/misc/3d-illustration.png" alt="User" class="h-25">                        </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                    <div class="me-2">
-                      <h6 class="mb-1">Especialista en CiberSeguridad</h6>
-                      <small>Para área de IT</small>
-                    </div>
-                    <div class="badge bg-label-primary rounded-pill">30</div>
-                  </div>
-                </li>
-                <li class="d-flex align-items-center mb-6">
-                  <div class="avatar avatar-md flex-shrink-0 me-4">
-                    <div class="avatar-initial bg-light-gray rounded-3">
-                      <div>
-                        <img src="../../assets/img/icons/misc/finance-app-design.png" alt="User" class="h-25">
+                      <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="me-2">
+                          <h6 class="mb-1">{{ $subarea->name }}</h6>
+                          <small>
+                            Para área 
+                            {{ $subarea->areas->first()->name ?? 'General' }}
+                          </small>
+                        </div>
+                        <div class="badge bg-label-primary rounded-pill">{{ $subarea->position_posts_count }} <!--Aquí número de posiciones--></div>
                       </div>
-                    </div>
+                    </li>
+                  @endforeach
+                @else
+                  <div class="text-center py-4 text-muted">
+                    <i class="bx bx-bar-chart-alt-2 mb-2" style="font-size: 2rem;"></i><br>
+                    Aún no hay estadísticas de vacantes.
                   </div>
-                  <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                    <div class="me-2">
-                      <h6 class="mb-1">Diseñador UI/UX</h6>
-                      <small>Para área de Tecnología</small>
-                    </div>
-                    <div class="badge bg-label-primary rounded-pill">20</div>
-                  </div>
-                </li>
-                <li class="d-flex align-items-center mb-6">
-                  <div class="avatar avatar-md flex-shrink-0 me-4">
-                    <div class="avatar-initial bg-light-gray rounded-3">
-                      <div>
-                        <img src="../../assets/img/icons/misc/4-square.png" alt="User" class="h-25">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                    <div class="me-2">
-                      <h6 class="mb-1">Analista Contable</h6>
-                      <small>Para área de Administración y Finanzasn</small>
-                    </div>
-                    <div class="badge bg-label-primary rounded-pill">10</div>
-                  </div>
-                </li>
-                <li class="d-flex align-items-center mb-6">
-                  <div class="avatar avatar-md flex-shrink-0 me-4">
-                    <div class="avatar-initial bg-light-gray rounded-3">
-                      <div>
-                        <img src="../../assets/img/icons/misc/delta-web-app.png" alt="User" class="h-25">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                    <div class="me-2">
-                      <h6 class="mb-1">Enfermero</h6>
-                      <small>Para área de Urgencias</small>
-                    </div>
-                    <div class="badge bg-label-primary rounded-pill">40</div>
-                  </div>
-                </li>
-                <li class="d-flex align-items-center">
-                  <div class="avatar avatar-md flex-shrink-0 me-4">
-                    <div class="avatar-initial bg-light-gray rounded-3">
-                      <div>
-                        <img src="../../assets/img/icons/misc/ecommerce-website.png" alt="User" class="h-25">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                    <div class="me-2">
-                      <h6 class="mb-1">Técnico en equipos biométicos</h6>
-                      <small>Para área de Manteminiento biomédico</small>
-                    </div>
-                    <div class="badge bg-label-primary rounded-pill">5</div>
-                  </div>
-                </li>
+                @endif
+
               </ul>
             </div>
           </div>
