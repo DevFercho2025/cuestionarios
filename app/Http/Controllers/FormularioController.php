@@ -59,39 +59,50 @@ class FormularioController extends Controller
             $cameraRequired = $request->query('cameraRequired');
             $locationRequired = $request->query('locationRequired');
 
-             // Obtener la sección con preguntas, respuestas, y tipo de pregunta
-        $seccion = Seccion::with([
-            'test:id,test_title',
-            'questions' => function ($query) {
-                $query->select('id', 'section_id', 'question', 'test_id', 'required', 'question_type_id')
-                ->with([
-                    'respuestas:id,question_id,answer,option,is_correct',
-                    'questionType:id,name,slug'
-                ]);
+            // Obtener la sección con preguntas, respuestas, y tipo de pregunta
+            $seccion = Seccion::with([
+                'test:id,test_title',
+                'questions' => function ($query) {
+                    $query->select('id', 'section_id', 'question', 'test_id', 'required', 'question_type_id')
+                    ->with([
+                        'respuestas:id,question_id,answer,option,is_correct,extra_data',
+                        'questionType:id,name,slug',
+                        'seccion:id,title'
+                    ]);
+                }
+            ])->findOrFail($seccion_id);
+
+            // Obtener preguntas y aplicar lógica de repetición aleatoria
+            $preguntas = $seccion->questions->shuffle();
+            $cantidadRepetidas = min(intval($preguntas->count() * 0.06), 5);
+            $preguntasRepetidas = $preguntas->random($cantidadRepetidas);
+            $preguntas = $preguntas->concat($preguntasRepetidas)->shuffle();
+            $preguntasNormales = $preguntas->filter(fn($p) => $p->question_type_id != 3);
+            $preguntasPares = $preguntas->filter(fn($p) => $p->question_type_id == 3);
+
+            $preguntas = $preguntasNormales->concat($preguntasPares)->values();
+
+            // Agregar campo de tiempo restante para cada pregunta (con base en la sección)
+            $tiempoSeccion = strtotime($seccion->time_at) - strtotime('00:00:00');
+            foreach ($preguntas as $pregunta) {
+                foreach ($pregunta->respuestas as $respuesta) {
+                    if ($respuesta->extra_data) {
+                        $respuesta->extra_data = json_decode($respuesta->extra_data, true);
+                    }
+                }
+                $pregunta->tiempoRestante = gmdate("i:s", $tiempoSeccion);
+                $pregunta->tipo_slug = $pregunta->questionType->slug ?? null;
             }
-        ])->findOrFail($seccion_id);
 
-        // Obtener preguntas y aplicar lógica de repetición aleatoria
-        $preguntas = $seccion->questions->shuffle();
-        $cantidadRepetidas = min(intval($preguntas->count() * 0.06), 5);
-        $preguntasRepetidas = $preguntas->random($cantidadRepetidas);
-        $preguntas = $preguntas->concat($preguntasRepetidas)->shuffle();
-
-        // Agregar campo de tiempo restante para cada pregunta (con base en la sección)
-        $tiempoSeccion = strtotime($seccion->time_at) - strtotime('00:00:00');
-        foreach ($preguntas as $pregunta) {
-            $pregunta->tiempoRestante = gmdate("i:s", $tiempoSeccion);
-        }
-
-        return view('candidate.formulario.parcial', [
-            'preguntas' => $preguntas,
-            'seccion' => $seccion,
-            'testTitulo' => $seccion->test->test_title,
-            'candidato' => $user,
-            'seccion_id' => $seccion_id,
-            'cameraRequired' => $cameraRequired,
-            'locationRequired' => $locationRequired
-        ]);
+            return view('candidate.formulario.parcial', [
+                'preguntas' => $preguntas,
+                'seccion' => $seccion,
+                'testTitulo' => $seccion->test->test_title,
+                'candidato' => $user,
+                'seccion_id' => $seccion_id,
+                'cameraRequired' => $cameraRequired,
+                'locationRequired' => $locationRequired
+            ]);
     
         } catch (\Exception $e) {
             Log::error("Error en cargarFormulario: " . $e->getMessage(), [

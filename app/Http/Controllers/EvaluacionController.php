@@ -143,7 +143,6 @@ class EvaluacionController extends Controller
                     'user_id' => $userId,
                     'test_id' => $testId,
                     'application_access_code_id' => $request->access_code_id,
-                    'company_id' => $companyId,
                 ]);
 
                 if ($created->wasRecentlyCreated) {

@@ -1,14 +1,21 @@
-<div class="d-flex justify-content-between w-100">
-    @foreach ($pregunta->respuestas as $respuesta)
-        <div class="form-check text-center mx-2">
-            <input class="form-check-input respuesta" type="radio"
-                name="respuestas[{{ $pregunta->pregunta_id }}]"
-                value="{{ $respuesta->respuesta_id }}"
-                data-pregunta="{{ $numPregunta }}"
-                @if($pregunta->required) required @endif>
-            <label class="form-check-label d-block mt-1">
-                {{ $respuesta->respuesta }}
-            </label>
-        </div>
-    @endforeach
+<div class="form-group mb-4">
+    <div class="d-flex flex-column gap-2">
+       @foreach($pregunta->respuestas->sortBy(fn($r) => $r->extra_data['label_index']) as $respuesta)
+            <div class="form-check form-check-inline text-start">
+                <input
+                    class="form-check-input respuesta"
+                    type="radio"
+                    name="respuestas[{{ $pregunta->id }}]"
+                    id="respuesta_{{ $respuesta->id }}"
+                    value="{{ $respuesta->id }}"
+                    data-pregunta="{{ $numPregunta }}"
+                    data-pregunta-id="{{ $pregunta->id }}"
+                    @if($pregunta->required) required @endif
+                >
+                <label class="form-check-label small d-block" for="respuesta_{{ $respuesta->id }}">
+                    {{ $respuesta->answer }}
+                </label>
+            </div>
+        @endforeach
+    </div>
 </div>

@@ -10,7 +10,7 @@ class Respuesta_Usuario extends Model
     use HasFactory;
 
     protected $table = "psico_alobri_user_answers";
-    protected $fillable = ['user_id','question_id', 'answer_id','ip_address','token_id'];
+    protected $fillable = ['user_id','question_id', 'answer_id','ip_address','token_id','extra_data'];
     public $timestamps = false; 
 
     public function tokenEv(){

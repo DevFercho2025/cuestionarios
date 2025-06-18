@@ -252,6 +252,7 @@ class CandidatoController extends Controller
         return response()->json(['code' => $codigo]);
     }
 
+    //al crear un código a un candidato
     public function guardarCodigo(Request $request)
     {
         try {

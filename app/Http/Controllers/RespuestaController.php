@@ -6,6 +6,7 @@ use App\Models\Respuesta;
 use App\Models\Pregunta;
 use App\Models\Test;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class RespuestaController extends Controller
     {
@@ -31,17 +32,91 @@ class RespuestaController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'answer'      => 'required|string',
-            'option'      => 'required|string',
-            'question_id' => 'required|exists:psico_alobri_questions,id' // tabla y columna correctas
+            'question_id' => 'required|exists:psico_alobri_questions,id',
+            'respuestas'  => 'required|array|min:1',
         ]);
 
-        $respuesta = Respuesta::create($data);
+        $question = Pregunta::findOrFail($data['question_id']);
+
+        $savedRespuestas = [];
+
+        foreach ($data['respuestas'] as $respuesta) {
+            $answer     = $respuesta['answer'] ?? null;
+            $option     = $respuesta['option'] ?? null;
+            $is_correct = $respuesta['is_correct'] ?? null;
+            $extra_data = $respuesta['extra_data'] ?? null;
+
+            if ($question->type == 3) {
+                //pares
+                $pairId = $extra_data['pair_id'] ?? uniqid('pair_', true);
+
+                $savedRespuestas[] = Respuesta::create([
+                    'question_id' => $data['question_id'],
+                    'answer'      => $answer,
+                    'option'      => null,
+                    'is_correct'  => null,
+                    'extra_data'  => json_encode(['pair_id' => $pairId]),
+                ]);
+
+                continue;
+            } elseif ($question->type == 2) {
+                //likert
+                $escala = intval($respuesta['escala'] ?? 5);
+
+                $labelsMap = [
+                    4 => [
+                        1 => "Totalmente en desacuerdo",
+                        2 => "En desacuerdo",
+                        3 => "De acuerdo",
+                        4 => "Totalmente de acuerdo"
+                    ],
+                    5 => [
+                        1 => "Totalmente en desacuerdo",
+                        2 => "En desacuerdo",
+                        3 => "Neutral",
+                        4 => "De acuerdo",
+                        5 => "Totalmente de acuerdo"
+                    ],
+                ];
+
+                $labels = $labelsMap[$escala] ?? [];
+
+                for ($i = 1; $i <= $escala; $i++) {
+                    $savedRespuestas[] = Respuesta::create([
+                        'question_id' => $data['question_id'],
+                        'answer'      => $labels[$i] ?? "Punto $i",
+                        'option'      => chr(96 + $i), // 'a', 'b', ...
+                        'is_correct'  => null,
+                        'extra_data'  => json_encode([
+                            'scale_type' => $escala,
+                            'label_index' => $i
+                        ]),
+                    ]);
+                }
+                            
+                break;
+            } else {
+
+                $is_correct = $respuesta['is_correct'] ?? null;
+
+                if ($question->type == 8) {
+                    $is_correct = null;
+                }
+                // Abierta, Verdadero/Falso, Múltiple, doble opción
+                $savedRespuestas[] = Respuesta::create([
+                    'question_id' => $data['question_id'],
+                    'answer'      => $answer,
+                    'option'      => $option,
+                    'is_correct'  => $is_correct === '' ? null : $is_correct,
+                    'extra_data'  => $extra_data ? json_encode($extra_data) : null,
+                ]);
+            }
+        }
 
         return response()->json([
             'status'    => 'success',
-            'message'   => 'Respuesta creada exitosamente.',
-            'respuesta' => $respuesta
+            'message'   => 'Respuestas creadas correctamente.',
+            'respuestas' => $savedRespuestas
         ]);
     }
 

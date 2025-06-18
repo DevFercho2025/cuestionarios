@@ -14,9 +14,9 @@
             padding: 50px 0;
             border-radius: 8px;
             align-items: center;
-            justify-content: center;  /*<-- asegurá que esté esto */
+            justify-content: center;  /*<-- asegurá que esté esto */  
             text-align: center;
-            margin: 0 auto;  /*<-- esto lo centra horizontalmente */
+            margin: 0 auto;  /*<-- esto lo centra horizontalmente */  
         }
         .circulo-Progreso{
             position: relative;
@@ -117,7 +117,7 @@
             flex-grow: 1; /* Temporizador y grabación ocupan menos espacio */
             text-align: center;
         }
-        
+
 
        .separador {
             width: 2px;
@@ -149,10 +149,9 @@
         }
     </style>
 
-
     <div class="barra-Superior d-flex align-items-center justify-content-between">
         <div class="barra-titulo-cuestionario flex-grow-1 text-center">
-            <h1 style="color: rgba(51,58,153,255);">{{ $preguntas->first()->test->test_title }}</h1>
+            <h1 style="color: rgba(51,58,153,255);">{{ $testTitulo }}</h1>
 
             <!--@ foreach ($ preguntas a s $ pregunta)
                 @ if ($ loop- >f irst)
@@ -207,7 +206,6 @@
                 @php $numPregunta = 0; @endphp
 
                 @foreach ($preguntas as $pregunta)
-                    <pre>{{ $pregunta->questionType->slug ?? 'SIN SLUG' }}</pre>
                     <div class="pregunta" id="pregunta-{{ $numPregunta }}" style="display: {{ $numPregunta == 0 ? 'block' : 'none' }};">
                         <div class="card shadow rounded p-3 m-4">
                             <div class="card-body">
@@ -216,12 +214,12 @@
                                         <span style="color: red;">*</span>
                                     @endif
                                     <span>{{ $numPregunta + 1 }}</span>
-                                    <span>. {{ $pregunta->pregunta ?? 'Texto de la pregunta' }}</span>
+                                    <span>. {{ $pregunta->question }}</span>
                                 </h4>
                                 <div class="d-flex" id="Respuestas">
                                     <div class="form-check d-block">
                                         @if (!empty($pregunta->respuestas) && is_iterable($pregunta->respuestas))
-                                           @includeIf('question_types.' . $pregunta->questionType->slug, [
+                                           @includeIf('question_types.' . $pregunta->tipo_slug, [
                                                 'pregunta' => $pregunta,
                                                 'numPregunta' => $numPregunta
                                             ])
@@ -245,23 +243,30 @@
 
         </div>
     </div>
-    <div class="w-50 mb-3">
+<div class="w-50 mb-3">
 
         <div>
-            @php
-                $candidato = session('candidato');
-            @endphp
 
             @if($candidato)
                 <div style="text-align: center; margin-bottom: 20px;">
                     <h4 style="margin: 0; color: #333;">
-                        {{ $candidato['nombre'] ?? '' }} {{ $candidato['apellidoPaterno'] ?? '' }} {{ $candidato['apellidoMaterno'] ?? '' }}
+                        {{ $candidato->name}}
                     </h4>
                     <p style="margin: 0; font-weight: bold;">
-                        Vacante: {{ $candidato['cargoAlQueAplica'] ?? '' }}
+                        Vacante: {{ $candidato->vacante?->vacancy ?? 'No especificada' }}
                     </p>
                 </div>
             @endif
         </div>
+        <div class="progreso-Seccion">
+            <div class="circulo-Progreso">
+                <span class="valor-Progreso">0%</span>
+            </div>
+
+            <div class="texto-Progreso" style="text-align: center" data-id-seccion="{{ $seccion->id }}">
+                {{ $seccion->titulo }}
+            </div>
+        </div>
+
     </div>
 </div>

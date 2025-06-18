@@ -89,4 +89,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(Respuesta_Usuario::class, 'user_id');
     }
+
+    
+    public function vacante()
+    {
+        return $this->hasOneThrough(
+            AccessCode::class,               // Modelo final (donde está vacante)
+            userAssignedTest::class,         // Tabla intermedia
+            'user_id',                       // Clave foránea en userAssignedTest (hacia User)
+            'id',                            // Clave foránea en AccessCode (usada por userAssignedTest)
+            'id',                            // Clave local en User
+            'application_access_code_id'     // Clave local en userAssignedTest que conecta a AccessCode
+        );
+    }
 }

@@ -7,6 +7,7 @@ use App\Models\AccessCode;
 
 class CodigoController extends Controller
 {
+    //validación de código al iniciar sesión como candidato
     public function verificar(Request $request)
     {
         $request->validate([

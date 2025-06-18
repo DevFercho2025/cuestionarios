@@ -649,30 +649,103 @@
                                 buttonsStyling: true,
                                 background: '#262b3c',
                                 preConfirm: () => {
+                                    console.log("preconfirm ejecutado");
+
                                     const test_id = document.getElementById('swal-test_id').value;
                                     const section_id = document.getElementById('swal-section_id').value;
                                     const question_id = document.getElementById('swal-question_id').value;
 
-                                    const questionType = parseInt(document.getElementById('add-respuesta-btn').dataset.questionType || '1');
+                                    const questionType = parseInt(document.getElementById('respuestas-container').dataset.questionType || '1');
                                     const respuestas = [];
+                                    let valid = true;
 
-                                    document.querySelectorAll('.respuesta-input').forEach(input => {
-                                        const answer = input.querySelector('.answer-text').value.trim();
-                                        const option = input.querySelector('.option-text').value.trim();
-                                        const is_correct = input.querySelector('.is-correct').checked ? 1 : 0;
+                                    switch (questionType) {
+                                        case 2:
+                                            // Likert
+                                            const scaleSize = parseInt(document.getElementById('likert-scale-size').value);
+                                            if (!scaleSize || ![4, 5].includes(scaleSize)) {
+                                                valid = false;
+                                                break;
+                                            }
 
-                                        if (questionType === 10) {
-                                            if (answer) respuestas.push({answer});
-                                        } else if (questionType === 3) {
-                                            if (answer && option) respuestas.push({answer, option});
-                                        } else {
-                                            if (answer && option) respuestas.push({answer, option, is_correct});
-                                        }
-                                    });
+                                            const labels = {
+                                                4: ['Totalmente en desacuerdo', 'En desacuerdo', 'De acuerdo', 'Totalmente de acuerdo'],
+                                                5: ['Totalmente en desacuerdo', 'En desacuerdo', 'Neutral', 'De acuerdo', 'Totalmente de acuerdo']
+                                            };
+
+                                            labels[scaleSize].forEach((label, index) => {
+                                                respuestas.push({
+                                                    answer: label,
+                                                    option: String.fromCharCode(97 + index),
+                                                    is_correct: null,
+                                                    extra_data: {
+                                                        scale_type: scaleSize,
+                                                        label_index: index + 1
+                                                    }
+                                                });
+                                            });
+                                            break;
+
+                                        case 3:
+                                            // Pareamiento forzado
+                                            document.querySelectorAll('.respuesta-input').forEach(input => {
+                                                const answerA = input.querySelector('.answer-text-a')?.value.trim();
+                                                const answerB = input.querySelector('.answer-text-b')?.value.trim();
+
+                                                if (answerA && answerB) {
+                                                    const pairId = 'pair_' + Math.random().toString(36).substr(2, 9);
+                                                    respuestas.push(
+                                                        { answer: answerA, extra_data: { pair_id: pairId } },
+                                                        { answer: answerB, extra_data: { pair_id: pairId } }
+                                                    );
+                                                } else {
+                                                    valid = false;
+                                                }
+                                            });
+                                            break;
+
+                                        default:
+                                            // Otros tipos que usan una sola respuesta por input
+                                            document.querySelectorAll('.respuesta-input').forEach(input => {
+                                                const answerEl = input.querySelector('.answer-text');
+                                                const optionEl = input.querySelector('.option-text');
+                                                const isCorrectEl = input.querySelector('.is-correct');
+
+                                                const answer = answerEl ? answerEl.value.trim() : '';
+                                                const option = optionEl ? optionEl.value.trim() : '';
+                                                let is_correct = null;
+
+                                                if (questionType !== 8 && isCorrectEl) {
+                                                    is_correct = isCorrectEl.checked ? 1 : 0;
+                                                }
+
+                                                switch (questionType) {
+                                                    case 5: // Verdadero/Falso
+                                                        if (answer && option) {
+                                                            respuestas.push({ answer, option, is_correct });
+                                                        } else {
+                                                            valid = false;
+                                                        }
+                                                        break;
+                                                    case 10: // Abierta
+                                                        if (answer) respuestas.push({ answer });
+                                                        else valid = false;
+                                                        break;
+                                                    default:
+                                                        if (answer && option) {
+                                                            respuestas.push({ answer, option, is_correct });
+                                                        } else {
+                                                            valid = false;
+                                                        }
+                                                        break;
+                                                }
+                                            });
+                                            break;
+                                    }
 
 
-                                    if (!test_id || !section_id || !question_id || !answer || !option) {
-                                        Swal.showValidationMessage('Por favor, complete todos los campos obligatorios.');
+                                    if (!test_id || !section_id || !question_id || !valid || respuestas.length === 0) {
+                                        Swal.showValidationMessage('Por favor, complete todos los campos requeridos.');
                                         return false;
                                     }
 
@@ -692,6 +765,7 @@
                                     const selectedQuestionId = parseInt(questionSelect.value);
                                     let questionType = getQuestionType(selectedQuestionId, tests);
 
+                                    container.dataset.questionType = questionType;
                                     //ajustar forma de agregar respuesta según tipo
                                     container.innerHTML = generateRespuestaHTML(questionType, selectedQuestionId);
                                     const addBtn = document.getElementById('add-respuesta-btn');
@@ -706,13 +780,6 @@
                                     if (questionType === 2) setupLikertButtonListener();
                                     
                                     updateRemoveButtons();
-                
-                                    /*addBtn.onclick = () => {
-                                        const tipo = parseInt(addBtn.dataset.questionType);
-                                        console.log(tipo)
-                                        container.insertAdjacentHTML('beforeend', generateRespuestaHTML(tipo));
-                                        updateRemoveButtons();
-                                    };*/
                                 }
                             }).then((result) => {
                                 if (result.isConfirmed) {
@@ -793,8 +860,8 @@
                                             }
                                             html += `
                                                         <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                                                            <input type="text" class="form-control answer-text" placeholder="Elemento A" required style="flex:2;">
-                                                            <input type="text" class="form-control option-text" placeholder="Elemento B" required style="flex:2;">
+                                                            <input type="text" class="form-control answer-text-a" placeholder="Elemento A" required style="flex:2;">
+                                                            <input type="text" class="form-control answer-text-b" placeholder="Elemento B" required style="flex:2;">
                                                             <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar par">×</button>
                                                         </div>
                                                     `;
@@ -825,10 +892,12 @@
                                             return `
                                                 <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                                                     <input type="text" class="form-control answer-text" value="Verdadero" disabled required style="flex:2;">
+                                                    <input type="text" class="form-control option-text" value="a" readonly style="width: 60px;">
                                                     <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                                                 </div>
                                                 <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                                                     <input type="text" class="form-control answer-text" value="Falso" disabled required style="flex:2;">
+                                                    <input type="text" class="form-control option-text" value="b" readonly style="width: 60px;">
                                                     <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                                                 </div>
                                             `;
@@ -837,7 +906,7 @@
                                         //Pregunta Abierta
                                             return `
                                                 <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                                                    <input type="text" class="form-control answer-text" value="Respuesta abierta" disabled style="flex:4;">
+                                                    <input type="text" class="form-control answer-text" value="Respuesta abierta" readonly style="flex:4;">
                                                 </div>
                                             `;
                                         break;
@@ -940,9 +1009,9 @@
 
                                 const container = document.getElementById('respuestas-container');
 
-                            
+                                container.dataset.questionType = questionType;
                                 container.innerHTML = generateRespuestaHTML(questionType, selectedQuestionId);
-                                
+
                                 const addBtn = document.getElementById('add-respuesta-btn');
 
                                 if (addBtn) {
