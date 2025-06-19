@@ -14,7 +14,8 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    //'default' => env('MAIL_MAILER', 'log'),
+     'default' => env('MAIL_MAILER', 'failover'),
 
     /*
     |--------------------------------------------------------------------------
@@ -36,6 +37,22 @@ return [
     */
 
     'mailers' => [
+
+        'mailgun' => [
+            'transport' => 'mailgun',
+            // 'client' => [
+            //     'timeout' => 5,
+            // ],
+        ],
+
+        'failover' => [
+            'transport' => 'failover',
+            'mailers' => [
+                'mailgun',
+                'smtp',
+                'log',
+            ],
+        ],
 
         'smtp' => [
             'transport' => 'smtp',
@@ -77,14 +94,6 @@ return [
 
         'array' => [
             'transport' => 'array',
-        ],
-
-        'failover' => [
-            'transport' => 'failover',
-            'mailers' => [
-                'smtp',
-                'log',
-            ],
         ],
 
         'roundrobin' => [

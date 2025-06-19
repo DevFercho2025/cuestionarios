@@ -167,4 +167,18 @@
             }
         });
     </script>
+
+    <script>
+        //Para cuando se redirige al candidato desde un correo
+        document.addEventListener('DOMContentLoaded', function () {
+            const hash = window.location.hash;
+            if (hash) {
+                const tabTrigger = document.querySelector(`[data-bs-toggle="tab"][data-bs-target="${hash}"]`);
+                if (tabTrigger) {
+                    const tab = new bootstrap.Tab(tabTrigger);
+                    tab.show();
+                }
+            }
+        });
+    </script>
 @endsection

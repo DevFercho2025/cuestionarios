@@ -33,6 +33,10 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/candidate', [CandidateController::class, 'index'])->name('candidate.index');
 Route::post('/candidate/validar-codigo', [CandidateController::class, 'validarCodigo'])->name('validar.codigo');
 
+    //ruta de prueba para ver aspecto de email al asignar evaluación
+    Route::get('/evaluaciones-asignadas/{userId}/{codeId}', [EvaluacionController::class, 'correoEvaluacionesAsignadas'])->name('enviar.correo');
+
+
 Route::get('register', [AuthController::class, 'showRegisterForm'])->name('register.wizard');
 Route::post('register/wizard', [AuthController::class, 'registerFormStore'])->name('register.wizard.store');
 

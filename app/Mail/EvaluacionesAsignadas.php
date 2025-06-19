@@ -2,6 +2,10 @@
 
 namespace App\Mail;
 
+use App\Models\User;
+use App\Models\AccessCode;
+use App\Models\Company;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,35 +18,39 @@ class EvaluacionesAsignadas extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct(
+        protected User $candidate,
+        protected AccessCode $code,
+        protected string $loginURL,
+    )
+    {}
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
             subject: 'Evaluaciones Asignadas',
-            //from en config mail.php
+            //from global en config mail.php
             replyTo: [
                 new Address('Asignador@example.com', 'Asignador'),
             ],
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
+        $assignedTests = $this->candidate->assignedTestsPorCodigo($this->code->id)->get();
+
         return new Content(
-            view: 'view.name',
+            view: 'emails.evaluaciones_asignadas',
+            with: [
+                'candidateName' => $this->candidate->name,
+                'assignedTests' => $assignedTests,
+                'testsCount' => $assignedTests->count(),
+                'company' => $this->code->company->name,
+                'code' => $this->code,
+                'logoPath' => public_path('assets/img/Alobri/alobriLogo.png'),
+                'loginURL' => $this->loginURL,
+            ],
         );
     }
 

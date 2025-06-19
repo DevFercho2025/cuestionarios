@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
-use function Ramsey\Uuid\v1;
-
 class CandidatoController extends Controller
 {
     public function index(Request $request)
@@ -75,7 +73,6 @@ class CandidatoController extends Controller
 
         } catch (\Exception $e) {
 
-            // Retornar error con detalles
             return response()->json([
                 'error' => 'Hubo un problema al obtener los candidatos.',
                 'message' => $e->getMessage(),

@@ -9,6 +9,11 @@ use App\Models\Pregunta;
 use App\Models\UserTestRecord;
 use App\Models\userAssignedTest;
 use App\Models\ContadorEvaluacion;
+
+use App\Mail\EvaluacionesAsignadas;
+use App\Models\AccessCode;
+use App\Models\User;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -151,12 +156,16 @@ class EvaluacionController extends Controller
                 }
             }
 
-            return response()->json([
+            return redirect()->route('enviar.correo', [
+                'userId' => $userId,
+                'codeId' => $request->access_code_id
+            ]);
+            /*return response()->json([
                 'success' => true,
                 'message' => $borrarRespuestas
                     ? 'Evaluaciones asignadas y respuestas anteriores eliminadas.'
                     : 'Evaluaciones asignadas sin borrar respuestas anteriores.',
-            ]);
+            ]);*/
         } catch (\Exception $e) {
             Log::error('Error al asignar evaluaciones: ' . $e->getMessage(), [
                 'exception' => $e,
@@ -169,6 +178,16 @@ class EvaluacionController extends Controller
                 'message' => 'Ocurrió un error inesperado al asignar las evaluaciones. Por favor, intenta nuevamente o contacta a soporte.'
             ], 500);
         }
+    }
+
+    public function correoEvaluacionesAsignadas($user_id, $code_id)
+    {
+        $candidate = User::findOrFail($user_id);
+        $code = AccessCode::with('company')->findOrFail($code_id);
+        $loginURL = route('login') . '#tab-candidate';
+
+        return new EvaluacionesAsignadas($candidate, $code, $loginURL);
+
     }
 
     public function evaluacionesPorUsuario(Request $request, $user_id)
