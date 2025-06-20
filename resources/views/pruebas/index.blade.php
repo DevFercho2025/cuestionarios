@@ -49,16 +49,24 @@
                             <h4 class="white-text">Gestión de Pruebas</h4>
                         </div>
                         <div class="col s4 right-align">
-                        <div style="text-align: right;">
-                            <a id="createTestBtn" class="btn btn-large gradient-btn pulse" style="color: white; display: inline-block; background-color:#4f52b5">
-                            Crear una nueva Prueba
-                            </a>
+                            <div style="text-align: right;">
+                                <a id="TestBtn" class="btn btn-large gradient-btn pulse" style="color: white; display: inline-block; background-color:#4f52b5">
+                                Crear una Prueba
+                                </a>
+                            </div>
                         </div>
-                        </div>
+                        <!--<div class="col s4 right-align">
+                            <div style="text-align: right;">
+                                <a id="createTestBtn" class="btn btn-large gradient-btn pulse" style="color: white; display: inline-block; background-color:#4f52b5">
+                                Crear una nueva Prueba
+                                </a>
+                            </div>
+                        </div>-->
                     </div>
                 </div>
             </div>
         </div>
+        @include('partials.form_crear_prueba_completa') 
         <!-- Tabla de Pruebas -->
         <div class="row">
             <div class="col s12">
@@ -113,8 +121,10 @@
         // Inicializar componentes del template
         if (typeof M !== 'undefined') {
             M.Modal.init(document.querySelectorAll('.modal'));
-            M.FormSelect.init(document.querySelectorAll('select'));
+            //M.FormSelect.init(document.querySelectorAll('select'));
             M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+            const selectsFueraDelModal = document.querySelectorAll('.no-bootstrap select');
+            M.FormSelect.init(document.querySelectorAll('.materialize-only select'));
         }
 
         // Inicialización de DataTable
