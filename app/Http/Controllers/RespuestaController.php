@@ -18,7 +18,7 @@ class RespuestaController extends Controller
 
     public function datatable(Request $request)
     {
-        $query = Respuesta::with('pregunta.test'); 
+        $query = Respuesta::with('pregunta.test');
 
         if ($request->has('test_id') && $request->test_id != '') {
             $query->whereHas('pregunta', function ($q) use ($request) {
@@ -46,7 +46,7 @@ class RespuestaController extends Controller
             $is_correct = $respuesta['is_correct'] ?? null;
             $extra_data = $respuesta['extra_data'] ?? null;
 
-            if ($question->type == 3) {
+            if ($question->question_type_id == 3) {
                 //pares
                 $pairId = $extra_data['pair_id'] ?? uniqid('pair_', true);
 
@@ -93,7 +93,7 @@ class RespuestaController extends Controller
                         ]),
                     ]);
                 }
-                            
+
                 break;
             } else {
 
@@ -191,7 +191,7 @@ class RespuestaController extends Controller
 
     public function actualizarRespuestas(Request $request, $id)
     {
-        
+
         return response()->json(['message' => 'Respuestas actualizadas correctamente.']);
     }
 

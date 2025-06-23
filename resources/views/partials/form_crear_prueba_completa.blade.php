@@ -5,7 +5,7 @@
             overflow-y: auto;
         }
     </style>
-    
+
 
 </head>
 <!-- Modal Bootstrap con contenido Materialize -->
@@ -73,7 +73,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                     </div>
                     <div class="col-md-8">
                         <!-- Nav tabs -->
@@ -116,7 +116,7 @@
         });
 
         //crear un test
-        document.getElementById('btn-crear-test').addEventListener('click', function () { 
+        document.getElementById('btn-crear-test').addEventListener('click', function () {
             const titulo = document.getElementById('test-titulo').value.trim();
             if (titulo === '') {
                 alert('El título es obligatorio');
@@ -259,8 +259,8 @@
                         document.querySelector(`#pregunta-tipo-id-${seccionId}`).selectedIndex = 0;
                         document.querySelector(`#pregunta-requerida-${seccionId}`).checked = false;
                         document.querySelector(`#contenedor-respuestas-previo-${seccionId}`).innerHTML = '<div class="text-muted small">Elige un tipo de pregunta</div>';
-                    
-                        guardarRespuestas({testId: testId,sectionId: sectionId,question_id: response.pregunta.id});
+
+                        guardarRespuestasAutomaticas({testId: testId, sectionId: sectionId, questionId: response.pregunta.id});
                     },
                     error: function (xhr) {
                         let errorMsg = 'No se pudo crear la pregunta.';
@@ -557,7 +557,7 @@
     function generateRespuestaHTML(questionType, questionId) {
         const alreadyHasAddButton = !!document.getElementById('add-respuesta-btn');
         let html = '';
-                                
+
 
         switch (questionType) {
             case 2:
@@ -649,7 +649,7 @@
 
         return html;
     }
-    
+
     //quitar una respuesta añadida
     function updateRemoveButtons(containerSelector) {
         const container = typeof containerSelector === 'string' ? document.querySelector(containerSelector) : containerSelector;
