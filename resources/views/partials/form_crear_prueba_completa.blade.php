@@ -251,15 +251,8 @@
                     data: data,
                     dataType: "json",
                     success: function (response) {
-                        alert('¡Pregunta creada exitosamente!');
                         const contenedorPreguntas = document.querySelector(`#preguntas-creadas-${seccionId}`);
-                        contenedorPreguntas.insertAdjacentHTML('beforeend', renderizarPregunta(response.pregunta));
-
-                        document.querySelector(`#pregunta-texto-${seccionId}`).value = '';
-                        document.querySelector(`#pregunta-tipo-id-${seccionId}`).selectedIndex = 0;
-                        document.querySelector(`#pregunta-requerida-${seccionId}`).checked = false;
-                        document.querySelector(`#contenedor-respuestas-previo-${seccionId}`).innerHTML = '<div class="text-muted small">Elige un tipo de pregunta</div>';
-
+                        
                         guardarRespuestasAutomaticas({testId: testId, sectionId: sectionId, questionId: response.pregunta.id});
                     },
                     error: function (xhr) {
@@ -612,12 +605,12 @@
                 //Verdadero o Falso
                     return `
                         <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                            <input type="text" class="form-control answer-text" value="Verdadero" disabled required style="flex:2;">
+                            <input type="text" class="form-control answer-text" value="Verdadero" readonly required style="flex:2;">
                             <input type="text" class="form-control option-text" value="a" readonly style="width: 60px;">
                             <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                         </div>
                         <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                            <input type="text" class="form-control answer-text" value="Falso" disabled required style="flex:2;">
+                            <input type="text" class="form-control answer-text" value="Falso" readonly required style="flex:2;">
                             <input type="text" class="form-control option-text" value="b" readonly style="width: 60px;">
                             <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                         </div>
@@ -664,7 +657,7 @@
         });
     }
 
-    function guardarRespuestasAutomaticas({testId, sectionId, questionId}) {
+    function guardarRespuestasAutomaticas({testId, sectionId, questionId}) { 
         const test_id = testId;
         const section_id = sectionId;
         const question_id = questionId;
@@ -783,8 +776,11 @@
                 data: data,
                 dataType: "json",
                 success: function (response) {
+                    console.log("success de respuestas")
                     alert('¡Respuestas creadas exitosamente!');
                     agregarPestañaDeSeccion(response.seccion);
+                    contenedorPreguntas.insertAdjacentHTML('beforeend', renderizarPregunta(response.pregunta));
+
                 },
                 error: function (xhr) {
                     let errorMsg = 'No se pudo crear la respuesta.';

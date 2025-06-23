@@ -31,6 +31,7 @@ class RespuestaController extends Controller
 
     public function store(Request $request)
     {
+        dd($request->all);
         $data = $request->validate([
             'question_id' => 'required|exists:psico_alobri_questions,id',
             'respuestas'  => 'required|array|min:1',
@@ -112,7 +113,7 @@ class RespuestaController extends Controller
                 ]);
             }
         }
-
+ 
         return response()->json([
             'status'    => 'success',
             'message'   => 'Respuestas creadas correctamente.',
