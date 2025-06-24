@@ -1,16 +1,36 @@
 <head>
     <style>
         .modal-fullheight .modal-content {
-            height: 80vh;
+            height: 65vh;
             overflow-y: auto;
+        }
+        .bs-stepper {
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .swal2-container.swal2-top-end,
+        .swal2-container.swal2-bottom-end,
+        .swal2-container.swal2-top,
+        .swal2-container.swal2-bottom,
+        .swal2-container.swal2-center {
+        z-index: 20000 !important;
+        }
+
+        .swal2-popup.swal2-toast {
+            background: #30334e !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8) !important;
+            z-index: 1100 !important;
         }
     </style>
 
 
 </head>
 <!-- Modal Bootstrap con contenido Materialize -->
+
 <div class="modal fade" id="ventana-crear-prueba" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl modal-fullheight">
+    <!--<div class="modal-dialog modal-dialog-centered modal-xl modal-fullheight">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Crea una prueba</h5>
@@ -18,9 +38,9 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-4"> <!-- border-end-->
+                    <div class="col-md-4"> <!-- border-end
                         <div class="card">
-                            <!--<h5 class="card-header">Crear Test</h5>-->
+                            <!--<h5 class="card-header">Crear Test</h5>
                             <div class="card-body">
                                 <div class="form-floating form-floating-outline mb-4">
                                     <input id="test-titulo" type="text" class="form-control" placeholder="Título" required>
@@ -44,7 +64,7 @@
                         </div>
 
                         <div class="card mt-2">
-                            <!--<h5 class="card-header">Crear Sección</h5>-->
+                            <!--<h5 class="card-header">Crear Sección</h5>
                             <div class="card-body">
                                 <div id="crear-seccion-form">
                                     <div class="form-floating form-floating-outline mb-4">
@@ -76,14 +96,14 @@
 
                     </div>
                     <div class="col-md-8">
-                        <!-- Nav tabs -->
+                        <!-- Nav tabs 
                         <ul class="nav nav-tabs" id="tabs-secciones" role="tablist">
-                            <!--Aquí van pestañas de secciones creadas-->
+                            <!--Aquí van pestañas de secciones creadas
                         </ul>
 
-                        <!-- Tab content -->
+                        <!-- Tab content 
                         <div class="tab-content mt-3" id="contenido-secciones">
-                            <!--Contenido para crear preguntas y sus respuestas-->
+                            <!--Contenido para crear preguntas y sus respuestas
                         </div>
                     </div>
                 </div>
@@ -92,12 +112,159 @@
                 <a href="#" class="btn btn-primary" id="TestGuardarBtn">Guardar</a>
             </div>
         </div>
+    </div>-->
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-fullheight">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="wizard-make-test" class="bs-stepper mt-2 linear">
+                    <!--Header con pasos visuales-->
+                    <div class="bs-stepper-header">
+                        <div class="step" data-target="#add-test">
+                            <button type="button" class="step-trigger flex-lg-wrap gap-lg-2 px-lg-0">
+                                <span class="bs-stepper-circle"><i class="ri-check-line"></i></span>
+                                <span class="bs-stepper-label ms-lg-0">
+                                    <span class="d-flex flex-column gap-1 text-lg-center">
+                                        <span class="bs-stepper-title">Crea una Prueba</span>
+                                        <span class="bs-stepper-subtitle">Elije a qué categoría y tipo pertenece</span>
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                        
+                        <div class="line mt-lg-n4 mb-lg-3"></div>
+                        <div class="step" data-target="#add-sections">
+                            <button type="button" class="step-trigger flex-lg-wrap gap-lg-2 px-lg-0">
+                                <span class="bs-stepper-circle"><i class="ri-check-line"></i></span>
+                                <span class="bs-stepper-label ms-lg-0">
+                                    <span class="d-flex flex-column gap-1 text-lg-center">
+                                        <span class="bs-stepper-title">secciones</span>
+                                        <span class="bs-stepper-subtitle">Crea secciones para la nueva prueba</span>
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                            
+                        <div class="line mt-lg-n4 mb-lg-3"></div>
+                        <div class="step" data-target="#add-questions">
+                            <button type="button" class="step-trigger flex-lg-wrap gap-lg-2 px-lg-0">
+                                <span class="bs-stepper-circle"><i class="ri-check-line"></i></span>
+                                <span class="bs-stepper-label ms-lg-0">
+                                    <span class="d-flex flex-column gap-1 text-lg-center">
+                                        <span class="bs-stepper-title">Preguntas</span>
+                                        <span class="bs-stepper-subtitle">Añade preguntas y sus respuestas a una sección</span>
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bs-stepper-content">
+                        <!--#1-->
+                        <div id="add-test" class="content fade">
+                            <div class="card">
+                                <!--<h5 class="card-header">Crear Test</h5>-->
+                                <div class="card-body">
+                                    <div class="form-floating form-floating-outline mb-4">
+                                        <input id="test-titulo" type="text" class="form-control" placeholder="Título" required>
+                                        <label for="test-titulo">Título</label>
+                                    </div>
+
+                                    <div class="form-floating form-floating-outline mb-4">
+                                        <select id="test-categoria" class="form-select" required>
+                                        </select>
+                                        <label for="test-categoria">Categoría</label>
+                                    </div>
+
+                                    <div class="form-floating form-floating-outline mb-4">
+                                        <select id="test-tipo" class="form-select" required>
+                                        </select>
+                                        <label for="test-tipo">Tipo</label>
+                                    </div>
+
+                                    <button id="btn-crear-test" class="btn btn-primary w-100 mt-2">Crear prueba</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--#2-->
+                        <div id="add-sections" class="content fade">
+                            <div class="card mt-2">
+                                <!--<h5 class="card-header">Crear Sección</h5-->
+                                <div class="card-body">
+                                    <div id="crear-seccion-form">
+                                        <div class="form-floating form-floating-outline mb-4">
+                                            <input id="seccion-titulo" type="text" class="form-control" placeholder="Título" required>
+                                            <label for="seccion-titulo">Título</label>
+                                        </div>
+
+                                        <div class="form-floating form-floating-outline mb-4">
+                                            <input id="seccion-bloque" type="text" class="form-control" placeholder="Bloque" required>
+                                            <label for="seccion-bloque">Bloque</label>
+                                        </div>
+
+                                        <div class="form-floating form-floating-outline mb-4">
+                                            <select id="seccion-test-id" class="form-select" required>
+                                                <option disabled selected>Selecciona una prueba</option>
+                                            </select>
+                                            <label for="seccion-test-id">Prueba a la que pertenece</label>
+                                        </div>
+
+                                        <div class="form-floating form-floating-outline mb-4">
+                                            <input type="text" id="seccion-tiempo" class="form-control" placeholder="Tiempo (hh:mm:ss)" value="00:00:00" required>
+                                            <label for="seccion-tiempo">Tiempo (hh:mm:ss)</label>
+                                        </div>
+
+                                        <button id="btn-crear-seccion" class="btn btn-secondary w-100 mt-2">Crear sección</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--#3-->
+                        <div id="add-questions" class="content fade">
+                            <div class="col-md-8">
+                                <!-- Nav tabs -->
+                                <ul class="nav nav-tabs" id="tabs-secciones" role="tablist">
+                                    <!--Aquí van pestañas de secciones creadas-->
+                                </ul>
+
+                                <!-- Tab content -->
+                                <div class="tab-content mt-3" id="contenido-secciones">
+                                    <!--Contenido para crear preguntas y sus respuestas-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Botón para secciones-->
+                    <button type="button"
+                            class="btn btn-primary position-absolute d-none"
+                            style="bottom: 1rem; right: 1rem;"
+                            id="btn-avanzar-secciones">
+                        <span class="align-middle d-sm-inline-block d-none me-sm-1">
+                             Ya creé todas las secciones que necesito
+                        </span>
+                        <i class="ri-arrow-right-line"></i>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bs-stepper/dist/js/bs-stepper.min.js"></script>
 
 <script>
     let bsModal;
     document.addEventListener('DOMContentLoaded', function () {
+
+        let stepper = new Stepper(document.querySelector('#wizard-make-test'), {
+            linear: true,
+            animation: true
+        });
+        stepper.to(1);
 
         //Abrir ventana
         document.getElementById('TestBtn').addEventListener('click', function () {
@@ -110,10 +277,10 @@
             });
         });
 
-        //Cerrar ventana
+        /*Cerrar ventana
         document.getElementById('TestGuardarBtn').addEventListener('click', function () {
             bsModal.hide();
-        });
+        });*/
 
         //crear un test
         document.getElementById('btn-crear-test').addEventListener('click', function () {
@@ -136,16 +303,37 @@
                 data: data,
                 dataType: "json",
                 success: function (response) {
-                    alert('¡Test creado exitosamente!');
+                    Swal.fire({
+                        toast: true,
+                        position: 'bottom-end',
+                        icon: 'success',
+                        title: '¡Test creado exitosamente!',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'custom-toast'
+                        },
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    });
                     let table = jQuery('#testsTable').DataTable();
                     table.ajax.reload(null, false);
 
                     const nuevoTestId = response.test.id;
 
+                    //avanzar a paso #2
+                    stepper.next();
+                    const btnAvanzar = document.getElementById('btn-avanzar-secciones');
+                    btnAvanzar.classList.remove('d-none');
+
                     //seleccionar test recién creado en el select de crear sección
                     cargarPruebas().then(() => {
                         jQuery('#seccion-test-id').val(nuevoTestId);
                     });
+                    
                 },
                 error: function (xhr) {
                     let errorMsg = 'No se pudo crear el nuevo test.';
@@ -173,7 +361,25 @@
                 data: data,
                 dataType: "json",
                 success: function (response) {
-                    alert('¡Sección creada exitosamente!');
+                    Swal.fire({
+                        toast: true,
+                        position: 'bottom-end',
+                        icon: 'success',
+                        title: '¡Sección creada exitosamente!',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'custom-toast'
+                        },
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    });
+                    let table = jQuery('#testsTable').DataTable();
+                    table.ajax.reload(null, false);
+
                     agregarPestañaDeSeccion(response.seccion);
                 },
                 error: function (xhr) {
@@ -185,6 +391,7 @@
                 }
             });
         });
+
         document.getElementById('seccion-tiempo').addEventListener('input', function () {
             const input = $(this);
             let value = input.val();
@@ -221,6 +428,16 @@
             input.prop("selectionEnd", cursorPosition);
         });
 
+        //botón para avanzar tras crear varias secciones
+        document.getElementById('btn-avanzar-secciones').addEventListener('click', function () {
+            stepper.next();
+            const btnAvanzar = document.getElementById('btn-avanzar-secciones');
+            btnAvanzar.classList.add('d-none');
+        });
+
+        
+        let letraActualCharCode = 97 //esto es "a", para las respuestas de cleaver
+
         //crear una pregunta
         document.body.addEventListener('click', function (event) {
             //guardar pregunta
@@ -251,8 +468,6 @@
                     data: data,
                     dataType: "json",
                     success: function (response) {
-                        const contenedorPreguntas = document.querySelector(`#preguntas-creadas-${seccionId}`);
-                        
                         guardarRespuestasAutomaticas({testId: testId, sectionId: sectionId, questionId: response.pregunta.id});
                     },
                     error: function (xhr) {
@@ -296,7 +511,7 @@
                 });
             }
 
-            //añadir respuesta en múltiple, reacción forzada o pares
+            //añadir respuesta en múltiple, reacción forzada, pares, o cleaver
             if (event.target && event.target.id.startsWith('add-respuesta-btn-')) {
                 const questionId = event.target.id.replace('add-respuesta-btn-', '');
                 const container = document.getElementById(`respuestas-dinamicas-${questionId}`);
@@ -305,7 +520,6 @@
 
                 // Detectar tipo de pregunta:
                 const tipo = parseInt(container.dataset.questionType || 1);
-
                 let newRespuestaHTML = '';
 
                 switch (tipo) {
@@ -318,12 +532,24 @@
                             </div>
                         `;
                         break;
-
+                    case 14:
+                        let letra = String.fromCharCode(letraActualCharCode); //Obtener letra actual
+                        newRespuestaHTML = '';
+                        for (let i = 0; i < 4; i++) {
+                            newRespuestaHTML += `
+                                <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center; ${i === 0 ? 'margin-top:30px;' : ''}">
+                                    <input type="text" class="form-control option-text" placeholder="Opción" value="${letra}" required style="flex:1;">
+                                    <input type="text" class="form-control answer-text" placeholder="característica" required style="flex:3;">
+                                </div>
+                            `;
+                        }
+                        letraActualCharCode++; //Incrementa para la próxima vez
+                        break;
                     default: // Selección múltiple, reacción forzada, otro tipo aún no definido.
                         newRespuestaHTML = `
                             <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                                <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
                                 <input type="text" class="form-control option-text" placeholder="Opción" required style="flex:2;">
+                                <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
                                 <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                                 <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
                             </div>
@@ -331,6 +557,7 @@
                         break;
                 }
 
+                console.log("Añadió html para crear respuesta");
                 container.insertAdjacentHTML('beforeend', newRespuestaHTML);
                 updateRemoveButtons(container);
             }
@@ -468,10 +695,13 @@
         return `
         <div class="card mt-3">
             <div class="card-body">
-                <!--h6 class="mb-3">Crear pregunta</h6>-->
-                <div class="form-floating form-floating-outline mb-4">
-                    <input type="text" class="form-control" id="pregunta-texto-${seccion.id}" placeholder="Pregunta" required>
-                    <label for="pregunta-texto-${seccion.id}">Pregunta</label>
+                <h6 class="mb-3">Crear pregunta</h6>
+
+                <div class="row mb-4">
+                    <div class="form-floating form-floating-outline mb-4">
+                        <input type="text" class="form-control" id="pregunta-texto-${seccion.id}" placeholder="Pregunta" required>
+                        <label for="pregunta-texto-${seccion.id}">Pregunta</label>
+                    </div>
                 </div>
 
                 <div class="row mb-4">
@@ -496,7 +726,7 @@
                     <div class="text-muted small mb-2">Elige un tipo de pregunta para modificar las respuestas posibles...</div>
                 </div>
 
-                <button class="btn btn-success w-100" id="btn-crear-pregunta-${seccion.id}">Crear pregunta</button>
+                <button class="btn btn-secondary w-100" id="btn-crear-pregunta-${seccion.id}">Crear pregunta</button>
 
                 <!-- Contenedor para mostrar preguntas creadas -->
                 <div id="preguntas-creadas-${seccion.id}" class="mt-4"></div>
@@ -588,14 +818,14 @@
                 //doble opción
                     return `
                         <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                            <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
                             <input type="text" class="form-control option-text" placeholder="Opción" value="a" required style="flex:2;">
+                            <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
                             <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                             <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
                         </div>
                         <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                            <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
                             <input type="text" class="form-control option-text" placeholder="Opción" value="b" required style="flex:2;">
+                            <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
                             <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                             <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
                         </div>
@@ -605,13 +835,13 @@
                 //Verdadero o Falso
                     return `
                         <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                            <input type="text" class="form-control answer-text" value="Verdadero" readonly required style="flex:2;">
                             <input type="text" class="form-control option-text" value="a" readonly style="width: 60px;">
+                            <input type="text" class="form-control answer-text" value="Verdadero" readonly required style="flex:2;">
                             <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                         </div>
                         <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                            <input type="text" class="form-control answer-text" value="Falso" readonly required style="flex:2;">
                             <input type="text" class="form-control option-text" value="b" readonly style="width: 60px;">
+                            <input type="text" class="form-control answer-text" value="Falso" readonly required style="flex:2;">
                             <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                         </div>
                     `;
@@ -624,6 +854,18 @@
                         </div>
                     `;
                 break;
+            case 14:
+                //Cleaver
+                    html += `<div id="respuestas-dinamicas-${questionId}" data-question-type="${questionType}"></div>`;
+
+                    // Botón para añadir nuevas respuestas
+                    html += `
+                        <button type="button" id="add-respuesta-btn-${questionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
+                            + Añadir otro bloque de características
+                        </button>
+                    `;
+                    return html;
+                break;
             default:
                 //Selección múltiple(1), reacción forzada(8)
                     html += `<div id="respuestas-dinamicas-${questionId}" data-question-type="${questionType}"></div>`;
@@ -634,8 +876,6 @@
                             + Añadir respuesta
                         </button>
                     `;
-
-
                     return html;
                 break;
             }
@@ -662,12 +902,13 @@
         const section_id = sectionId;
         const question_id = questionId;
 
-        const container = document.getElementById(`respuestas-container-${question_id}`);
+        const container = document.getElementById(`#contenedor-respuestas-previo-${section_id}`);
         if (!container) {
-            console.warn(`Contenedor de respuestas no encontrado para pregunta ${question_id}`);
+            console.warn(`Contenedor de respuestas no encontrado`);
             return;
         }
-        const questionType = parseInt(container.dataset.questionType || '1');
+        const tipo = document.querySelector(`#pregunta-tipo-id-${seccionId}`);
+        const questionType = parseInt(tipo.value || '1');
 
             const respuestas = [];
             let valid = true;
@@ -776,11 +1017,7 @@
                 data: data,
                 dataType: "json",
                 success: function (response) {
-                    console.log("success de respuestas")
-                    alert('¡Respuestas creadas exitosamente!');
                     agregarPestañaDeSeccion(response.seccion);
-                    contenedorPreguntas.insertAdjacentHTML('beforeend', renderizarPregunta(response.pregunta));
-
                 },
                 error: function (xhr) {
                     let errorMsg = 'No se pudo crear la respuesta.';
