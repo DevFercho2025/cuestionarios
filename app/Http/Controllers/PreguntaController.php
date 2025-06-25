@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pregunta;
 use App\Models\Test;
 use App\Models\QuestionType;
+use App\Services\RespuestaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -36,7 +37,7 @@ class PreguntaController extends Controller
         return response()->json($preguntas);
     }
 
-    public function store(Request $request)
+    public function store(Request $request,  RespuestaService $respuestaService)
     {
         $data = $request->validate([
             'question'          => 'required|string',
@@ -48,12 +49,25 @@ class PreguntaController extends Controller
 
         $data['required'] = $data['required'] ?? 0;
 
-        $pregunta = Pregunta::create($data);
+        Log::info('Creando pregunta con datos:', $data);
 
+        $question = Pregunta::create($data);
+
+        if ($request->has('answers')) {
+            Log::info("Guardando respuestas para pregunta ID {$question->id}", [
+                'answers' => $request->answers
+            ]);
+
+            $respuestaService->saveAnswers($request->answers, $question->id);
+        } else {
+            Log::warning("No se recibieron respuestas para la pregunta ID {$question->id}");
+        }
+
+        Log::info("Pregunta creada correctamente", ['pregunta_id' => $question->id]);
         return response()->json([
             'status'   => 'success',
             'message'  => 'Pregunta creada exitosamente.',
-            'pregunta' => $pregunta
+            'pregunta' => $question
         ]);
     }
 

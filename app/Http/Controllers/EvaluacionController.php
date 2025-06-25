@@ -156,16 +156,18 @@ class EvaluacionController extends Controller
                 }
             }
 
-            return redirect()->route('enviar.correo', [
+            //prueba para ver correo tras asignar
+            /*return redirect()->route('enviar.correo', [
                 'userId' => $userId,
                 'codeId' => $request->access_code_id
-            ]);
-            /*return response()->json([
+            ]);*/
+
+            return response()->json([
                 'success' => true,
                 'message' => $borrarRespuestas
                     ? 'Evaluaciones asignadas y respuestas anteriores eliminadas.'
                     : 'Evaluaciones asignadas sin borrar respuestas anteriores.',
-            ]);*/
+            ]);
         } catch (\Exception $e) {
             Log::error('Error al asignar evaluaciones: ' . $e->getMessage(), [
                 'exception' => $e,

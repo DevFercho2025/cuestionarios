@@ -60,67 +60,92 @@ function inicializarMostrarPreguntas() {
 
 function manejarCambioRespuesta(event) {
     if (event.target.classList.contains("respuesta")) {
-        
-        let preguntaActual = parseInt(event.target.dataset.pregunta);
-        let siguientePreguntaDiv = document.getElementById(`pregunta-${preguntaActual + 1}`);
+        const preguntaId = event.target.dataset.preguntaId;
+        const respuestaId = event.target.value;
 
-        console.log(`Respondida pregunta: ${preguntaActual}`);
-        console.log(`Mostrando pregunta: ${preguntaActual + 1}`);
-
-        // Obtener el ID real de la pregunta desde data-pregunta-id
-        let preguntaId = event.target.dataset.preguntaId;
         if (!preguntaId) {
             console.warn("No se encontró data-pregunta-id en el input:", event.target);
             return;
         }
 
-        // Para preguntas de selección: usar value como respuesta
-        // Para preguntas abiertas: también se puede usar value (del textarea)
-        let respuestaId = event.target.value;
+        const container = document.getElementById('respuestas-hidden-container');
 
-        // Guardar en campo oculto
-        let container = document.getElementById('respuestas-hidden-container');
-        let existing = container.querySelector(`input[name="respuestas[${preguntaId}]"]`);
+        // Detectar si es Cleaver
+        const isCleaver = event.target.name.includes('bloque_');
+        if (isCleaver) {
+            // Extraer tipo (M o L)
+            let tipoSeleccion = null;
+            let optionB = null;
+            const tipoMatch = event.target.name.match(/\[([ML])\]$/);
 
-        if (existing) {
-            existing.value = respuestaId;
+            if (tipoMatch) {
+                tipoSeleccion = tipoMatch[1]; 
+            }
+
+            //option de bloque (a, b...)
+            const bloqueMatch = event.target.name.match(/\[.*bloque_([^\]]+)\]/);
+            if (bloqueMatch) {
+                optionB = bloqueMatch[1];
+            }
+
+            const hiddenName = `respuestas[${preguntaId}][bloque_${optionB}][${tipoSeleccion}]`;
+
+            // Reemplazar o agregar input oculto para este bloque y tipo
+            let existing = container.querySelector(`input[name="${hiddenName}"]`);
+            if (existing) {
+                existing.value = respuestaId;
+            } else {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = hiddenName;
+                hiddenInput.value = respuestaId;
+                container.appendChild(hiddenInput);
+            }
+
         } else {
-            let hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = `respuestas[${preguntaId}]`;
-            hiddenInput.value = respuestaId;
-            container.appendChild(hiddenInput);
+            // Pregunta normal (abierta o selección)
+            const hiddenName = `respuestas[${preguntaId}]`;
+            let existing = container.querySelector(`input[name="${hiddenName}"]`);
+            if (existing) {
+                existing.value = respuestaId;
+            } else {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = hiddenName;
+                hiddenInput.value = respuestaId;
+                container.appendChild(hiddenInput);
+            }
         }
 
-        // Mostrar respuestas en consola
-        let todasLasRespuestas = {};
+        // Mostrar en consola
+        const todasLasRespuestas = {};
         document.querySelectorAll('#respuestas-hidden-container input[type="hidden"]').forEach(input => {
             todasLasRespuestas[input.name] = input.value;
         });
         console.log("📋 Respuestas guardadas hasta ahora:", todasLasRespuestas);
 
-        respuestasEnGrupo++; // Aumentar contador ERROR ACÁ
+        // Avanzar pregunta
+        const preguntaActual = parseInt(event.target.dataset.pregunta);
+        const siguientePreguntaDiv = document.getElementById(`pregunta-${preguntaActual + 1}`);
 
-        // Mostrar siguiente pregunta o botón de enviar
         if (siguientePreguntaDiv) {
             siguientePreguntaDiv.style.display = "block";
         } else {
-            let botonEnviar = document.getElementById("enviar");
+            const botonEnviar = document.getElementById("enviar");
             if (botonEnviar) {
                 botonEnviar.style.display = "block";
             }
         }
 
-        // Ocultar bloque anterior de preguntas si se completó el grupo
+        // Control de grupo
+        respuestasEnGrupo++;
         if (respuestasEnGrupo === LIMITE_PREGUNTAS_POR_BLOQUE) {
-            let preguntaInicialDelGrupo = preguntaActual - (LIMITE_PREGUNTAS_POR_BLOQUE - 1);
-            for (let i = preguntaInicialDelGrupo; i <= preguntaActual; i++) {
-                let preguntaDiv = document.getElementById(`pregunta-${i}`);
-                if (preguntaDiv) {
-                    preguntaDiv.style.display = "none";
-                }
+            const inicio = preguntaActual - (LIMITE_PREGUNTAS_POR_BLOQUE - 1);
+            for (let i = inicio; i <= preguntaActual; i++) {
+                const preguntaDiv = document.getElementById(`pregunta-${i}`);
+                if (preguntaDiv) preguntaDiv.style.display = "none";
             }
-            respuestasEnGrupo = 0; // Reiniciar contador
+            respuestasEnGrupo = 0;
         }
     }
 }

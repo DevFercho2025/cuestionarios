@@ -30,7 +30,7 @@
 
     <div class="col-md-6">
         <ul id="column-a-{{ $numPregunta }}" class="list-group p-2 border" data-column="a">
-            @foreach ($izquierda as $item)
+            @foreach ($left as $item)
                 <li class="list-group-item"
                     id="item-a-{{ $item->id }}"
                     data-id="{{ $item->id }}">
@@ -42,7 +42,7 @@
 
     <div class="col-md-6">
         <ul id="column-b-{{ $numPregunta }}" class="list-group p-2 border" data-column="b">
-            @foreach ($derecha as $item)
+            @foreach ($right as $item)
                 <li class="list-group-item"
                     id="item-b-{{ $item->id }}"
                     data-id="{{ $item->id }}">

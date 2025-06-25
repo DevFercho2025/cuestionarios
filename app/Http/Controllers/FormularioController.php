@@ -192,9 +192,39 @@ class FormularioController extends Controller
         }
         $respuestas = $request->input('respuestas', []) ?? []; //Toma el valor del campo respuestas del request. Si no existe, usa un array vacío como valor predeterminado. Si por alguna razón sigue siendo null, entonces lo reemplazará con otro array vacío.
 
-        foreach ($respuestas as $pregunta_id => $respuesta_id) {
+        foreach ($respuestas as $pregunta_id => $respuesta_data) {
+
+            if (is_scalar($respuesta_data)) {
+                $respuesta = Respuesta_Usuario::updateOrCreate(
+                    ['user_id' => $user_id, 'pregunta_id' => $pregunta_id],
+                    [
+                        'respuesta_id' => $respuesta_data,
+                        'ip_usuario' => $usuarioIp,
+                        'extra_data' => null
+                    ]
+                );
+            } 
+            //respuesta es compuesta (como cleaver)
+            elseif (is_array($respuesta_data)) {
+                foreach ($respuesta_data as $bloque => $tipos) {
+                    foreach ($tipos as $tipo => $respuesta_id) {
+                        $respuesta = Respuesta_Usuario::updateOrCreate(
+                            ['user_id' => $user_id, 'pregunta_id' => $pregunta_id],
+                            [
+                                'respuesta_id' => $respuesta_id,
+                                'ip_usuario' => $usuarioIp,
+                                'extra_data' => json_encode([
+                                    'bloque' => $bloque, //a, b, c...
+                                    'tipo' => $tipo // M o L
+                                ])
+                            ]
+                        );
+                    }
+                }
+            }
+
             // Buscar respuesta existente
-            $respuesta = Respuesta_Usuario::where('user_id', $user_id)
+            /*$respuesta = Respuesta_Usuario::where('user_id', $user_id)
                 ->where('pregunta_id', $pregunta_id)
                 ->first();
         
@@ -209,9 +239,9 @@ class FormularioController extends Controller
                 $respuesta->pregunta_id = $pregunta_id;
                 $respuesta->respuesta_id = $respuesta_id;
                 $respuesta->ip_usuario = $usuarioIp;
-            }
+            }*/
         
-            $respuesta->save();
+            /*$respuesta->save();*/
         }
 
         $this->generarToken($user_id);

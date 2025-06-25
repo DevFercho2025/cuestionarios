@@ -201,7 +201,7 @@
                                         </div>
 
                                         <div class="form-floating form-floating-outline mb-4">
-                                            <input id="seccion-bloque" type="text" class="form-control" placeholder="Bloque" required>
+                                            <input id="seccion-bloque" type="number" class="form-control" placeholder="Bloque" required>
                                             <label for="seccion-bloque">Bloque</label>
                                         </div>
 
@@ -248,6 +248,17 @@
                              Ya creé todas las secciones que necesito
                         </span>
                         <i class="ri-arrow-right-line"></i>
+
+                    <!--Botón para cerrar ventana-->
+                    <button type="button"
+                            class="btn btn-primary position-absolute d-none"
+                            style="bottom: 1rem; right: 1rem;"
+                            id="btn-terminar">
+                        <span class="align-middle d-sm-inline-block d-none me-sm-1">
+                             Ya terminé
+                        </span>
+                        <i class="ri-arrow-right-line"></i>
+
                 </div>
             </div>
         </div>
@@ -277,10 +288,16 @@
             });
         });
 
-        /*Cerrar ventana
-        document.getElementById('TestGuardarBtn').addEventListener('click', function () {
+        //Cerrar ventana
+        document.getElementById('btn-terminar').addEventListener('click', function () {
             bsModal.hide();
-        });*/
+            stepper.to(1);
+
+            //limpiar campos
+            document.getElementById('test-titulo').value = '';
+            document.getElementById('test-categoria').selectedIndex = 0;
+            document.getElementById('test-tipo').selectedIndex = 0;
+        });
 
         //crear un test
         document.getElementById('btn-crear-test').addEventListener('click', function () {
@@ -307,7 +324,7 @@
                         toast: true,
                         position: 'bottom-end',
                         icon: 'success',
-                        title: '¡Test creado exitosamente!',
+                        title: '¡Test creado!',
                         showConfirmButton: false,
                         timer: 3000,
                         timerProgressBar: true,
@@ -365,7 +382,7 @@
                         toast: true,
                         position: 'bottom-end',
                         icon: 'success',
-                        title: '¡Sección creada exitosamente!',
+                        title: '¡Sección creada',
                         showConfirmButton: false,
                         timer: 3000,
                         timerProgressBar: true,
@@ -433,10 +450,13 @@
             stepper.next();
             const btnAvanzar = document.getElementById('btn-avanzar-secciones');
             btnAvanzar.classList.add('d-none');
+
+            const btnterminar = document.getElementById('btn-terminar');
+            btnterminar.classList.remove('d-none');
         });
 
         
-        let letraActualCharCode = 97 //esto es "a", para las respuestas de cleaver
+        let letraActualCharCode = 97 //Inicia con "a", para las respuestas de cleaver
 
         //crear una pregunta
         document.body.addEventListener('click', function (event) {
@@ -453,12 +473,20 @@
                 const testId = contenedor.getAttribute('data-test-id');
                 const sectionId = contenedor.getAttribute('data-section-id');
 
+                const { respuestas, valid } = obtenerRespuestas(sectionId);
+
+                if (!texto || !tipo || !valid || respuestas.length === 0) {
+                    Swal.fire('Error', 'Debes completar todos los campos de la pregunta y al menos una respuesta válida.', 'warning');
+                    return;
+                }
+
                 const data = {
                     question: texto,
                     test_id: testId,
                     section_id: sectionId,
                     question_type_id: tipo,
                     required: requerida ? 1 : 0,
+                    answers: respuestas,
                     _token: '{{ csrf_token() }}'
                 };
 
@@ -468,10 +496,30 @@
                     data: data,
                     dataType: "json",
                     success: function (response) {
-                        guardarRespuestasAutomaticas({testId: testId, sectionId: sectionId, questionId: response.pregunta.id});
+                        Swal.fire({
+                            toast: true,
+                            position: 'bottom-end',
+                            icon: 'success',
+                            title: '¡Pregunta creada!',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'custom-toast'
+                            },
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        }).then(() => {
+                            //limpiar campos
+                            document.querySelector(`#pregunta-texto-${seccionId}`).value = '';
+                            document.querySelector(`#pregunta-tipo-id-${seccionId}`).selectedIndex = 0;
+                            document.querySelector(`#pregunta-requerida-${seccionId}`).checked = false;
+                        });
                     },
                     error: function (xhr) {
-                        let errorMsg = 'No se pudo crear la pregunta.';
+                        let errorMsg = 'No se pudo crear la pregunta con sus respuestas.';
                         if (xhr.responseJSON && xhr.responseJSON.message) {
                             errorMsg = xhr.responseJSON.message;
                         }
@@ -532,6 +580,17 @@
                             </div>
                         `;
                         break;
+                    case 8:
+                        //reacción forzada
+                        newRespuestaHTML = `
+                            <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                <input type="text" class="form-control option-text" placeholder="Opción" required style="flex:2;">
+                                <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
+                                <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
+                            </div>
+                        `;
+                        break;
+
                     case 14:
                         let letra = String.fromCharCode(letraActualCharCode); //Obtener letra actual
                         newRespuestaHTML = '';
@@ -545,7 +604,20 @@
                         }
                         letraActualCharCode++; //Incrementa para la próxima vez
                         break;
-                    default: // Selección múltiple, reacción forzada, otro tipo aún no definido.
+                    case 15:
+                        //ordenar por importancia (para Zavik)
+                        for (let i = 0; i < 4; i++) {
+                            let letraOpcion = String.fromCharCode(97 + i); // 97 es 'a', 98 es 'b', etc.
+
+                            newRespuestaHTML += `
+                                <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center; ${i === 0 ? 'margin-top:30px;' : ''}">
+                                    <input type="text" class="form-control option-text" placeholder="Opción" value="${letraOpcion}" required style="flex:1;">
+                                    <input type="text" class="form-control answer-text" placeholder="característica" required style="flex:3;">
+                                </div>
+                            `;
+                        }
+                        break;
+                    default: // Selección múltiple, otro tipo aún no definido.
                         newRespuestaHTML = `
                             <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                                 <input type="text" class="form-control option-text" placeholder="Opción" required style="flex:2;">
@@ -557,7 +629,6 @@
                         break;
                 }
 
-                console.log("Añadió html para crear respuesta");
                 container.insertAdjacentHTML('beforeend', newRespuestaHTML);
                 updateRemoveButtons(container);
             }
@@ -573,7 +644,7 @@
                 const contenedorPrevio = document.querySelector(`#contenedor-respuestas-previo-${seccionId}`);
 
                 if (!isNaN(tipo) && contenedorPrevio) {
-                    contenedorPrevio.innerHTML = generateRespuestaHTML(tipo);
+                    contenedorPrevio.innerHTML = generateRespuestaHTML(tipo, seccionId);
                     updateRemoveButtons(contenedorPrevio);
                 }
             }
@@ -687,7 +758,7 @@
         const tabTrigger = new bootstrap.Tab(tabTriggerEl);
         tabTrigger.show();
 
-         cargarTiposDePregunta(`#pregunta-tipo-id-${seccion.id}`);
+        cargarTiposDePregunta(`#pregunta-tipo-id-${seccion.id}`);
     }
 
     //cargar contenido para crear una pregunta
@@ -752,32 +823,8 @@
         });
     }
 
-    //Mostrar preguntas ya creadas
-    function renderizarPregunta(pregunta) {
-        const tipo = parseInt(pregunta.question_type_id || pregunta.question_type?.id || 1);
-        const contenedorRespuestasID = `respuestas-container-${pregunta.id}`;
-        let html = `
-            <div class="card mb-3 border-start border-success border-3">
-                <div class="card-body">
-                    <p class="fw-bold mb-1">${pregunta.question}</p>
-                    <small class="text-muted d-block mb-3">
-                        Tipo: ${pregunta.question_type?.name || 'N/A'} |
-                        ${pregunta.required ? 'Requerida' : 'Opcional'}
-                    </small>
-
-                    <!-- Formulario para respuestas -->
-                    <div id="${contenedorRespuestasID}" data-question-id="${pregunta.id}" data-question-type="${tipo}">
-                        ${generateRespuestaHTML(tipo, pregunta.id)}
-                    </div>
-                </div>
-            </div>
-        `;
-
-        return html;
-    }
-
     //Mostrar form para crear respuesta según el tipo de la pregunta ya creada
-    function generateRespuestaHTML(questionType, questionId) {
+    function generateRespuestaHTML(questionType, sectionId) {
         const alreadyHasAddButton = !!document.getElementById('add-respuesta-btn');
         let html = '';
 
@@ -802,11 +849,11 @@
                 break;
             case 3:
                 //Pareamiento forzado
-                    html += `<div id="respuestas-dinamicas-${questionId}" data-question-type="3"></div>`;
+                    html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="3"></div>`;
 
                     if (!alreadyHasAddButton) {
                         html += `
-                            <button type="button" id="add-respuesta-btn-${questionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px">
+                            <button type="button" id="add-respuesta-btn-${sectionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px">
                                 + Añadir respuesta
                             </button>
                         `;
@@ -846,6 +893,9 @@
                         </div>
                     `;
                 break;
+            case 8:
+
+                break;
             case 10:
                 //Pregunta Abierta
                     return `
@@ -855,24 +905,25 @@
                     `;
                 break;
             case 14:
-                //Cleaver
-                    html += `<div id="respuestas-dinamicas-${questionId}" data-question-type="${questionType}"></div>`;
+            case 15:
+                //Cleaver o Zavik (Bloques de 4 características)
+                    html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}"></div>`;
 
                     // Botón para añadir nuevas respuestas
                     html += `
-                        <button type="button" id="add-respuesta-btn-${questionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
-                            + Añadir otro bloque de características
+                        <button type="button" id="add-respuesta-btn-${sectionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
+                            + Añadir un bloque de características
                         </button>
                     `;
                     return html;
                 break;
             default:
                 //Selección múltiple(1), reacción forzada(8)
-                    html += `<div id="respuestas-dinamicas-${questionId}" data-question-type="${questionType}"></div>`;
+                    html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}"></div>`;
 
                     // Botón para añadir nuevas respuestas
                     html += `
-                        <button type="button" id="add-respuesta-btn-${questionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
+                        <button type="button" id="add-respuesta-btn-${sectionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
                             + Añadir respuesta
                         </button>
                     `;
@@ -897,17 +948,15 @@
         });
     }
 
-    function guardarRespuestasAutomaticas({testId, sectionId, questionId}) { 
-        const test_id = testId;
-        const section_id = sectionId;
-        const question_id = questionId;
 
-        const container = document.getElementById(`#contenedor-respuestas-previo-${section_id}`);
+    function obtenerRespuestas(sectionId) { 
+
+        const container = document.getElementById(`contenedor-respuestas-previo-${sectionId}`);
         if (!container) {
             console.warn(`Contenedor de respuestas no encontrado`);
             return;
         }
-        const tipo = document.querySelector(`#pregunta-tipo-id-${seccionId}`);
+        const tipo = document.querySelector(`#pregunta-tipo-id-${sectionId}`);
         const questionType = parseInt(tipo.value || '1');
 
             const respuestas = [];
@@ -995,38 +1044,9 @@
                         }
                     });
                 break;
-            }
+            }    
 
-
-            if (!test_id || !section_id || !question_id || !valid || respuestas.length === 0) {
-                Swal.showValidationMessage('Por favor, complete todos los campos requeridos.');
-                return false;
-            }
-
-            const data = {
-                test_id,
-                section_id,
-                question_id,
-                respuestas,
-                _token: '{{ csrf_token() }}'
-            };
-
-            jQuery.ajax({
-                url: "{{ route('respuestas.store') }}",
-                type: "POST",
-                data: data,
-                dataType: "json",
-                success: function (response) {
-                    agregarPestañaDeSeccion(response.seccion);
-                },
-                error: function (xhr) {
-                    let errorMsg = 'No se pudo crear la respuesta.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMsg = xhr.responseJSON.message;
-                    }
-                    alert(errorMsg);
-                }
-            });
+        return {respuestas, valid};
     }
 </script>
 
