@@ -1,0 +1,1 @@
+<!--Elegir qué patrón sigue-->

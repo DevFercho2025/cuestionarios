@@ -135,7 +135,7 @@ class PreguntaController extends Controller
 
     public function allQuestionTypes()
     {
-        $types = QuestionType::select('id', 'name')->get();
+        $types = QuestionType::select('id', 'name','description')->get();
 
         return response()->json($types);
     }

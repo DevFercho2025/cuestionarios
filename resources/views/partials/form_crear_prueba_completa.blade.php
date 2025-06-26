@@ -297,7 +297,7 @@
             document.getElementById('test-titulo').value = '';
             document.getElementById('test-categoria').selectedIndex = 0;
             document.getElementById('test-tipo').selectedIndex = 0;
-        });
+        })
 
         //crear un test
         document.getElementById('btn-crear-test').addEventListener('click', function () {
@@ -472,9 +472,9 @@
                 const contenedor = document.querySelector(`#seccion-${seccionId}`);
                 const testId = contenedor.getAttribute('data-test-id');
                 const sectionId = contenedor.getAttribute('data-section-id');
-
+                
                 const { respuestas, valid } = obtenerRespuestas(sectionId);
-
+                console.log("Respuestas:", respuestas, "Valid:", valid);
                 if (!texto || !tipo || !valid || respuestas.length === 0) {
                     Swal.fire('Error', 'Debes completar todos los campos de la pregunta y al menos una respuesta válida.', 'warning');
                     return;
@@ -516,6 +516,7 @@
                             document.querySelector(`#pregunta-texto-${seccionId}`).value = '';
                             document.querySelector(`#pregunta-tipo-id-${seccionId}`).selectedIndex = 0;
                             document.querySelector(`#pregunta-requerida-${seccionId}`).checked = false;
+                            document.querySelector(`#contenedor-respuestas-previo-${seccionId}`).innerHTML = '';
                         });
                     },
                     error: function (xhr) {
@@ -559,7 +560,7 @@
                 });
             }
 
-            //añadir respuesta en múltiple, reacción forzada, pares, o cleaver
+            //añadir respuesta en múltiple, reacción forzada, pares, cleaver, zavik, barsit (completar num)
             if (event.target && event.target.id.startsWith('add-respuesta-btn-')) {
                 const questionId = event.target.id.replace('add-respuesta-btn-', '');
                 const container = document.getElementById(`respuestas-dinamicas-${questionId}`);
@@ -592,6 +593,7 @@
                         break;
 
                     case 14:
+                        //Cleaver
                         let letra = String.fromCharCode(letraActualCharCode); //Obtener letra actual
                         newRespuestaHTML = '';
                         for (let i = 0; i < 4; i++) {
@@ -616,6 +618,16 @@
                                 </div>
                             `;
                         }
+                        break;
+                    case 16:
+                        //patron numérico
+                        newRespuestaHTML = `
+                            <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                <input type="number" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
+                                <input type="checkbox" class="form-check-input is-correct patron-num" title="¿El candidato debe rellenarla?">
+                                <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
+                            </div>
+                        `;
                         break;
                     default: // Selección múltiple, otro tipo aún no definido.
                         newRespuestaHTML = `
@@ -642,6 +654,27 @@
                 const seccionId = select.id.replace('pregunta-tipo-id-', '');
                 const tipo = parseInt(select.value);
                 const contenedorPrevio = document.querySelector(`#contenedor-respuestas-previo-${seccionId}`);
+
+                const selectedOption = select.options[select.selectedIndex];
+                const description = selectedOption.dataset.description || '';
+
+                const descDiv = document.getElementById(`descripcion-tipo-${seccionId}`);
+                if (descDiv) {
+                    descDiv.textContent = description;
+                }
+
+                const infoBtn = document.getElementById(`tipo-info-${seccionId}`);
+                if (infoBtn) {
+                        const oldTooltip = M.Tooltip.getInstance(infoBtn);
+                        if (oldTooltip) {
+                            oldTooltip.destroy();
+                        }
+
+                        infoBtn.setAttribute('data-tooltip', description);
+                        infoBtn.setAttribute('title', description);
+
+                        M.Tooltip.init(infoBtn);
+                }
 
                 if (!isNaN(tipo) && contenedorPrevio) {
                     contenedorPrevio.innerHTML = generateRespuestaHTML(tipo, seccionId);
@@ -776,7 +809,7 @@
                 </div>
 
                 <div class="row mb-4">
-                    <div class="col-md-8">
+                    <div class="col-md-9">
                         <div class="form-floating form-floating-outline">
                             <select class="form-select" id="pregunta-tipo-id-${seccion.id}" required>
                                 <!-- Opciones se cargan dinámicamente -->
@@ -784,13 +817,23 @@
                             <label for="pregunta-tipo-id-${seccion.id}">Tipo de pregunta</label>
                         </div>
                     </div>
-                    <div class="col-md-4 d-flex align-items-center">
+
+                    <div class="col-md-3 d-flex align-items-center">
                         <div class="form-check ms-2">
                             <input class="form-check-input" type="checkbox" value="1" id="pregunta-requerida-${seccion.id}">
                             <label class="form-check-label" for="pregunta-requerida-${seccion.id}">¿Requerida?</label>
                         </div>
                     </div>
                 </div>
+
+                <!-- Ver descripción del tipo de pregunta -->
+                    <button type="button" class="btn btn-sm btn-outline-secondary tipo-info"
+                        id="tipo-info-${seccion.id}"
+                        data-tooltip="tooltip"
+                        title="Selecciona un tipo para ver su descripción"
+                        style="padding: 2px 6px; font-size: 12px; line-height: 1; min-width: 60px; max-width: auto;min-height: 48px; margin-bottom: 10px; border:none;">
+                          ❔ <div id="descripcion-tipo-${seccion.id}" class="text-muted small mt-1" style="margin-left:5px;"></div>
+                    </button>
 
                 <!-- Contenedor para crear respuestas -->
                 <div id="contenedor-respuestas-previo-${seccion.id}" class="mb-3">
@@ -814,7 +857,7 @@
                 const $select = $(selectSelector);
                 $select.empty().append('<option disabled selected>Selecciona tipo</option>');
                 tipos.forEach(tipo => {
-                    $select.append(`<option value="${tipo.id}">${tipo.name}</option>`);
+                    $select.append(`<option value="${tipo.id}" data-description="${tipo.description || ''}">${tipo.name}</option>`);
                 });
             },
             error: function () {
@@ -913,6 +956,18 @@
                     html += `
                         <button type="button" id="add-respuesta-btn-${sectionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
                             + Añadir un bloque de características
+                        </button>
+                    `;
+                    return html;
+                break;
+            case 16:
+                //patrón num (barsit)
+                    html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}"></div>`;
+
+                    // Botón para añadir nuevas respuestas
+                    html += `
+                        <button type="button" id="add-respuesta-btn-${sectionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
+                            + Añadir un número
                         </button>
                     `;
                     return html;
@@ -1033,7 +1088,22 @@
                             case 10: // Abierta
                                 if (answer) respuestas.push({ answer });
                                 else valid = false;
-                                 break;
+                                break;
+                            case 16: //patron num
+                                const patronNumEl = input.querySelector('.patron-num');
+                                const fillable = patronNumEl?.checked || false;
+
+                                if (answer) {
+                                        respuestas.push({
+                                            answer: answer,
+                                            option: null,
+                                            is_correct: null,
+                                            extra_data: {
+                                                fillable: fillable,
+                                            }
+                                        });
+                                    }
+                                break;
                             default:
                                 if (answer && option) {
                                     respuestas.push({ answer, option, is_correct });
