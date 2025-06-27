@@ -49,15 +49,9 @@ class PreguntaController extends Controller
 
         $data['required'] = $data['required'] ?? 0;
 
-        Log::info('Creando pregunta con datos:', $data);
-
         $question = Pregunta::create($data);
 
         if ($request->has('answers')) {
-            Log::info("Guardando respuestas para pregunta ID {$question->id}", [
-                'answers' => $request->answers
-            ]);
-
             $respuestaService->saveAnswers($request->answers, $question->id);
         } else {
             Log::warning("No se recibieron respuestas para la pregunta ID {$question->id}");

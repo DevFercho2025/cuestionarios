@@ -6,6 +6,7 @@ use App\Models\Respuesta;
 use App\Models\Pregunta;
 use App\Models\Test;
 use Illuminate\Http\Request;
+use App\Services\RespuestaService;
 use Illuminate\Support\Facades\Log;
 
 class RespuestaController extends Controller
@@ -29,90 +30,17 @@ class RespuestaController extends Controller
         return response()->json($query->get());
     }
 
-    public function store(Request $request)
+    public function store(Request $request, RespuestaService $respuestaService)
     {
         $data = $request->validate([
             'question_id' => 'required|exists:psico_alobri_questions,id',
             'respuestas'  => 'required|array|min:1',
         ]);
 
-        $question = Pregunta::findOrFail($data['question_id']);
+        $respuestaService->saveAnswers($request->respuestas, $request->question_id);
 
-        $savedRespuestas = [];
+        $savedRespuestas = Respuesta::where('question_id', $request->question_id)->get();
 
-        foreach ($data['respuestas'] as $respuesta) {
-            $answer     = $respuesta['answer'] ?? null;
-            $option     = $respuesta['option'] ?? null;
-            $is_correct = $respuesta['is_correct'] ?? null;
-            $extra_data = $respuesta['extra_data'] ?? null;
-
-            if ($question->question_type_id == 3) {
-                //pares
-                $pairId = $extra_data['pair_id'] ?? uniqid('pair_', true);
-
-                $savedRespuestas[] = Respuesta::create([
-                    'question_id' => $data['question_id'],
-                    'answer'      => $answer,
-                    'option'      => null,
-                    'is_correct'  => null,
-                    'extra_data'  => json_encode(['pair_id' => $pairId]),
-                ]);
-
-                continue;
-            } elseif ($question->type == 2) {
-                //likert
-                $escala = intval($respuesta['escala'] ?? 5);
-
-                $labelsMap = [
-                    4 => [
-                        1 => "Totalmente en desacuerdo",
-                        2 => "En desacuerdo",
-                        3 => "De acuerdo",
-                        4 => "Totalmente de acuerdo"
-                    ],
-                    5 => [
-                        1 => "Totalmente en desacuerdo",
-                        2 => "En desacuerdo",
-                        3 => "Neutral",
-                        4 => "De acuerdo",
-                        5 => "Totalmente de acuerdo"
-                    ],
-                ];
-
-                $labels = $labelsMap[$escala] ?? [];
-
-                for ($i = 1; $i <= $escala; $i++) {
-                    $savedRespuestas[] = Respuesta::create([
-                        'question_id' => $data['question_id'],
-                        'answer'      => $labels[$i] ?? "Punto $i",
-                        'option'      => chr(96 + $i), // 'a', 'b', ...
-                        'is_correct'  => null,
-                        'extra_data'  => json_encode([
-                            'scale_type' => $escala,
-                            'label_index' => $i
-                        ]),
-                    ]);
-                }
-
-                break;
-            } else {
-                
-                $is_correct = $respuesta['is_correct'] ?? null;
-                dd($is_correct);
-                if ($question->type == 8) {
-                    $is_correct = null;
-                }
-                // Abierta, Verdadero/Falso, Múltiple, doble opción
-                $savedRespuestas[] = Respuesta::create([
-                    'question_id' => $data['question_id'],
-                    'answer'      => $answer,
-                    'option'      => $option,
-                    'is_correct'  => $is_correct === '' ? null : $is_correct,
-                    'extra_data'  => $extra_data ? json_encode($extra_data) : null,
-                ]);
-            }
-        }
- 
         return response()->json([
             'status'    => 'success',
             'message'   => 'Respuestas creadas correctamente.',

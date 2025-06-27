@@ -23,6 +23,75 @@
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.8) !important;
             z-index: 1100 !important;
         }
+
+        /*DOMINOS*/
+        .contenedor {
+            width: 67px;
+            height: 110px;
+            border: 2px solid black;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .fila {
+            flex: 1;
+            border-top: 2px solid black;
+            box-sizing: border-box;
+        }
+
+        .fila:first-child {
+            border-top: none;
+        }
+
+        .contenedor-circulos {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .circulo {
+            width: 9px;
+            height: 9px;
+            background-color: rgb(0, 0, 0);
+            border-radius: 50%;
+            position: absolute;
+            transition: opacity 0.2s;
+        }
+
+        .circulo-input {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 100%;
+            height: 100%;
+            font-size: 20px;
+            font-weight: bold;
+            color: black;
+
+            /*visualmente invisible*/
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+            z-index: 2;
+
+            caret-color: black;
+        }
+
+        .contenedor-dinamico-domino {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .contenedor-dinamico-domino.respuesta-input {
+            width: 67px;
+            height: 110px;
+        }
     </style>
 
 
@@ -266,7 +335,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bs-stepper/dist/js/bs-stepper.min.js"></script>
-
+<script src="{{ asset('js/Dominos.js') }}"></script>
 <script>
     let bsModal;
     document.addEventListener('DOMContentLoaded', function () {
@@ -562,10 +631,12 @@
 
             //añadir respuesta en múltiple, reacción forzada, pares, cleaver, zavik, barsit (completar num)
             if (event.target && event.target.id.startsWith('add-respuesta-btn-')) {
-                const questionId = event.target.id.replace('add-respuesta-btn-', '');
-                const container = document.getElementById(`respuestas-dinamicas-${questionId}`);
+                const sectionId = event.target.id.replace('add-respuesta-btn-', '');
+                const container = document.getElementById(`respuestas-dinamicas-${sectionId}`);
 
                 if (!container) return;
+
+                const uId = Date.now() + '-' + Math.floor(Math.random() * 1000);
 
                 // Detectar tipo de pregunta:
                 const tipo = parseInt(container.dataset.questionType || 1);
@@ -591,7 +662,27 @@
                             </div>
                         `;
                         break;
-
+                    case 6:
+                        //Patrones visuales: Dominos
+                        newRespuestaHTML = `
+                            <div class="respuesta-input">
+                                <input type="checkbox" class="form-check-input is-correct patron-domino" title="¿El candidato debe rellenar esta Ficha?">
+                                <div class="contenedor ">
+                                    <div class="fila" data-fila="1">
+                                        <div class="contenedor-circulos" id="circulos-1-${uId}">
+                                            <input class="circulo-input answer-text" type="number" id="input-f1-${uId}" min="0" max="6">
+                                        </div>
+                                    </div>
+                                    <div class="fila" data-fila="2">
+                                        <div class="contenedor-circulos" id="circulos-2-${uId}">
+                                            <input class="circulo-input answer-text" type="number" id="input-f2-${uId}" min="0" max="6">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="remove-respuesta btn btn-rojo btn-sm" style="margin-top:5px;" title="Eliminar Ficha">×</button>
+                            </div>
+                            `;
+                        break;
                     case 14:
                         //Cleaver
                         let letra = String.fromCharCode(letraActualCharCode); //Obtener letra actual
@@ -642,6 +733,10 @@
                 }
 
                 container.insertAdjacentHTML('beforeend', newRespuestaHTML);
+                if (tipo===6) {
+                    const nuevosDominos = container.querySelectorAll('.respuesta-input:last-child .contenedor');
+                    nuevosDominos.forEach(domino => inicializarDomino(domino));
+                }
                 updateRemoveButtons(container);
             }
 
@@ -936,8 +1031,17 @@
                         </div>
                     `;
                 break;
-            case 8:
+            case 6:
+                //Figuras incompletas
+                    html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}" class="contenedor-dinamico-domino"></div>`;
 
+                    // Botón para añadir nuevas respuestas
+                    html += `
+                        <button type="button" id="add-respuesta-btn-${sectionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
+                            + Añadir una ficha de Domino
+                        </button>
+                    `;
+                    return html;  
                 break;
             case 10:
                 //Pregunta Abierta
@@ -1061,7 +1165,33 @@
                         }
                     });
                     break;
+                case 6:
+                    container.querySelectorAll('.respuesta-input').forEach(input => {
+                        const patronDom = input.querySelector('.patron-domino');
+                        const fillable = patronDom?.checked || false;
 
+                        const topCircles = input.querySelectorAll('.fila[data-fila="1"] .circulo').length;
+                        const bottomCircles = input.querySelectorAll('.fila[data-fila="2"] .circulo').length;
+
+                        const isTopValid = topCircles >= 0 && topCircles <= 6;
+                        const isBottomValid = bottomCircles >= 0 && bottomCircles <= 6;
+
+                        if (isTopValid && isBottomValid) {
+                            respuestas.push({
+                                answer: `${topCircles}-${bottomCircles}`,
+                                option: null,
+                                is_correct: null,
+                                extra_data: {
+                                    top: topCircles,
+                                    bottom: bottomCircles,
+                                    fillable: fillable
+                                }
+                            });
+                        } else {
+                            valid = false;
+                        }
+                    });
+                    break;
                 default:
                     // Otros tipos que usan una sola respuesta por input
                     document.querySelectorAll('.respuesta-input').forEach(input => {
