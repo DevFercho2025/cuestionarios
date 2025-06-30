@@ -16,7 +16,7 @@
 
         <div class="respuesta-item">
             @if ($isFillable)
-                <input class="form-control p-1 text-center" type="text"
+                <input class="form-control p-1 text-center respuesta" type="text"
                     style="width: auto; min-height: 40px; max-width: 60px; display: inline-block;"
                     name="respuestas[{{ $pregunta->id }}]"
                     data-pregunta="{{ $numPregunta }}"

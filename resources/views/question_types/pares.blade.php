@@ -25,7 +25,7 @@
     </style>
 </head>
 
-<div class="row">
+<div class="row" data-pregunta-id="{{ $numPregunta }}" data-role="pregunta">
     <h5>Ordene los pares.</h5>
 
     <div class="col-md-6">
@@ -54,76 +54,6 @@
 </div>
 
 <input type="hidden"
-    name="matches[{{ $pregunta->id }}]"
-    id="answers-{{ $pregunta->id }}"
-    data-pregunta-id="{{ $pregunta->id }}">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.8/leader-line.min.js"></script>
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('[data-pregunta-id]').forEach(contenedor => {
-            const preguntaId = contenedor.dataset.preguntaId;
-            const Answersinput = document.getElementById('answers-' + preguntaId);
-
-            let selectedA = null;
-            let connections = [];
-
-            //Seleccionar ítems dentro de cada columna
-            const itemsA = contenedor.querySelectorAll('[data-column="a"] .list-group-item');
-            const itemsB = contenedor.querySelectorAll('[data-column="b"] .list-group-item');
-
-            function clearSelection() {
-                itemsA.forEach(item => item.classList.remove('selected'));
-                itemsB.forEach(item => item.classList.remove('selected'));
-            }
-
-            itemsA.forEach(item => {
-                item.addEventListener("click", () => {
-                    clearSelection();
-                    selectedA = item;
-                    item.classList.add("selected");
-                });
-            });
-
-            itemsB.forEach(item => {
-                item.addEventListener("click", () => {
-                    if (selectedA) {
-                        item.classList.add("selected");
-
-                        const line = new LeaderLine(
-                            selectedA,
-                            item,
-                            {
-                                color: '#0d6efd',
-                                size: 4,
-                                path: 'straight'
-                            }
-                        );
-
-                        connections.push({
-                            idA: selectedA.dataset.id,
-                            idB: item.dataset.id,
-                            line: line
-                        });
-
-                        selectedA.classList.add("disabled");
-                        item.classList.add("disabled");
-
-                        selectedA = null;
-                        clearSelection();
-
-                        //actualiza guardado de respuestas
-                        const data = connections.map(c => ({
-                            left_id: c.idA,
-                            right_id: c.idB
-                        }));
-                        input.value = JSON.stringify(data);
-                    }
-                });
-            });
-        });
-    });
-</script>
-@endpush
+    name="matches[{{ $numPregunta }}]"
+    id="answers-{{$numPregunta }}"
+    data-pregunta-id="{{ $numPregunta }}">

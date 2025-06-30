@@ -181,7 +181,15 @@
                 const scripts = [
                     /*"{{ asset('js/Formulario.js') }}",*/
                     "{{ asset('js/mostrarPreg.js') }}",
-                    "{{ asset('js/progresoEv.js') }}"
+                    "{{ asset('js/progresoEv.js') }}",
+
+                    //preguntas de emparejamiento
+                    "{{ asset('js/pares.js') }}",
+                    "https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.8/leader-line.min.js",
+
+                    //pregunta V o F con ordenamiento de palabras
+                    "../../assets/vendor/libs/sortablejs/sortable.js",
+                    "{{ asset('js/ordenarPalabras.js') }}"
                 ];
 
                 if (cameraRequired === 1) {

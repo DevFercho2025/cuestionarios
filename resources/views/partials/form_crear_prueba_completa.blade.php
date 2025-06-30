@@ -1019,6 +1019,9 @@
             case 5:
                 //Verdadero o Falso
                     return `
+                        <div class="ordenar">
+                            ¿El candidato debe re-ordenar el texto de la pregunta? <input type="checkbox" class="form-check-input ordenar-checkbox" title="¿El candidato debe ordenar el texto?">
+                        </div>
                         <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                             <input type="text" class="form-control option-text" value="a" readonly style="width: 60px;">
                             <input type="text" class="form-control answer-text" value="Verdadero" readonly required style="flex:2;">
@@ -1166,6 +1169,7 @@
                     });
                     break;
                 case 6:
+                    //Figuras incompletas: Dominos
                     container.querySelectorAll('.respuesta-input').forEach(input => {
                         const patronDom = input.querySelector('.patron-domino');
                         const fillable = patronDom?.checked || false;
@@ -1210,7 +1214,16 @@
                         switch (questionType) {
                             case 5: // Verdadero/Falso
                                 if (answer && option) {
-                                    respuestas.push({ answer, option, is_correct });
+                                      const ordenarCheckbox = document.querySelector('.ordenar-checkbox');
+                                    const debeOrdenar = ordenarCheckbox?.checked || false;
+                                    respuestas.push({
+                                        answer,
+                                        option,
+                                        is_correct,
+                                        extra_data: {
+                                            ordenar: debeOrdenar
+                                        }
+                                    });
                                 } else {
                                     valid = false;
                                 }
