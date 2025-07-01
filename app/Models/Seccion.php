@@ -38,7 +38,9 @@ class Seccion extends Model
         parent::boot();
 
         static::deleting(function ($section) {
-            $section->questions()->delete(); //eliminar preguntas asociadas
+            foreach ($section->questions as $pregunta) {
+                $pregunta->delete(); //eliminar sus secciones
+            }//eliminar preguntas asociadas
         });
     }
 }

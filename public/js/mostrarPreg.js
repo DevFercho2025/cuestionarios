@@ -187,3 +187,9 @@ function iniciarTemporizador() {
         }
     }, 1000);
 }
+
+document.querySelectorAll('.cleaver-bloque').forEach((bloque, index) => {
+    if (index > 1) {
+        bloque.style.display = 'none';
+    }
+});

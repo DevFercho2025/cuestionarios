@@ -327,6 +327,10 @@
                         {
                             data: 'is_correct',
                             render: function (data, type, row) {
+                                if (data === null) {
+                                    return `<span class="editable" data-id="${row.id}" data-field="is_correct" data-value="">-</span>`;
+                                }
+
                                 const icon = data ? '<i class="ri-check-line"></i>' : '<i class="ri-close-large-line"></i>';
                                 return `<span class="editable" data-id="${row.id}" data-field="is_correct" data-value="${data}">${icon}</span>`;
                             }
@@ -429,14 +433,20 @@
                     if (field === 'is_correct') {
                         editor = $(`
                             <select class="inline-select">
+                                <option value="">-</option>
                                 <option value="1">✔️ Correcto</option>
                                 <option value="0">❌ Incorrecto</option>
                             </select>
                         `);
 
                         // Ajustar valor inicial detectando el ícono existente
-                        const isChecked = originalHTML.includes('ri-check-line');
-                        editor.val(isChecked ? '1' : '0');
+                        if (originalHTML.includes('ri-check-line')) {
+                            editor.val('1');
+                        } else if (originalHTML.includes('ri-close-large-line')) {
+                            editor.val('0');
+                        } else {
+                            editor.val('');
+                        }
                     } else {
                         editor = $('<input type="text" class="inline-input"/>')
                             .val(span.text().trim())
@@ -475,8 +485,12 @@
 
                         // Si hay cambios, actualizar con el ícono correcto
                         const updatedHTML = field === 'is_correct'
-                            ? (newValue === '1' ? '<i class="ri-check-line"></i>' : '<i class="ri-close-large-line"></i>')
-                            : newValue;
+                        ? (newValue === '1'
+                            ? '<i class="ri-check-line"></i>'
+                            : newValue === '0'
+                                ? '<i class="ri-close-large-line"></i>'
+                                : '-')
+                        : newValue;
 
                         const restored = $('<span>')
                             .addClass('editable')

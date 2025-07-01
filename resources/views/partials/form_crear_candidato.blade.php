@@ -338,6 +338,11 @@
                 .then(data => {
                     if (data.success) {
                         form.reset();
+
+                        if ($.fn.DataTable.isDataTable('#candidatosTable')) {
+                            const tabla = $('#candidatosTable').DataTable();
+                            tabla.ajax.reload(null, false);
+                        }
                         formData = {
                             genero_legal: null,
                             nacimiento: null,

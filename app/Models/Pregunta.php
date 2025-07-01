@@ -41,7 +41,7 @@ class pregunta extends Model
         parent::boot();
 
         static::deleting(function ($pregunta) {
-            $pregunta->respuestas()->delete();//eliminar respuestas asociadas
+            $pregunta->respuestas()->delete();
         });
     }
 }

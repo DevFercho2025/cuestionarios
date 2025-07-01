@@ -500,7 +500,7 @@
                                 confirmButtonText: 'Generar',
                                 cancelButtonText: 'Cancelar',
                                 preConfirm: () => {
-                                    let vacante = $('#vacanteInput').val().trim();
+                                    let vacanteManual = $('#vacanteInput').val().trim();
                                     const vacanteSeleccionada = $('#positionSelect').val();
 
                                     vacante = vacanteSeleccionada || vacanteManual;

@@ -189,7 +189,10 @@
 
                     //pregunta V o F con ordenamiento de palabras
                     "../../assets/vendor/libs/sortablejs/sortable.js",
-                    "{{ asset('js/ordenarPalabras.js') }}"
+                    "{{ asset('js/ordenarPalabras.js') }}",
+
+                    //Glosario de Cleaver
+                    "{{ asset('js/glosario.js') }}"
                 ];
 
                 if (cameraRequired === 1) {

@@ -200,7 +200,7 @@
 
 <div class="contenedor-C d-flex justify-content-center align-items-center vh-100">
     <div class="card quiz-card">
-        <div class="card-body">
+        <div class="card-body" style="max-height: 740px">
             <form action="{{ route('guardar.respuestas') }}" method="POST">
                 @csrf
                 @php $numPregunta = 0; @endphp
@@ -266,7 +266,19 @@
             <div class="texto-Progreso" style="text-align: center" data-id-seccion="{{ $seccion->id }}">
                 {{ $seccion->titulo }}
             </div>
+
+            @if ($testTitulo === 'Cleaver')
+                <div id="contenedor-glosario" class="mt-4"></div>
+            @endif
+
         </div>
 
     </div>
 </div>
+
+
+@if ($testTitulo === 'cleaver')
+    <div id="glosario-original" style="display: none;">
+        @include('partials.glosario_cleaver')
+    </div>
+@endif

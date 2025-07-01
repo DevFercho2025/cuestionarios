@@ -14,7 +14,7 @@ class ConfigUser extends Model
         'role_id',
         'is_talentina_user',
         'user_id',
-        'is_pisco_ser',
+        'is_pisco_user',
         'active',
     ];
 

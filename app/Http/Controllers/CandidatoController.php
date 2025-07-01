@@ -122,6 +122,7 @@ class CandidatoController extends Controller
             [
                 'active'   => 1,
                 'role_id'  => 0,
+                'is_pisco_user' => 1,
             ]
         );
 
@@ -224,6 +225,9 @@ class CandidatoController extends Controller
     
             // Eliminar la configuración del usuario del candidato (config_users)
             $candidato->config()->delete();
+
+            //Eliminar códigos activos para el candidato
+            $candidato->userTestsAcessCodes()->delete();
     
             // Eliminar al usuario del candidato
             $candidato->delete();
