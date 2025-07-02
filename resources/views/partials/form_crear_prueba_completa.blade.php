@@ -92,6 +92,23 @@
             width: 67px;
             height: 110px;
         }
+
+        /* Para pregunta de Terman con Checkbox, al seleccionar "Opuestos" o "Iguales" */
+        .checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: border 0.3s;
+        }
+
+        /* Aplica el borde al label cuando el checkbox dentro está marcado */
+        .checkbox-label:has(input[type="checkbox"]:checked) {
+            border-color: #666cff;
+        }
     </style>
 
 
@@ -338,6 +355,8 @@
 <script src="{{ asset('js/Dominos.js') }}"></script>
 <script>
     let bsModal;
+    let letraActualMultiple = 97; //Inicia con "a", para respuestas múltiples
+
     document.addEventListener('DOMContentLoaded', function () {
 
         let stepper = new Stepper(document.querySelector('#wizard-make-test'), {
@@ -525,8 +544,7 @@
         });
 
         
-        let letraActualCharCode = 97 //Inicia con "a", para las respuestas de cleaver
-
+        let letraActualCharCode = 97; //Inicia con "a", para las respuestas de cleaver
         //crear una pregunta
         document.body.addEventListener('click', function (event) {
             //guardar pregunta
@@ -720,15 +738,37 @@
                             </div>
                         `;
                         break;
-                    default: // Selección múltiple, otro tipo aún no definido.
+                    case 17:
+                        //Comparar palabras
                         newRespuestaHTML = `
                             <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                                <input type="text" class="form-control option-text" placeholder="Opción" required style="flex:2;">
-                                <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
+                                <input type="text" class="form-control answer-text-a" placeholder="Palabra A" required style="flex:2;">
+                                <input type="text" class="form-control answer-text-b" placeholder="Palabra B" required style="flex:2;">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="form-check-input is-correct opposite" title="¿Estas palabras tienen significado Opuesto?">
+                                    Opuestas
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="form-check-input is-correct same"title="¿Estas palabras tienen el mismo significado?">
+                                    Iguales
+                                </label>
+                                <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar par">×</button>
+                            </div>
+                        `;
+                        break;
+                    default: // Selección múltiple, otro tipo aún no definido.
+                        let letraM = String.fromCharCode(letraActualMultiple); //Obtener letra actual
+
+                        newRespuestaHTML = `
+                            <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                <input type="text" class="form-control option-text" placeholder="Opción" value="${letraM}" required style="flex:1;">
+                                <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:3;">
                                 <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                                 <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
                             </div>
                         `;
+
+                        letraActualMultiple++;
                         break;
                 }
 
@@ -758,6 +798,8 @@
                     descDiv.textContent = description;
                 }
 
+                letraActualMultiple = 97;
+
                 const infoBtn = document.getElementById(`tipo-info-${seccionId}`);
                 if (infoBtn) {
                         const oldTooltip = M.Tooltip.getInstance(infoBtn);
@@ -775,6 +817,25 @@
                     contenedorPrevio.innerHTML = generateRespuestaHTML(tipo, seccionId);
                     updateRemoveButtons(contenedorPrevio);
                 }
+            }
+
+            if (e.target.matches('.checkbox-label input[type="checkbox"]')) {
+                const label = e.target.closest('.checkbox-label');
+                if (e.target.checked) {
+                    label.classList.add('active');
+                } else {
+                    label.classList.remove('active');
+                }
+            }
+
+            if (e.target.classList.contains('opposite')) {
+                const parent = e.target.closest('.respuesta-input');
+                if (e.target.checked) parent.querySelector('.same').checked = false;
+            }
+
+            if (e.target.classList.contains('same')) {
+                const parent = e.target.closest('.respuesta-input');
+                if (e.target.checked) parent.querySelector('.opposite').checked = false;
             }
         });
     });
@@ -1079,6 +1140,17 @@
                     `;
                     return html;
                 break;
+            case 17:
+                //Comparar significados de palabras (Terman-Merrill)
+                    html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}"></div>`;
+
+                    // Botón para añadir nuevas respuestas
+                    html += `
+                        <button type="button" id="add-respuesta-btn-${sectionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
+                            + Añadir otro par de palabras
+                        </button>
+                    `;
+                break;
             default:
                 //Selección múltiple(1), reacción forzada(8)
                     html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}"></div>`;
@@ -1105,6 +1177,7 @@
             btn.onclick = () => {
                 if (container.querySelectorAll('.respuesta-input').length > 1) {
                     btn.parentElement.remove();
+                    letraActualMultiple--;
                 }
             };
         });
@@ -1246,6 +1319,32 @@
                                             }
                                         });
                                     }
+                                break;
+                            case 17: //comparar palabras
+                                const answerA = input.querySelector('.answer-text-a')?.value.trim();
+                                const answerB = input.querySelector('.answer-text-b')?.value.trim();
+
+                                const oEl = input.querySelector('.opposite');
+                                const iEl = input.querySelector('.same');
+
+                                const isO = oEl?.checked || false;
+                                const isI = iEl?.checked || false;
+
+                                if (answerA && answerB && (isO !== isI)) {
+                                    const answer = `${answerA} ${answerB}`;
+                                    const comparation = isO ? 'opposite' : 'same';
+
+                                    respuestas.push({
+                                        answer: answer,
+                                        option: null,
+                                        is_correct: null,
+                                        extra_data: {
+                                            comparation: comparation
+                                        }
+                                    });
+                                } else {
+                                    valid = false;
+                                }
                                 break;
                             default:
                                 if (answer && option) {
