@@ -356,6 +356,7 @@
 <script>
     let bsModal;
     let letraActualMultiple = 97; //Inicia con "a", para respuestas múltiples
+    let testEnProgreso = false;
 
     document.addEventListener('DOMContentLoaded', function () {
 
@@ -373,6 +374,12 @@
             ]).then(() => {
                 bsModal = new bootstrap.Modal(document.getElementById('ventana-crear-prueba'));
                 bsModal.show();
+
+                testEnProgreso = true;
+                const testBtn = document.getElementById('TestBtn');
+                if (testEnProgreso) {
+                    testBtn.textContent = "Continuar creando test";
+                }
             });
         });
 
@@ -385,6 +392,9 @@
             document.getElementById('test-titulo').value = '';
             document.getElementById('test-categoria').selectedIndex = 0;
             document.getElementById('test-tipo').selectedIndex = 0;
+
+            testEnProgreso = false;
+            document.getElementById('TestBtn').textContent = "Crear nuevo test";
         })
 
         //crear un test
@@ -560,12 +570,35 @@
                 const testId = contenedor.getAttribute('data-test-id');
                 const sectionId = contenedor.getAttribute('data-section-id');
                 
-                const { respuestas, valid } = obtenerRespuestas(sectionId);
-                console.log("Respuestas:", respuestas, "Valid:", valid);
+                const { respuestas, archivos, valid } = obtenerRespuestas(sectionId);
                 if (!texto || !tipo || !valid || respuestas.length === 0) {
                     Swal.fire('Error', 'Debes completar todos los campos de la pregunta y al menos una respuesta válida.', 'warning');
                     return;
                 }
+
+                const inputFile = document.querySelector(`#question-picture-${seccionId}`);
+                const archivo = inputFile.files[0];
+
+                const formData = new FormData();
+                formData.append('question', texto);
+                formData.append('test_id', testId);
+                formData.append('section_id', sectionId);
+                formData.append('question_type_id', tipo);
+                formData.append('required', requerida ? 1 : 0);
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('answers', JSON.stringify(respuestas));
+
+                //imagen pregunta
+                if (archivo) {
+                    formData.append('picture', archivo);
+                }
+                
+                //imagenes respuestas
+                archivos.forEach((file, index) => {
+                    if (file) {
+                        formData.append(`answer_files[${index}]`, file);
+                    }
+                });
 
                 const data = {
                     question: texto,
@@ -580,7 +613,9 @@
                 jQuery.ajax({
                     url: "{{ route('preguntas.store') }}",
                     type: "POST",
-                    data: data,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
                     dataType: "json",
                     success: function (response) {
                         Swal.fire({
@@ -763,6 +798,7 @@
                             <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                                 <input type="text" class="form-control option-text" placeholder="Opción" value="${letraM}" required style="flex:1;">
                                 <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:3;">
+                                <input type="file" class="form-control answer-file">
                                 <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                                 <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
                             </div>
@@ -955,12 +991,19 @@
         return `
         <div class="card mt-3">
             <div class="card-body">
-                <h6 class="mb-3">Crear pregunta</h6>
+                <h6 class="mb-3"><strong>Crear pregunta</strong></h6>
 
-                <div class="row mb-4">
+                <div class="row mb-2">
                     <div class="form-floating form-floating-outline mb-4">
                         <input type="text" class="form-control" id="pregunta-texto-${seccion.id}" placeholder="Pregunta" required>
                         <label for="pregunta-texto-${seccion.id}">Pregunta</label>
+                    </div>
+                </div>
+
+                <h6 class="mb-2">Si la pregunta lo requiere, selecciona una imagen.</h6>
+                <div class="row mb-4">
+                    <div class="col-md-12 d-flex align-items-center">
+                        <input id="question-picture-${seccion.id}" type="file" class="form-control" placeholder="Si la pregunta lo requiere, selecciona una imagen.">
                     </div>
                 </div>
 
@@ -974,13 +1017,15 @@
                         </div>
                     </div>
 
-                    <div class="col-md-3 d-flex align-items-center">
+                    <div class="col-md-2 d-flex align-items-center">
                         <div class="form-check ms-2">
                             <input class="form-check-input" type="checkbox" value="1" id="pregunta-requerida-${seccion.id}">
                             <label class="form-check-label" for="pregunta-requerida-${seccion.id}">¿Requerida?</label>
                         </div>
                     </div>
                 </div>
+            
+                
 
                 <!-- Ver descripción del tipo de pregunta -->
                     <button type="button" class="btn btn-sm btn-outline-secondary tipo-info"
@@ -1195,11 +1240,11 @@
         const questionType = parseInt(tipo.value || '1');
 
             const respuestas = [];
+            const archivos = [];
             let valid = true;
 
             switch (questionType) {
-                case 2:
-                    // Likert
+                case 2: // Likert
                     const scaleSize = parseInt(document.getElementById('likert-scale-size').value);
                     if (!scaleSize || ![4, 5].includes(scaleSize)) {
                         valid = false;
@@ -1224,8 +1269,7 @@
                     });
                     break;
 
-                case 3:
-                    // Pareamiento forzado
+                case 3: // Pareamiento forzado
                     document.querySelectorAll('.respuesta-input').forEach(input => {
                         const answerA = input.querySelector('.answer-text-a')?.value.trim();
                         const answerB = input.querySelector('.answer-text-b')?.value.trim();
@@ -1241,8 +1285,7 @@
                         }
                     });
                     break;
-                case 6:
-                    //Figuras incompletas: Dominos
+                case 6: //Figuras incompletas: Dominos
                     container.querySelectorAll('.respuesta-input').forEach(input => {
                         const patronDom = input.querySelector('.patron-domino');
                         const fillable = patronDom?.checked || false;
@@ -1278,6 +1321,7 @@
 
                         const answer = answerEl ? answerEl.value.trim() : '';
                         const option = optionEl ? optionEl.value.trim() : '';
+                        
                         let is_correct = null;
 
                         if (questionType !== 8 && isCorrectEl) {
@@ -1347,8 +1391,11 @@
                                 }
                                 break;
                             default:
+                                const fileEl = input.querySelector('.answer-file');
+                                const file = fileEl && fileEl.files.length > 0 ? fileEl.files[0] : null;
                                 if (answer && option) {
                                     respuestas.push({ answer, option, is_correct });
+                                    archivos.push({ file });
                                 } else {
                                      valid = false;
                                 }
@@ -1358,7 +1405,7 @@
                 break;
             }    
 
-        return {respuestas, valid};
+        return {respuestas, archivos, valid};
     }
 </script>
 

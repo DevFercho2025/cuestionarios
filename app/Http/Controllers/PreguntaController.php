@@ -45,14 +45,41 @@ class PreguntaController extends Controller
             'section_id'        => 'required|exists:psico_alobri_sections,id',
             'required'          => 'nullable|boolean',
             'question_type_id'  => 'required|exists:psico_alobri_question_types,id',
+            'picture'           => 'nullable|image|max:2048'
         ]);
 
+        $answers = json_decode($request->input('answers'), true); 
         $data['required'] = $data['required'] ?? 0;
+
+        if ($request->hasFile('picture')) {
+            // Guarda el archivo en storage/app/public/preguntas y obtiene la ruta relativa
+            $ruta = $request->file('picture')->store('preguntas', 'public');
+            $data['picture'] = $ruta;
+        }
 
         $question = Pregunta::create($data);
 
         if ($request->has('answers')) {
-            $respuestaService->saveAnswers($request->answers, $question->id);
+
+            foreach ($answers as $index => &$answer) {
+                $fileA = "answer_files.$index";
+
+                if ($request->hasFile($fileA)) {
+                    $archivo = $request->file($fileA);
+                    $ruta = $archivo->store('respuestas', 'public');
+
+                    //usar extradata si ya existe, Si no crea uno
+                    $extra = isset($answer['extra_data']) && is_array($answer['extra_data'])
+                        ? $answer['extra_data']
+                        : [];
+                        
+                    $extra['file_path'] = $ruta;
+                    $answer['extra_data'] = $extra;
+
+                }
+            }
+            $respuestaService->saveAnswers($answers, $question->id);
+
         } else {
             Log::warning("No se recibieron respuestas para la pregunta ID {$question->id}");
         }
