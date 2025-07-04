@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class pregunta extends Model
 {
@@ -41,7 +42,13 @@ class pregunta extends Model
         parent::boot();
 
         static::deleting(function ($pregunta) {
-            $pregunta->respuestas()->delete();
+            if ($pregunta->picture && Storage::disk('public')->exists($pregunta->picture)) {
+                Storage::disk('public')->delete($pregunta->picture);
+            }
+            
+            foreach ($pregunta->respuestas as $respuesta) {
+                $respuesta->delete();
+            }
         });
     }
 }

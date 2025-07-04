@@ -594,21 +594,11 @@
                 }
                 
                 //imagenes respuestas
-                archivos.forEach((file, index) => {
-                    if (file) {
-                        formData.append(`answer_files[${index}]`, file);
+                archivos.forEach((archivoObj, index) => {
+                    if (archivoObj && archivoObj.file) {
+                        formData.append(`answer_files[${index}]`, archivoObj.file);
                     }
                 });
-
-                const data = {
-                    question: texto,
-                    test_id: testId,
-                    section_id: sectionId,
-                    question_type_id: tipo,
-                    required: requerida ? 1 : 0,
-                    answers: respuestas,
-                    _token: '{{ csrf_token() }}'
-                };
 
                 jQuery.ajax({
                     url: "{{ route('preguntas.store') }}",
@@ -642,11 +632,16 @@
                         });
                     },
                     error: function (xhr) {
-                        let errorMsg = 'No se pudo crear la pregunta con sus respuestas.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMsg = xhr.responseJSON.message;
+                        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                            let messages = Object.values(xhr.responseJSON.errors).flat();
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error de validación',
+                                html: messages.join('<br>'),
+                            });
+                        } else {
+                            Swal.fire('Error', 'No se pudo crear la pregunta con sus respuestas.', 'error');
                         }
-                        alert(errorMsg);
                     }
                 });
 
@@ -791,14 +786,29 @@
                             </div>
                         `;
                         break;
+                    case 18:
+                        //pdq
+                        let letraOO = String.fromCharCode(letraActualMultiple); //Obtener letra actual
+
+                        newRespuestaHTML = `
+                            <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                <input type="text" class="form-control option-text" placeholder="Opción" value="${letraOO}" required style="flex:1;">
+                                <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
+                                <input type="file" class="form-control answer-file" style="flex:1;"">
+                                <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
+                            </div>
+                        `;
+
+                        letraActualMultiple++;
+                        break;
                     default: // Selección múltiple, otro tipo aún no definido.
                         let letraM = String.fromCharCode(letraActualMultiple); //Obtener letra actual
 
                         newRespuestaHTML = `
                             <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                                 <input type="text" class="form-control option-text" placeholder="Opción" value="${letraM}" required style="flex:1;">
-                                <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:3;">
-                                <input type="file" class="form-control answer-file">
+                                <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
+                                <input type="file" class="form-control answer-file" style="flex:1;"">
                                 <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                                 <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
                             </div>
@@ -1003,7 +1013,7 @@
                 <h6 class="mb-2">Si la pregunta lo requiere, selecciona una imagen.</h6>
                 <div class="row mb-4">
                     <div class="col-md-12 d-flex align-items-center">
-                        <input id="question-picture-${seccion.id}" type="file" class="form-control" placeholder="Si la pregunta lo requiere, selecciona una imagen.">
+                        <input id="question-picture-${seccion.id}" type="file" class="form-control">
                     </div>
                 </div>
 

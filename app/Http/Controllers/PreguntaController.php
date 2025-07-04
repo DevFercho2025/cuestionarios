@@ -39,16 +39,29 @@ class PreguntaController extends Controller
 
     public function store(Request $request,  RespuestaService $respuestaService)
     {
+        $customAttributes = [];
+        //Guardar qué respeustas tienen imagen subida.
+        if ($request->hasFile('answer_files')) {
+            foreach ($request->file('answer_files') as $index => $file) {
+                $customAttributes["answer_files.$index"] = "imagen de la respuesta " . ($index + 1);
+            }
+        }
+
         $data = $request->validate([
             'question'          => 'required|string',
             'test_id'           => 'required|exists:psico_alobri_tests,id',
             'section_id'        => 'required|exists:psico_alobri_sections,id',
             'required'          => 'nullable|boolean',
             'question_type_id'  => 'required|exists:psico_alobri_question_types,id',
-            'picture'           => 'nullable|image|max:2048'
-        ]);
+            'picture'           => 'nullable|image|max:2048',
+            'answer_files.*'    => 'nullable|image|max:2048',
+        ],[
+            // Mensajes personalizados
+            'picture.max' => 'La imagen de la pregunta no debe pesar más de 2MB.',
+            'answer_files.*.image' => 'La :attribute debe ser una imagen válida.',
+            'answer_files.*.max' => 'La :attribute es muy pesada. Las imágenes no deben pesar más de 2MB.',
+        ], $customAttributes);
 
-        $answers = json_decode($request->input('answers'), true); 
         $data['required'] = $data['required'] ?? 0;
 
         if ($request->hasFile('picture')) {
@@ -56,26 +69,25 @@ class PreguntaController extends Controller
             $ruta = $request->file('picture')->store('preguntas', 'public');
             $data['picture'] = $ruta;
         }
-
         $question = Pregunta::create($data);
+
+        $answers = json_decode($request->input('answers'), true); 
 
         if ($request->has('answers')) {
 
             foreach ($answers as $index => &$answer) {
-                $fileA = "answer_files.$index";
+                $fileKey = "answer_files.$index";
 
-                if ($request->hasFile($fileA)) {
-                    $archivo = $request->file($fileA);
+                if ($request->hasFile($fileKey)) {
+                    $archivo = $request->file($fileKey);
                     $ruta = $archivo->store('respuestas', 'public');
 
-                    //usar extradata si ya existe, Si no crea uno
                     $extra = isset($answer['extra_data']) && is_array($answer['extra_data'])
                         ? $answer['extra_data']
                         : [];
-                        
+
                     $extra['file_path'] = $ruta;
                     $answer['extra_data'] = $extra;
-
                 }
             }
             $respuestaService->saveAnswers($answers, $question->id);

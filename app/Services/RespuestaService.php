@@ -14,6 +14,7 @@ class RespuestaService
             'question_type_id' => $question->question_type_id,
             'answers_count' => count($answers),
         ]);
+        
 
         $savedRespuestas = [];
 
@@ -79,6 +80,12 @@ class RespuestaService
                     if ($question->type == 8 || $question->type == 14 || $question->type == 15) {
                         $is_correct = null;
                     }
+                    Log::debug("Extra data antes de guardar", [
+                        'index' => $index,
+                        'extra_data' => $extra_data,
+                        'tipo' => gettype($extra_data),
+                    ]);
+
                     // Abierta, Verdadero/Falso, Múltiple, doble opción
                     $savedRespuestas[] = Respuesta::create([
                         'question_id' => $questionId,
