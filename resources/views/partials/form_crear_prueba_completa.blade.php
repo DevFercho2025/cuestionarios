@@ -801,6 +801,32 @@
 
                         letraActualMultiple++;
                         break;
+                    case 19:
+                        //moss
+                        let letraMoss = String.fromCharCode(letraActualMultiple); //Obtener letra actual
+
+                        newRespuestaHTML = `
+                            <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                <input type="text" class="form-control option-text" placeholder="Opción" value="${letraMoss}" required style="flex:1;">
+                                <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
+                                
+                                <select class="form-select aspecto" style="flex:2;">
+                                    <option value="">Seleccione una opción</option>
+                                    <option value="A">A. Habilidad en Supervisión.</option>
+                                    <option value="B">B. Capacidad de decisión en las relaciones humanas.</option>
+                                    <option value="C">C. Capacidad de evacuación de problemas interpersonales.</option>
+                                    <option value="D">D. Habilidad para establecer relaciones interpersonales.</option>
+                                    <option value="E">E. Sentido común y tacto en las relaciones interpersonales.</option>
+                                </select>
+
+                                <input type="file" class="form-control answer-file" style="flex:1;"">
+                                <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
+                                <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
+                            </div>
+                        `;
+
+                        letraActualMultiple++;
+                        break;
                     default: // Selección múltiple, otro tipo aún no definido.
                         let letraM = String.fromCharCode(letraActualMultiple); //Obtener letra actual
 
@@ -1093,7 +1119,8 @@
                             <select id="likert-scale-size" class="form-control" style="width: 200px;">
                                 <option value="">Seleccione</option>
                                 <option value="4">Escala de 4 puntos</option>
-                                <option value="5">Escala de 5 puntos</option>
+                                <option value="5a">Escala de 5 puntos de acuerdo</option>
+                                <option value="5b">Escala de 5 puntos de verdadero/falso</option>
                             </select>
                             <button type="button" class="ver-likert btn btn-azul btn-sm" title="Ver las opciones de esta escala"> ? </button>
                         </div>
@@ -1152,7 +1179,14 @@
                 break;
             case 6:
                 //Figuras incompletas
-                    html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}" class="contenedor-dinamico-domino"></div>`;
+                    html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}" class="contenedor-dinamico-domino">
+                                <select class="form-select form-Domino" style="flex:2;">
+                                    <option value="">Seleccione la forma de los Dominos</option>
+                                    <option value="A">Predeterminada</option>
+                                    <option value="B">Espiral</option>
+                                    <option value="C">Circular</option>
+                                </select>
+                            </div>`;
 
                     // Botón para añadir nuevas respuestas
                     html += `
@@ -1256,14 +1290,15 @@
             switch (questionType) {
                 case 2: // Likert
                     const scaleSize = parseInt(document.getElementById('likert-scale-size').value);
-                    if (!scaleSize || ![4, 5].includes(scaleSize)) {
+                    if (!scaleSize || ![4, '5a','5b'].includes(scaleSize)) {
                         valid = false;
                         break;
                     }
 
                     const labels = {
                         4: ['Totalmente en desacuerdo', 'En desacuerdo', 'De acuerdo', 'Totalmente de acuerdo'],
-                        5: ['Totalmente en desacuerdo', 'En desacuerdo', 'Neutral', 'De acuerdo', 'Totalmente de acuerdo']
+                        '5a': ['Totalmente en desacuerdo', 'En desacuerdo', 'Neutral', 'De acuerdo', 'Totalmente de acuerdo'],
+                        '5b': ['Completamente falso para mí', 'Bastante falso para mí', 'Ni verdadero ni falso para mí', 'Bastante verdadero para mí', 'Completamente verdadro para mí']
                     };
 
                     labels[scaleSize].forEach((label, index) => {
@@ -1306,16 +1341,25 @@
                         const isTopValid = topCircles >= 0 && topCircles <= 6;
                         const isBottomValid = bottomCircles >= 0 && bottomCircles <= 6;
 
+                        const formSelect = input.querySelector('.form-Domino');
+                        const formValue = formSelect?.value || '';
+
                         if (isTopValid && isBottomValid) {
+                            const extraData = {
+                                top: topCircles,
+                                bottom: bottomCircles,
+                                fillable: fillable
+                            };
+
+                        if (formValue && formValue !== 'A') {
+                            extraData.shape = formValue;
+                        }
+
                             respuestas.push({
                                 answer: `${topCircles}-${bottomCircles}`,
                                 option: null,
                                 is_correct: null,
-                                extra_data: {
-                                    top: topCircles,
-                                    bottom: bottomCircles,
-                                    fillable: fillable
-                                }
+                                extra_data: extraData
                             });
                         } else {
                             valid = false;
@@ -1399,6 +1443,20 @@
                                 } else {
                                     valid = false;
                                 }
+                                break;
+                            case 19:
+                                const AspectSelectEl = input.querySelector('.aspecto');
+                                const AspectValue = AspectSelectEl?.value || '';
+
+                                if (answer && option && relacionValue) {
+                                    respuestas.push({
+                                        answer,
+                                        option,
+                                        is_correct,
+                                        extra_data: {
+                                            Aspecto: AspectValue
+                                        }
+                                    });
                                 break;
                             default:
                                 const fileEl = input.querySelector('.answer-file');
