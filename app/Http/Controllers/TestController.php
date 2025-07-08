@@ -19,7 +19,7 @@ class TestController extends Controller
 
     public function datatable(Request $request)
     {
-        $tests = Test::with(['type.category', 'sections'])->get();
+        $tests = Test::with(['type.category', 'sections', 'questions'])->get();
 
         $data = $tests->map(function ($test) {
             return [
@@ -27,8 +27,9 @@ class TestController extends Controller
                 'titulo' => $test->test_title,
                 'tipo' => $test->type?->type_name,
                 'tipo_id' => $test->type?->id,
-                'categoria' => $test->type->category->category_name,
-                'categoria_id' => $test->type->category->id,
+                'categoria' => $test->type?->category?->category_name,
+                'categoria_id' => $test->type?->category?->id,
+                'preguntas' => $test->questions->count(),
                 'secciones' => $test->sections->count(),
                 'time_at' => $test->time_at,
             ];

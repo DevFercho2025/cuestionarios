@@ -3,7 +3,14 @@
     <div class="app-brand demo">
         
         <div style="display: flex; justify-content: center; padding: 10px;">
-            <img src="../../assets/img/Alobri/alobriLogo2.png" height="30px" />
+            <img
+                src="{{ asset('assets/img/Alobri/alobri-light.png') }}"
+                alt="Logo"
+                height="30px"
+                class="app-brand-img"
+                data-app-light-img="Alobri/Alobri-light.png"
+                data-app-dark-img="Alobri/Alobri-dark.png"
+            />
         </div>
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -42,19 +49,27 @@
                     <div data-i18n="Candidatos">Candidatos</div>
                 </a>
                 <ul class="menu-sub">
-                    <form action="{{ route('candidatos.index') }}" method="POST">
-                        @csrf
-                        <li class="menu-item">
-                            <button type="submit" name="conVacante" value="1" class="menu-link" style="border: none; background-color: transparent;">
-                                <div data-i18n="+ Candidato con vacante">Candidato con vacante</div>
-                            </button>
-                        </li>
-                        <li class="menu-item">
-                            <button type="submit" name="conVacante" value="0" class="menu-link" style="border: none; background-color: transparent;">
-                                <div data-i18n="+ Candidato sin vacante">Candidato sin vacante</div>
-                            </button>
-                        </li>
-                    </form>
+                    <!-- Candidato con vacante -->
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" onclick="event.preventDefault(); document.getElementById('form-con-vacante').submit();">
+                            <div data-i18n="Candidatos con vacante">Candidato con vacante</div>
+                        </a>
+                        <form id="form-con-vacante" action="{{ route('candidatos.index') }}" method="POST" style="display: none;">
+                            @csrf
+                            <input type="hidden" name="conVacante" value="1">
+                        </form>
+                    </li>
+
+                    <!-- Candidato sin vacante -->
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" onclick="event.preventDefault(); document.getElementById('form-sin-vacante').submit();">
+                            <div data-i18n="Candidatos sin vacante">Candidato sin vacante</div>
+                        </a>
+                        <form id="form-sin-vacante" action="{{ route('candidatos.index') }}" method="POST" style="display: none;">
+                            @csrf
+                            <input type="hidden" name="conVacante" value="0">
+                        </form>
+                    </li>
                     
                     <li class="menu-item">
                         <a href="{{ route('evaluaciones.index') }}" class="menu-link">
@@ -67,7 +82,6 @@
                         </a>
                     </li>
                 </ul>
-                
             </li>
             @if(auth()->user()->config?->role?->type === 'Super Admin')
                 <li class="menu-item active open">
@@ -91,27 +105,25 @@
                                 <div data-i18n="Secciones"></div>
                             </a>
                         </li>
-                        <li class="menu-item active open">
-                            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                                <i class="menu-icon tf-icons ri-questionnaire-line me-2"></i> 
-                                <div data-i18n="Preguntas"></div>
+                    </ul>
+                </li>
+                <li class="menu-item active open">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons ri-questionnaire-line me-2"></i> 
+                        <div data-i18n="Preguntas"></div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item">
+                            <a href="{{ route('preguntas.index') }}" class="menu-link">
+                                <div data-i18n="Preguntas que existen"></div>
                             </a>
-                            <ul class="menu-sub">
-                                <li class="menu-item">
-                                    <a href="{{ route('preguntas.index') }}" class="menu-link">
-                                        <div data-i18n="Preguntas que existen"></div>
-                                    </a>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="{{ route('respuestas.index') }}" class="menu-link">
-                                        <div data-i18n="Respuestas que existen"></div>
-                                    </a>
-                                </li>
-                            </ul>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('respuestas.index') }}" class="menu-link">
+                                <div data-i18n="Respuestas que existen"></div>
+                            </a>
                         </li>
                     </ul>
-                    
-
                 </li>
             @endif
         @endif

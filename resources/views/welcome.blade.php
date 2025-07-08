@@ -15,7 +15,14 @@
             </button>
             <!-- Mobile menu toggle: End-->
             <a href="{{ route('home.index') }}" class="app-brand-link">
-                <span class="app-brand-text demo menu-text fw-semibold ms-2 ps-1 text-primary"><img style="height: 35px" src="../../assets/img/Alobri/alobriLogo.png"></span>
+                <img style="height: 35px"
+                    src="{{ asset('assets/img/Alobri/alobri-light.png') }}"
+                    alt="Logo"
+                    height="30px"
+                    class="app-brand-img"
+                    data-app-light-img="Alobri/Alobri-light.png"
+                    data-app-dark-img="Alobri/Alobri-dark.png"
+                />
             </a>
         </div>
         <!-- / Menu logo-->

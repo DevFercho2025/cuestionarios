@@ -24,6 +24,11 @@ class Test extends Model
     {
         return $this->hasMany(Seccion::class, 'test_id');
     }
+
+    public function questions()
+    {
+        return $this->hasMany(Pregunta::class, 'test_id');
+    }
     
     public function assignedUsers()
     {

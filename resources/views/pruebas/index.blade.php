@@ -37,6 +37,27 @@
             color: white;
             background-color: #8b1a1a;
         }
+
+        /*input cuando se elimina un test */
+        .swal2-popup input.swal-confirm-input {
+            background-color: #1e2333;
+            color: white;
+            border: 1px solid #4b5563;
+            padding: 10px;
+            border-radius: 6px;
+            transition: border 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .swal2-popup input.swal-confirm-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .swal2-popup input.swal-confirm-input:focus {
+            outline: none;
+            border: 1px solid #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+
     </style>
 </head>
     <div class="container">
@@ -79,6 +100,7 @@
                                 <th>Tipo</th>
                                 <th>Categoria</th>
                                 <th>Total de Secciones</th>
+                                <th>Total de Preguntas</th>
                                 <th>Tiempo estimado de realización</th>
                                 <th>Acciones</th>
                             </tr>
@@ -89,6 +111,36 @@
             </div>
         </div>
     </div>
+
+    <!--Modal para añadir preguntas a pruebas ya creadas-->
+    <div class="modal fade" id="modal-add-questions" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-fullheight">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="add-questions" class="content fade">
+                        <div class="col-md-12">
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs" id="tabs-secciones" role="tablist">
+                                <!--Aquí van pestañas de secciones-->
+                            </ul>
+                            <!-- Tab content -->
+                            <div class="tab-content mt-3" id="contenido-secciones">
+                                <!--Contenido para crear preguntas y sus respuestas-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Botón para cerrar ventana-->
+                <div class="modal-footer">
+                    <button class="modal-close btn btn-azul">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- jQuery y Scripts adicionales -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -169,6 +221,7 @@
                     {data: 'tipo'},
                     {data: 'categoria'},
                     {data: 'secciones'},
+                    {data: 'preguntas'},
                     {data: 'time_at'},
                     {
                         data: null,
@@ -220,162 +273,6 @@
                 document.body.appendChild(swalScript);
             }
 
-            // Crear nueva evaluación
-            jQuery('#createTestBtn').on('click', function () {
-                if (typeof Swal === 'undefined') {
-                    alert('No se puede mostrar el formulario. Falta una dependencia (SweetAlert2).');
-                    return;
-                }
-
-                // Cargar categorías y tipos
-                jQuery.ajax({
-                    url: "{{ route('pruebas.categorias.tipos') }}",
-                    type: "GET",
-                    dataType: "json",
-                    success: function (categories) {
-                        // Opciones para categorías
-                        let catOptions = '';
-                        categories.forEach(cat => {
-                            catOptions += `<option value="${cat.id}">${cat.category_name}</option>`;
-                        });
-
-                        // Seleccionar la primera categoría para cargar sus tipos
-                        let firstCategory = categories[0];
-                        let tipos = firstCategory ? firstCategory.test_types : [];
-
-                        // Opciones para tipos
-                        let typeOptions = '';
-                        tipos.forEach((type, index) => {
-                            // Selecciona el primero por defecto
-                            let selected = index === 0 ? 'selected' : '';
-                            typeOptions += `<option value="${type.id}" ${selected}>${type.type_name}</option>`;
-                        });
-
-                        Swal.fire({
-                            html: `
-                                <div class="col-md mb-6 mb-md-0">
-                                    <div class="card">
-                                        <h2 class="card-header">Crear Test</h2>
-                                        <div class="card-body">
-                                            <div class="form-floating form-floating-outline mb-6">
-                                                <input id="swal-titulo" type="text" class="form-control" placeholder="Título" required>
-                                                <label for="swal-titulo">Título</label>
-                                            </div>
-
-                                            <div class="form-floating form-floating-outline mb-6">
-                                                <select id="swal-categoria" class="form-select" required>
-                                                    ${catOptions}
-                                                </select>
-                                                <label for="swal-categoria">Categoría</label>
-                                            </div>
-
-                                            <div class="form-floating form-floating-outline mb-6">
-                                                <select id="swal-tipo" class="form-select" required>
-                                                    ${typeOptions}
-                                                </select>
-                                                <label for="swal-tipo">Tipo</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            `,
-                            showClass: { popup: 'animate__animated animate__fadeInDown' },
-                            hideClass: { popup: 'animate__animated animate__fadeOutUp' },
-                            focusConfirm: false,
-                            confirmButtonText: 'Crear',
-                            confirmButtonColor: '#3d4e81',
-                            cancelButtonText: 'Cancelar',
-                            cancelButtonColor: '#d32f2f',
-                            showCancelButton: true,
-                            buttonsStyling: true,
-                            background: '#262b3c',
-                            preConfirm: () => {
-                                const titulo = document.getElementById('swal-titulo').value.trim();
-                                const categoria_id = document.getElementById('swal-categoria').value;
-                                const tipo_id = document.getElementById('swal-tipo').value;
-
-                                if (!titulo) {
-                                    Swal.showValidationMessage('El título es obligatorio');
-                                    return false;
-                                }
-
-                                return {
-                                    titulo,
-                                    categoria_id,
-                                    tipo_id,
-                                    _token: '{{ csrf_token() }}'
-                                };
-                            }
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                jQuery.ajax({
-                                    url: `{{ url('psicometricas/admin/pruebas') }}`, // POST para crear
-                                    type: "POST",
-                                    data: result.value,
-                                    dataType: "json",
-                                    success: function (response) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: '¡Creado!',
-                                            text: response.message,
-                                            confirmButtonColor: '#3d4e81',
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            background: '#262b3c',
-                                        });
-                                        let table = jQuery('#testsTable').DataTable();
-                                        table.ajax.reload(null, false);
-                                    },
-                                    error: function (xhr) {
-                                        let errorMsg = 'No se pudo crear el test.';
-                                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                                            errorMsg = xhr.responseJSON.message;
-                                        }
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Error',
-                                            text: errorMsg,
-                                            confirmButtonColor: '#d32f2f',
-                                            background: '#262b3c',
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        // Cuando cambie la categoría, actualizar el select de tipos
-                        jQuery(document).off('change', '#swal-categoria'); // Evita listeners duplicados
-                        jQuery(document).on('change', '#swal-categoria', function () {
-                            let catId = jQuery(this).val();
-                            let categoriaSeleccionada = categories.find(cat => cat.id == catId);
-                            let tiposNuevaCategoria = categoriaSeleccionada ? categoriaSeleccionada.test_types : [];
-
-                            let newTypeOptions = '';
-
-                            if (!Array.isArray(tiposNuevaCategoria) || tiposNuevaCategoria.length === 0) {
-                                newTypeOptions = `<option value="" disabled selected>Categoría sin tipos</option>`;
-                            } else {
-                                tiposNuevaCategoria.forEach((type, index) => {
-                                    let selected = index === 0 ? 'selected' : '';
-                                    newTypeOptions += `<option value="${type.id}" ${selected}>${type.type_name}</option>`;
-                                });
-                            }
-
-                            jQuery('#swal-tipo').html(newTypeOptions);
-                        });
-                    },
-                    error: function () {
-                        if (typeof M !== 'undefined') {
-                            M.toast({
-                                html: '<i class="material-icons left">error</i> No se pudieron cargar las categorías',
-                                classes: 'red rounded'
-                            });
-                        } else {
-                            alert('No se pudieron cargar las categorías');
-                        }
-                    }
-                });
-            });
 
             // Editar una evaluación
             jQuery('#testsTable').on('click', '.edit-btn', function () {
@@ -397,7 +294,7 @@
                         // Opciones para categorías
                         let catOptions = '';
                         categories.forEach(cat => {
-                            const selected = row.categoria === cat.category_name ? 'selected' : '';
+                            const selected = row.categoria_id == cat.id ? 'selected' : '';
                             catOptions += `<option value="${cat.id}" ${selected}>${cat.category_name}</option>`;
                         });
 
@@ -408,7 +305,7 @@
                         // Opciones para tipos
                         let typeOptions = '';
                         tipos.forEach(type => {
-                            const selected = row.tipo === type.type_name ? 'selected' : '';
+                            const selected = row.tipo_id == type.id ? 'selected' : '';
                             typeOptions += `<option value="${type.id}" ${selected}>${type.type_name}</option>`;
                         });
 
@@ -436,6 +333,10 @@
                                                 </select>
                                                 <label for="swal-tipo">Tipo</label>
                                             </div>
+
+                                            <button type="button" class="btn btn-azul waves-effect waves-light add-questions"  data-id="${id}" style="margin-top: 10px;">
+                                                <i class="ri-add-line me-1"></i> Añadir más preguntas
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -525,6 +426,70 @@
                 });
             });
 
+            jQuery(document).off('click', '.add-questions');
+            jQuery(document).on('click', '.add-questions', function () {
+                const modal = document.getElementById('modal-add-questions');
+                const bootstrapModal = new bootstrap.Modal(modal);
+                bootstrapModal.show();
+                document.getElementById('modal-add-questions').style.zIndex = '20001';
+
+                const id = $(this).data('id');
+
+                $.ajax({
+                    url: `secciones/by-test/${id}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (secciones) {
+                        $('#tabs-secciones').empty();
+                        $('#contenido-secciones').empty();
+
+                        secciones.forEach((seccion, index) => {
+                            const seccionId = 'seccion-' + seccion.id;
+                            const titulo = seccion.title;
+
+                            const tab = `
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link ${index === 0 ? 'active' : ''}" 
+                                            id="${seccionId}-tab" 
+                                            data-bs-toggle="tab" 
+                                            data-bs-target="#${seccionId}" 
+                                            type="button" 
+                                            role="tab" 
+                                            aria-controls="${seccionId}" 
+                                            aria-selected="${index === 0 ? 'true' : 'false'}">
+                                        ${titulo}
+                                    </button>
+                                </li>`;
+
+                            const contenido = `
+                                <div class="tab-pane fade ${index === 0 ? 'show active' : ''}" 
+                                    id="${seccionId}" 
+                                    role="tabpanel" 
+                                    aria-labelledby="${seccionId}-tab"
+                                    data-test-id="${seccion.test_id}" 
+                                    data-section-id="${seccion.id}">
+                                    <p>Preguntas para <strong>${titulo}</strong> van aquí.</p>
+                                </div>`;
+                            jQuery('#tabs-secciones').append(tab);
+                            jQuery('#contenido-secciones').append(contenido);
+
+                            // Activar la primera pestaña
+                            if (index === 0) {
+                                const tabTriggerEl = document.querySelector(`#${seccionId}-tab`);
+                                const tabTrigger = new bootstrap.Tab(tabTriggerEl);
+                                tabTrigger.show();
+                            }
+                        });
+
+                    },
+                    error: function () {
+                        console.error('No se pudieron cargar las secciones.');
+                    }
+                });
+            });
+
+
+
             //Eliminar una evaluación
             jQuery('#testsTable').on('click', '.delete-btn', function () {
                 if (typeof Swal === 'undefined') {
@@ -534,9 +499,22 @@
                 var id = jQuery(this).data('id');
                 let table = jQuery('#testsTable').DataTable();
 
+                let row = jQuery(this).closest('tr');
+                let rowData = table.row(row).data();
+                let testTitle = rowData.titulo;
+
                 Swal.fire({
                     title: '<span style="color: white;">¿Eliminar evaluación?</span>',
-                    html: '<span style="color: #d32f2f;">Al eliminar esta evaluación, también se eliminarán todas las secciones, preguntas y respuestas asociadas. Los candidatos no podrán realizarla, y tampoco se podrá generar reportes de análisis de respuestas. <br><br> Esta acción no se puede deshacer.</span>',
+                    html: `
+                            <span style="color: #d32f2f;">
+                                Al eliminar la evaluación <span style="color: white;">${testTitle}</span>, también se eliminarán todas las secciones, preguntas y respuestas asociadas. 
+                                Los candidatos no podrán realizarla, y tampoco se podrá generar reportes de análisis de respuestas. 
+                                <br><br> 
+                                Esta acción no se puede deshacer.
+                            </span>
+                        `,
+                    input: 'text',
+                    inputPlaceholder: 'Escriba el nombre exacto de la evaluación',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d32f2f',
@@ -544,8 +522,16 @@
                     confirmButtonText: 'Sí, eliminar',
                     cancelButtonText: 'Cancelar',
                     background: '#262b3c',
+                    customClass: {
+                        input: 'swal-confirm-input'
+                    },
                     showClass: { popup: 'animate__animated animate__fadeIn' },
-                    hideClass: { popup: 'animate__animated animate__fadeOut' }
+                    hideClass: { popup: 'animate__animated animate__fadeOut' },
+                    preConfirm: (inputValue) => {
+                        if (inputValue !== testTitle) {
+                            Swal.showValidationMessage('El nombre no coincide. Escriba el nombre exacto de la evaluación.');
+                        }
+                    }
                 }).then((result) => {
                     if (result.isConfirmed) {
                         jQuery.ajax({
