@@ -311,7 +311,7 @@
                         </div>
                         <!--#3-->
                         <div id="add-questions" class="content fade">
-                            <div class="col-md-8">
+                            <div class="col-md-12">
                                 <!-- Nav tabs -->
                                 <ul class="nav nav-tabs" id="tabs-secciones" role="tablist">
                                     <!--Aquí van pestañas de secciones creadas-->
@@ -647,7 +647,7 @@
 
             }
 
-            //ver cómo es la escala likert 4 o 5
+            //ver cómo es la escala likert
             if (event.target && event.target.classList.contains('ver-likert')) {
                 const btn = event.target;
                 const wrapper = btn.closest('.likert-wrapper');
@@ -659,14 +659,16 @@
                 const value = parseInt(select.value);
                 container.innerHTML = '';
 
-                if (![4, 5].includes(value)) {
+                if (![1,2,3,4].includes(value)) {
                     container.innerHTML = '<p style="color: red;">Seleccione una escala válida.</p>';
                     return;
                 }
 
                 const labels = {
-                    4: ['Totalmente en desacuerdo', 'En desacuerdo', 'De acuerdo', 'Totalmente de acuerdo'],
-                    5: ['Totalmente en desacuerdo', 'En desacuerdo', 'Neutral', 'De acuerdo', 'Totalmente de acuerdo']
+                    1: ['Totalmente en desacuerdo', 'En desacuerdo', 'De acuerdo', 'Totalmente de acuerdo'],
+                    2: ['Totalmente en desacuerdo', 'En desacuerdo', 'Neutral', 'De acuerdo', 'Totalmente de acuerdo'],
+                    3: ['Completamente falso para mí', 'Bastante falso para mí', 'Ni verdadero ni falso para mí', 'Bastante verdadero para mí', 'Completamente verdadro para mí'], //BFQ
+                    4: ['En absoluto', 'Levemente', 'Moderadamente', 'Severamente'] //BAI
                 };
 
                 labels[value].forEach(label => {
@@ -1118,9 +1120,10 @@
                             <label style="font-weight: bold;">Tamaño de la escala:</label>
                             <select id="likert-scale-size" class="form-control" style="width: 200px;">
                                 <option value="">Seleccione</option>
-                                <option value="4">Escala de 4 puntos</option>
-                                <option value="5a">Escala de 5 puntos de acuerdo</option>
-                                <option value="5b">Escala de 5 puntos de verdadero/falso</option>
+                                <option value="1">Escala de 4 puntos de acuerdo</option>
+                                <option value="2">Escala de 5 puntos de acuerdo</option>
+                                <option value="3">Escala de 5 puntos de verdadero/falso para BFQ</option>
+                                <option value="4">Escala de 4 puntos de frecuencia para BAI</option>
                             </select>
                             <button type="button" class="ver-likert btn btn-azul btn-sm" title="Ver las opciones de esta escala"> ? </button>
                         </div>
@@ -1290,15 +1293,16 @@
             switch (questionType) {
                 case 2: // Likert
                     const scaleSize = parseInt(document.getElementById('likert-scale-size').value);
-                    if (!scaleSize || ![4, '5a','5b'].includes(scaleSize)) {
+                    if (!scaleSize || ![1, 2,3, 4].includes(scaleSize)) {
                         valid = false;
                         break;
                     }
 
                     const labels = {
-                        4: ['Totalmente en desacuerdo', 'En desacuerdo', 'De acuerdo', 'Totalmente de acuerdo'],
-                        '5a': ['Totalmente en desacuerdo', 'En desacuerdo', 'Neutral', 'De acuerdo', 'Totalmente de acuerdo'],
-                        '5b': ['Completamente falso para mí', 'Bastante falso para mí', 'Ni verdadero ni falso para mí', 'Bastante verdadero para mí', 'Completamente verdadro para mí']
+                        1: ['Totalmente en desacuerdo', 'En desacuerdo', 'De acuerdo', 'Totalmente de acuerdo'],
+                        2: ['Totalmente en desacuerdo', 'En desacuerdo', 'Neutral', 'De acuerdo', 'Totalmente de acuerdo'],
+                        3: ['Completamente falso para mí', 'Bastante falso para mí', 'Ni verdadero ni falso para mí', 'Bastante verdadero para mí', 'Completamente verdadro para mí'], //BFQ
+                        4: ['En absoluto', 'Levemente', 'Moderadamente', 'Severamente'] //BAI
                     };
 
                     labels[scaleSize].forEach((label, index) => {
@@ -1448,7 +1452,7 @@
                                 const AspectSelectEl = input.querySelector('.aspecto');
                                 const AspectValue = AspectSelectEl?.value || '';
 
-                                if (answer && option && relacionValue) {
+                                if (answer && option && AspectValue) {
                                     respuestas.push({
                                         answer,
                                         option,
@@ -1457,6 +1461,7 @@
                                             Aspecto: AspectValue
                                         }
                                     });
+                                }
                                 break;
                             default:
                                 const fileEl = input.querySelector('.answer-file');
