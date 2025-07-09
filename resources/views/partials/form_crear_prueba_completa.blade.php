@@ -357,6 +357,7 @@
     let bsModal;
     let letraActualMultiple = 97; //Inicia con "a", para respuestas múltiples
     let testEnProgreso = false;
+    let numBeck = 0;
 
     document.addEventListener('DOMContentLoaded', function () {
 
@@ -659,16 +660,19 @@
                 const value = parseInt(select.value);
                 container.innerHTML = '';
 
-                if (![1,2,3,4].includes(value)) {
+                if (![1,2,3,4,5,6].includes(value)) {
                     container.innerHTML = '<p style="color: red;">Seleccione una escala válida.</p>';
                     return;
                 }
 
-                const labels = {
+                labels = {
                     1: ['Totalmente en desacuerdo', 'En desacuerdo', 'De acuerdo', 'Totalmente de acuerdo'],
                     2: ['Totalmente en desacuerdo', 'En desacuerdo', 'Neutral', 'De acuerdo', 'Totalmente de acuerdo'],
                     3: ['Completamente falso para mí', 'Bastante falso para mí', 'Ni verdadero ni falso para mí', 'Bastante verdadero para mí', 'Completamente verdadro para mí'], //BFQ
-                    4: ['En absoluto', 'Levemente', 'Moderadamente', 'Severamente'] //BAI
+                    4: ['En absoluto', 'Levemente', 'Moderadamente', 'Severamente'], //BAI
+                    5: ['Me desagrada mucho', 'no me gusta','Me es indiferente','Me gusta','Me gusta mucho'], //Hereford
+                    6: ['Me gusta','Me es indiferente o tengo dudas','No me gusta','No conozco esa actividad o profesión'], //IPP
+                    7: ['Mucho','Poco','Nada']
                 };
 
                 labels[value].forEach(label => {
@@ -829,6 +833,61 @@
 
                         letraActualMultiple++;
                         break;
+                    case 20:
+                        let letraB = String.fromCharCode(letraActualMultiple);
+
+                        //Depresión de Beck
+                        newRespuestaHTML = `
+                            <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                <input type="text" class="form-control option-text" placeholder="Opción" value="${letraB}" required style="flex:1;">
+                                <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
+                                <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
+                            </div>
+                        `;
+
+                        numBeck++;
+                        letraActualMultiple++;
+                        break;
+                    case 21:
+                        //# de columnas definido por el usuario
+                        const inputCol = document.getElementById(`num-columnas-${sectionId}`);
+                        const numCol = parseInt(inputCol?.value || 0);
+
+                        if (!numCol || numCol < 1) {
+                            alert("Por favor, indica cuántas columnas tiene esta pregunta antes de añadir respuestas.");
+                            return;
+                        }
+
+                        const alreadyHasTitle = container.querySelector('.title-row');
+
+                        //Si no hay títulos, generar una fila para ellos
+                        if (!alreadyHasTitle) {
+                            let titleRow = `<div class="respuesta-input title-row" style="display:flex; gap:10px; margin-bottom:10px; align-items:center; margin-right:52px;">`;
+
+                            for (let i = 0; i < numCol; i++) {
+                                titleRow += `
+                                    <input type="text" class="form-control title-col" placeholder="Título de columna ${i + 1}" style="flex:4; font-weight:bold;">
+                                `;
+                            }
+
+                            titleRow += `</div>`;
+                            container.insertAdjacentHTML('beforeend', titleRow);
+                            return;
+                        }
+
+                        //Fila de inputs de respuesta abierta
+                        newRespuestaHTML = `<div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">`;
+
+                        for (let i = 0; i < numCol; i++) {
+                            newRespuestaHTML += `
+                                <input type="text" class="form-control answer-text" value="Respuesta abierta" readonly style="flex:4;">
+                            `
+                        }
+
+                        newRespuestaHTML += `
+                                            <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
+                                        </div>`;
+                        break;
                     default: // Selección múltiple, otro tipo aún no definido.
                         let letraM = String.fromCharCode(letraActualMultiple); //Obtener letra actual
 
@@ -873,6 +932,7 @@
                 }
 
                 letraActualMultiple = 97;
+                numBeck = 0;
 
                 const infoBtn = document.getElementById(`tipo-info-${seccionId}`);
                 if (infoBtn) {
@@ -893,23 +953,23 @@
                 }
             }
 
-            if (e.target.matches('.checkbox-label input[type="checkbox"]')) {
-                const label = e.target.closest('.checkbox-label');
-                if (e.target.checked) {
+            if (event.target.matches('.checkbox-label input[type="checkbox"]')) {
+                const label = event.target.closest('.checkbox-label');
+                if (event.target.checked) {
                     label.classList.add('active');
                 } else {
                     label.classList.remove('active');
                 }
             }
 
-            if (e.target.classList.contains('opposite')) {
-                const parent = e.target.closest('.respuesta-input');
-                if (e.target.checked) parent.querySelector('.same').checked = false;
+            if (event.target.classList.contains('opposite')) {
+                const parent = event.target.closest('.respuesta-input');
+                if (event.target.checked) parent.querySelector('.same').checked = false;
             }
 
-            if (e.target.classList.contains('same')) {
-                const parent = e.target.closest('.respuesta-input');
-                if (e.target.checked) parent.querySelector('.opposite').checked = false;
+            if (event.target.classList.contains('same')) {
+                const parent = event.target.closest('.respuesta-input');
+                if (event.target.checked) parent.querySelector('.opposite').checked = false;
             }
         });
     });
@@ -1124,6 +1184,9 @@
                                 <option value="2">Escala de 5 puntos de acuerdo</option>
                                 <option value="3">Escala de 5 puntos de verdadero/falso para BFQ</option>
                                 <option value="4">Escala de 4 puntos de frecuencia para BAI</option>
+                                <option value="5">Escala de 5 puntos de gusto para Hereford</option>
+                                <option value="6">Escala de 4 puntos de gusto para IPP</option>
+                                <option value="7">Escala de 3 puntos de aptitud para IPP</option>
                             </select>
                             <button type="button" class="ver-likert btn btn-azul btn-sm" title="Ver las opciones de esta escala"> ? </button>
                         </div>
@@ -1243,6 +1306,26 @@
                         </button>
                     `;
                 break;
+            case 21:
+                    html += `
+                            <div class="form-floating form-floating-outline mb-4">
+                                div class="row mb-2">
+                                    <div class="form-floating form-floating-outline mb-4">
+                                        <input type="number" id="num-columnas-${sectionId}" class="form-control" min="1" placeholder="Ej. 2">
+                                        <label for="num-columnas-${sectionId}">¿Cuántas columnas tiene esta pregunta?</label>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                    html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}"></div>`;
+
+                    html += `
+                        <button type="button" id="add-respuesta-btn-${sectionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
+                            + Añadir respuestas
+                        </button>
+                    `;
+                break;
             default:
                 //Selección múltiple(1), reacción forzada(8)
                     html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}"></div>`;
@@ -1270,6 +1353,7 @@
                 if (container.querySelectorAll('.respuesta-input').length > 1) {
                     btn.parentElement.remove();
                     letraActualMultiple--;
+                    numBeck--;
                 }
             };
         });
@@ -1293,7 +1377,7 @@
             switch (questionType) {
                 case 2: // Likert
                     const scaleSize = parseInt(document.getElementById('likert-scale-size').value);
-                    if (!scaleSize || ![1, 2,3, 4].includes(scaleSize)) {
+                    if (!scaleSize || ![1, 2, 3, 4, 5, 6].includes(scaleSize)) {
                         valid = false;
                         break;
                     }
@@ -1302,18 +1386,34 @@
                         1: ['Totalmente en desacuerdo', 'En desacuerdo', 'De acuerdo', 'Totalmente de acuerdo'],
                         2: ['Totalmente en desacuerdo', 'En desacuerdo', 'Neutral', 'De acuerdo', 'Totalmente de acuerdo'],
                         3: ['Completamente falso para mí', 'Bastante falso para mí', 'Ni verdadero ni falso para mí', 'Bastante verdadero para mí', 'Completamente verdadro para mí'], //BFQ
-                        4: ['En absoluto', 'Levemente', 'Moderadamente', 'Severamente'] //BAI
+                        4: ['En absoluto', 'Levemente', 'Moderadamente', 'Severamente'], //BAI
+                        5: ['Me desagrada mucho', 'no me gusta','Me es indiferente','Me gusta','Me gusta mucho'], //Hereford
+                        6: ['Me gusta','Me es indiferente o tengo dudas','No me gusta','No conozco esa actividad o profesión'], //IPP
+                        7: ['Mucho','Poco','Nada']
                     };
 
                     labels[scaleSize].forEach((label, index) => {
+
+                        const extraData = {
+                            scale_type: scaleSize,
+                            label_index: index + 1
+                        };
+
+                         if (scaleSize === 6) {
+                            if (index === 0) {
+                                extraData.score = 2;
+                            } else if (index === 2) {
+                                extraData.score = 1;
+                            } else {
+                                extraData.score = 0;
+                            }
+                        }
+
                         respuestas.push({
                             answer: label,
                             option: String.fromCharCode(97 + index),
                             is_correct: null,
-                            extra_data: {
-                                scale_type: scaleSize,
-                                label_index: index + 1
-                            }
+                            extra_data: extraData
                         });
                     });
                     break;
@@ -1459,6 +1559,20 @@
                                         is_correct,
                                         extra_data: {
                                             Aspecto: AspectValue
+                                        }
+                                    });
+                                }
+                                break;
+                            case 20:
+                                const scoreValue = input.querySelector('.score-text')?.value.trim();
+
+                                if (answer && option && scoreValue) {
+                                    respuestas.push({
+                                        answer,
+                                        option,
+                                        is_correct,
+                                        extra_data: {
+                                            beck_score: scoreValue
                                         }
                                     });
                                 }
