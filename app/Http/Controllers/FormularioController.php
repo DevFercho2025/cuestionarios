@@ -77,10 +77,16 @@ class FormularioController extends Controller
             $cantidadRepetidas = min(intval($preguntas->count() * 0.06), 5);
             $preguntasRepetidas = $preguntas->random($cantidadRepetidas);
             $preguntas = $preguntas->concat($preguntasRepetidas)->shuffle();
-            $preguntasNormales = $preguntas->filter(fn($p) => $p->question_type_id != 3);
+
+            // Separar preguntas abiertas (id 10), normales, y pares (id 3)
+            $preguntasAbiertas = $preguntas->filter(fn($p) => $p->question_type_id == 10);
+            $preguntasNormales = $preguntas->filter(fn($p) => $p->question_type_id != 10 && $p->question_type_id != 3);
             $preguntasPares = $preguntas->filter(fn($p) => $p->question_type_id == 3);
 
-            $preguntas = $preguntasNormales->concat($preguntasPares)->values();
+            $preguntas = $preguntasAbiertas
+                ->concat($preguntasNormales)
+                ->concat($preguntasPares)
+                ->values();
 
             // Agregar campo de tiempo restante para cada pregunta (con base en la sección)
             $tiempoSeccion = strtotime($seccion->time_at) - strtotime('00:00:00');
@@ -164,6 +170,73 @@ class FormularioController extends Controller
     {
         $user = Auth::user();
         $user_id = $user->id;
+        $ip = \Illuminate\Support\Facades\Request::getClientIp(true);
+        $respuestas = $request->input('respuestas', []);
+
+        foreach ($respuestas as $question_id => $respuesta_data) {
+            // Pregunta normal
+            if (is_scalar($respuesta_data)) {
+                Respuesta_Usuario::updateOrCreate(
+                    ['user_id' => $user_id, 'question_id' => $question_id],
+                    [
+                        'answer_id' => $respuesta_data,
+                        'ip_address' => $ip,
+                        'extra_data' => null
+                    ]
+                );
+            }
+            elseif (is_array($respuesta_data) && array_key_exists('texto', $respuesta_data) && array_key_exists('respuesta_id', $respuesta_data)) {
+                Respuesta_Usuario::updateOrCreate(
+                    ['user_id' => $user_id, 'question_id' => $question_id],
+                    [
+                        'answer_id' => $respuesta_data['respuesta_id'],
+                        'ip_address' => $ip,
+                        'extra_data' => json_encode(['texto' => $respuesta_data['texto']])
+                    ]
+                );
+            }
+
+            // Pregunta compuesta tipo Cleaver
+            elseif (is_array($respuesta_data)) {
+                foreach ($respuesta_data as $bloque => $tipos) {
+                    foreach ($tipos as $tipo => $answer_id) {
+                        // Buscar si ya existe esa combinación
+                        $respuestaExistente = Respuesta_Usuario::where('user_id', $user_id)
+                            ->where('question_id', $question_id)
+                            ->where('extra_data->bloque', $bloque)
+                            ->where('extra_data->tipo', $tipo)
+                            ->first();
+
+                        if ($respuestaExistente) {
+                            // Actualizar
+                            $respuestaExistente->answer_id = $answer_id;
+                            $respuestaExistente->ip_address = $ip;
+                            $respuestaExistente->save();
+                        } else {
+                            // Crear nueva
+                            Respuesta_Usuario::create([
+                                'user_id' => $user_id,
+                                'question_id' => $question_id,
+                                'answer_id' => $answer_id,
+                                'ip_address' => $ip,
+                                'extra_data' => json_encode([
+                                    'bloque' => $bloque,
+                                    'tipo' => $tipo
+                                ])
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Respuesta guardada correctamente.']);
+    }
+    /*public function guardarRespuestas(Request $request)
+    {
+        
+        $user = Auth::user();
+        $user_id = $user->id;
         $usuarioIp = \Illuminate\Support\Facades\Request::getClientIp(true);
 
         $tiempoAgotado = $request->input('tiempo_agotado', 0);
@@ -176,9 +249,9 @@ class FormularioController extends Controller
 
         if ($tiempoAgotado != 1) {
             #Obtener las preguntas requeridas dentro del rango actual
-            $preguntasRequeridas = Pregunta::where('seccion_id', $seccion_id)
+            $preguntasRequeridas = Pregunta::where('section_id', $seccion_id)
                 ->where('required', true)
-                ->pluck('pregunta_id')
+                ->pluck('id')
                 ->toArray();
 
             #Verificar si todas las preguntas requeridas fueron respondidas
@@ -228,11 +301,11 @@ class FormularioController extends Controller
                 ->where('pregunta_id', $pregunta_id)
                 ->first();
         
-            if ($respuesta) {
-                // Si existe, actualiza la respuesta_id y la IP
-                $respuesta->respuesta_id = $respuesta_id;
-                $respuesta->ip_usuario = $usuarioIp;
-            } else {
+                if ($respuesta) {
+                    // Si existe, actualiza la respuesta_id y la IP
+                    $respuesta->respuesta_id = $respuesta_id;
+                    $respuesta->ip_usuario = $usuarioIp;
+                } else {
                 // Si no existe, crea una nueva
                 $respuesta = new Respuesta_Usuario();
                 $respuesta->user_id = $user_id;
@@ -241,7 +314,7 @@ class FormularioController extends Controller
                 $respuesta->ip_usuario = $usuarioIp;
             }*/
         
-            /*$respuesta->save();*/
+            /*$respuesta->save();
         }
 
         $this->generarToken($user_id);
@@ -256,7 +329,7 @@ class FormularioController extends Controller
         session(['secciones_completadas' => $seccionesRespondidas]);
 
         return redirect()->route('candidate.dashboard');
-    }
+    }*/
 
     public function generarToken($user_id)
     {

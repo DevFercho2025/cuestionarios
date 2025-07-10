@@ -216,8 +216,8 @@
                                     <span>{{ $numPregunta + 1 }}</span>
                                     <span>. {{ $pregunta->question }}</span>
                                 </h4>
-                                <div class="d-flex" id="Respuestas">
-                                    <div class="form-check d-block">
+                                <div class="d-flex" id="Respuestas" >
+                                    <div class="form-check d-block" style="width: 100%;">
                                         @if (!empty($pregunta->respuestas) && is_iterable($pregunta->respuestas))
                                            @includeIf('question_types.' . $pregunta->tipo_slug, [
                                                 'pregunta' => $pregunta,

@@ -29,7 +29,7 @@
                 <div class="col-3 text-center">
                     <input type="radio"
                         class="respuesta"
-                        name="respuestas[{{ $pregunta->id }}][c_bloque_{{ $option }}][M]"
+                        name="respuestas[{{ $pregunta->id }}][bloque_{{ $option }}][M]"
                         value="{{ $respuesta->id }}"
                         data-pregunta-id="{{ $pregunta->id }}"
                         required
@@ -38,7 +38,7 @@
                 <div class="col-3 text-center">
                     <input type="radio"
                         class="respuesta"
-                        name="respuestas[{{ $pregunta->id }}][c_bloque_{{ $option }}][L]"
+                        name="respuestas[{{ $pregunta->id }}][bloque_{{ $option }}][L]"
                         value="{{ $respuesta->id }}"
                         data-pregunta-id="{{ $pregunta->id }}"
                         required

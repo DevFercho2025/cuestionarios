@@ -22,6 +22,9 @@
     </style>
 
 @push('scripts')
+    <script>
+        const RUTA_GUARDAR_RESPUESTAS = "{{ route('guardar.respuestas') }}";
+    </script>
     <script src="{{ asset('js/ubicacion.js') }}"></script>
     <script>
         let rangoInicio = {{ $rango_inicio }};

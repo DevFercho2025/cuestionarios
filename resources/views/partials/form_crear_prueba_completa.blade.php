@@ -1309,11 +1309,9 @@
             case 21:
                     html += `
                             <div class="form-floating form-floating-outline mb-4">
-                                div class="row mb-2">
-                                    <div class="form-floating form-floating-outline mb-4">
-                                        <input type="number" id="num-columnas-${sectionId}" class="form-control" min="1" placeholder="Ej. 2">
-                                        <label for="num-columnas-${sectionId}">¿Cuántas columnas tiene esta pregunta?</label>
-                                    </div>
+                                <div class="form-floating form-floating-outline mb-4">
+                                    <input type="number" id="num-columnas-${sectionId}" class="form-control" min="1" placeholder="Ej. 2">
+                                    <label for="num-columnas-${sectionId}">¿Cuántas columnas tiene esta pregunta?</label>
                                 </div>
                             </div>
                         `;

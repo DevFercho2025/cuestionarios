@@ -39,7 +39,6 @@ inicializarMostrarPreguntas();*/
 let respuestasEnGrupo = 0; // Contador de respuestas dentro del bloque de 3
 const LIMITE_PREGUNTAS_POR_BLOQUE = 2; // Tamaño del bloque
 
-
 if (document.readyState === "complete") {
     inicializarMostrarPreguntas();
     iniciarTemporizador();
@@ -70,19 +69,18 @@ function manejarCambioRespuesta(event) {
 
         const container = document.getElementById('respuestas-hidden-container');
 
-        // Detectar si es Cleaver
+        let avanzar = false; 
+
         const isCleaver = event.target.name.includes('bloque_');
         if (isCleaver) {
             // Extraer tipo (M o L)
             let tipoSeleccion = null;
             let optionB = null;
             const tipoMatch = event.target.name.match(/\[([ML])\]$/);
-
             if (tipoMatch) {
-                tipoSeleccion = tipoMatch[1]; 
+                tipoSeleccion = tipoMatch[1];
             }
 
-            //option de bloque (a, b...)
             const bloqueMatch = event.target.name.match(/\[.*bloque_([^\]]+)\]/);
             if (bloqueMatch) {
                 optionB = bloqueMatch[1];
@@ -90,7 +88,6 @@ function manejarCambioRespuesta(event) {
 
             const hiddenName = `respuestas[${preguntaId}][bloque_${optionB}][${tipoSeleccion}]`;
 
-            // Reemplazar o agregar input oculto para este bloque y tipo
             let existing = container.querySelector(`input[name="${hiddenName}"]`);
             if (existing) {
                 existing.value = respuestaId;
@@ -102,8 +99,78 @@ function manejarCambioRespuesta(event) {
                 container.appendChild(hiddenInput);
             }
 
+            //Verificar si hay M y L para ese bloque
+            const mInputChecked = document.querySelector(`input[name="respuestas[${preguntaId}][bloque_${optionB}][M]"]:checked`);
+            const lInputChecked = document.querySelector(`input[name="respuestas[${preguntaId}][bloque_${optionB}][L]"]:checked`);
+            if (mInputChecked && lInputChecked) {
+                // Buscar el contenedor actual del bloque
+                const bloqueActual = event.target.closest('.cleaver-bloque');
+                const siguienteBloque = bloqueActual?.nextElementSibling;
+
+                if (siguienteBloque && siguienteBloque.classList.contains('cleaver-bloque')) {
+                    siguienteBloque.style.display = 'block';
+                    bloqueActual.style.display = 'none';
+                } else {
+                    // Ya no hay más bloques, mostrar siguiente pregunta
+                    const siguientePreguntaDiv = document.getElementById(`pregunta-${parseInt(preguntaId) + 1}`);
+                    if (siguientePreguntaDiv) {
+                        siguientePreguntaDiv.style.display = "block";
+                        bloqueActual.style.display = 'none';
+                    } else {
+                        const botonEnviar = document.getElementById("enviar");
+                        if (botonEnviar) {
+                            botonEnviar.style.display = "block";
+                            bloqueActual.style.display = 'none';
+                        }
+                    }
+                }
+            }
+        } else if (event.target.tagName === "TEXTAREA") { //pregunta abierta
+            const preguntaId = event.target.dataset.preguntaId;
+            const texto = event.target.value;
+            
+            const respuestaIdInput = document.querySelector(`input[name="respuestas[${preguntaId}][respuesta_id]"]`);
+            const respuestaId = respuestaIdInput?.value || null;
+
+            const payload = {
+                [`respuestas[${preguntaId}][respuesta_id]`]: respuestaId,
+                [`respuestas[${preguntaId}][texto]`]: texto
+            };
+
+            const preguntaActual = parseInt(event.target.dataset.pregunta);
+            const siguientePreguntaDiv = document.getElementById(`pregunta-${preguntaActual + 1}`);
+            if (siguientePreguntaDiv) {
+                siguientePreguntaDiv.style.display = "block";
+            }
+
+            respuestasEnGrupo++;
+            if (respuestasEnGrupo === LIMITE_PREGUNTAS_POR_BLOQUE) {
+                const inicio = preguntaActual - (LIMITE_PREGUNTAS_POR_BLOQUE - 1);
+                for (let i = inicio; i <= preguntaActual; i++) {
+                    const preguntaDiv = document.getElementById(`pregunta-${i}`);
+                    if (preguntaDiv) preguntaDiv.style.display = "none";
+                }
+                respuestasEnGrupo = 0;
+            }
+
+            $.ajax({
+                url: RUTA_GUARDAR_RESPUESTAS,
+                method: 'POST',
+                data: payload,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    console.log("✏️ Pregunta abierta enviada:", response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al enviar respuesta abierta:", error);
+                }
+            });
+
+            return;
         } else {
-            // Pregunta normal (abierta o selección)
+            // Pregunta normal
             const hiddenName = `respuestas[${preguntaId}]`;
             let existing = container.querySelector(`input[name="${hiddenName}"]`);
             if (existing) {
@@ -115,6 +182,7 @@ function manejarCambioRespuesta(event) {
                 hiddenInput.value = respuestaId;
                 container.appendChild(hiddenInput);
             }
+            avanzar = true;
         }
 
         // Mostrar en consola
@@ -124,28 +192,46 @@ function manejarCambioRespuesta(event) {
         });
         console.log("📋 Respuestas guardadas hasta ahora:", todasLasRespuestas);
 
-        // Avanzar pregunta
-        const preguntaActual = parseInt(event.target.dataset.pregunta);
-        const siguientePreguntaDiv = document.getElementById(`pregunta-${preguntaActual + 1}`);
-
-        if (siguientePreguntaDiv) {
-            siguientePreguntaDiv.style.display = "block";
-        } else {
-            const botonEnviar = document.getElementById("enviar");
-            if (botonEnviar) {
-                botonEnviar.style.display = "block";
+        // Guardar
+        $.ajax({
+            url: RUTA_GUARDAR_RESPUESTAS,
+            method: 'POST',
+            data: todasLasRespuestas,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                console.log("Respuesta enviada correctamente:", response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al enviar la respuesta:", error);
             }
-        }
+        });
 
-        // Control de grupo
-        respuestasEnGrupo++;
-        if (respuestasEnGrupo === LIMITE_PREGUNTAS_POR_BLOQUE) {
-            const inicio = preguntaActual - (LIMITE_PREGUNTAS_POR_BLOQUE - 1);
-            for (let i = inicio; i <= preguntaActual; i++) {
-                const preguntaDiv = document.getElementById(`pregunta-${i}`);
-                if (preguntaDiv) preguntaDiv.style.display = "none";
+        //Avanzar si corresponde
+        if (avanzar) {
+            const preguntaActual = parseInt(event.target.dataset.pregunta);
+            const siguientePreguntaDiv = document.getElementById(`pregunta-${preguntaActual + 1}`);
+
+            if (siguientePreguntaDiv) {
+                siguientePreguntaDiv.style.display = "block";
+            } else {
+                const botonEnviar = document.getElementById("enviar");
+                if (botonEnviar) {
+                    botonEnviar.style.display = "block";
+                }
             }
-            respuestasEnGrupo = 0;
+
+            // Ocultar grupo anterior si aplica
+            respuestasEnGrupo++;
+            if (respuestasEnGrupo === LIMITE_PREGUNTAS_POR_BLOQUE) {
+                const inicio = preguntaActual - (LIMITE_PREGUNTAS_POR_BLOQUE - 1);
+                for (let i = inicio; i <= preguntaActual; i++) {
+                    const preguntaDiv = document.getElementById(`pregunta-${i}`);
+                    if (preguntaDiv) preguntaDiv.style.display = "none";
+                }
+                respuestasEnGrupo = 0;
+            }
         }
     }
 }
