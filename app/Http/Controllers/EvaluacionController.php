@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Test;
 use App\Models\Respuesta_Usuario;
-use App\Models\Pregunta;  
+use App\Models\Pregunta;
 use App\Models\UserTestRecord;
-use App\Models\userAssignedTest;
+use App\Models\UserAssignedTest;
 use App\Models\ContadorEvaluacion;
 
 use App\Mail\EvaluacionesAsignadas;
@@ -22,7 +22,7 @@ class EvaluacionController extends Controller
 {
     public function index()
     {
-        return view('Evaluaciones.index'); // Asegúrate que la ruta del archivo sea esta
+        return view('evaluaciones.index');
     }
 
     public function listarCategorias(Request $request)
@@ -36,7 +36,7 @@ class EvaluacionController extends Controller
         $accessCodeId = $request->access_code_id;
 
         #Buscar las evaluaciones ya asignadas al usuario en este código
-        $testsYaAsignados = userAssignedTest::where('user_id', $userId)
+        $testsYaAsignados = UserAssignedTest::where('user_id', $userId)
             ->where('application_access_code_id', $accessCodeId)
             ->pluck('test_id');
 
@@ -144,7 +144,7 @@ class EvaluacionController extends Controller
                 }
 
                 // Asignar prueba
-                $created = userAssignedTest::firstOrCreate([
+                $created = UserAssignedTest::firstOrCreate([
                     'user_id' => $userId,
                     'test_id' => $testId,
                     'application_access_code_id' => $request->access_code_id,
@@ -200,7 +200,7 @@ class EvaluacionController extends Controller
 
         $codeId = $request->input('code_id');
 
-         $evaluaciones = userAssignedTest::with('test')
+         $evaluaciones = UserAssignedTest::with('test')
                 ->where('user_id', $user_id)
                 ->where('application_access_code_id', $codeId)
                 ->with('test:id,test_title')
@@ -217,13 +217,13 @@ class EvaluacionController extends Controller
             'tests' => 'required|array',
             'tests.*' => 'exists:psico_alobri_tests,id',
         ]);
-    
-        userAssignedTest::where('user_id', $request->user_id)
+
+        UserAssignedTest::where('user_id', $request->user_id)
             ->whereIn('test_id', $request->tests)
             ->delete();
-    
+
         return response()->json(['success' => true, 'message' => 'Evaluaciones eliminadas']);
     }
-    
+
 
 }

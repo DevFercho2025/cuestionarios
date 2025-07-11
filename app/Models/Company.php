@@ -28,7 +28,7 @@ class Company extends Model
 
     public function assignedTests()
     {
-        return $this->hasMany(userAssignedTest::class, 'company_id');
+        return $this->hasMany(UserAssignedTest::class, 'company_id');
     }
 
 }
