@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class userAssignedTest extends Model
+class UserAssignedTest extends Model
 {
     //tabla donde se registra quiénes asignan tests, a qué candidatos y con qué código.
     use HasFactory;

@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class pregunta extends Model
 {
     use HasFactory;
+    use softDeletes;
 
     #define qué tabla es preguntas
     protected $table = "psico_alobri_questions"; #título tabla
@@ -41,6 +43,16 @@ class pregunta extends Model
     {
         parent::boot();
 
+        static::forceDeleted(function ($question) {
+            if ($question->picture && Storage::disk('public')->exists($question->picture)) {
+                Storage::disk('public')->delete($question->picture);
+            }
+
+            foreach ($question->respuestas()->withTrashed()->get() as $respuesta) {
+                $respuesta->forceDelete();
+            }
+        });
+
         static::deleting(function ($pregunta) {
             if ($pregunta->picture && Storage::disk('public')->exists($pregunta->picture)) {
                 Storage::disk('public')->delete($pregunta->picture);
@@ -48,6 +60,12 @@ class pregunta extends Model
             
             foreach ($pregunta->respuestas as $respuesta) {
                 $respuesta->delete();
+            }
+        });
+
+        static::restored(function ($pregunta) {
+            foreach ($pregunta->respuestas()->withTrashed()->get() as $respuesta) {
+                $respuesta->restore();
             }
         });
     }

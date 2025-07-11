@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Test;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
 
 class TestController extends Controller
 {
@@ -118,7 +120,45 @@ class TestController extends Controller
         }
     }
 
+    public function trash()
+    {
+        $tests = Test::onlyTrashed()
+            ->with(['type.category'])
+            ->get();
 
+        $data = $tests->map(function ($test) {
+            return [
+                'id' => $test->id,
+                'titulo' => $test->test_title,
+                'tipo' => $test->type?->type_name,
+                'categoria' => $test->type?->category?->category_name,
+                'deleted_at' => $test->deleted_at?->format('Y-m-d H:i:s'),
+            ];
+        });
+        $html = view('partials.deleted-tests-table', ['tests' => $data])->render();
+        return response()->json(['html' => $html]);
+    }
+
+    public function restore($id)
+    {
+        $test = Test::onlyTrashed()->find($id);
+
+        if (!$test) {
+            return back()->with('error', 'No se pudo restaurar el test: no existe o no está en la papelera.');
+        }
+
+        $test->restore();
+
+        return back()->with('success', 'Test restaurado correctamente.');
+    }
+
+    public function forceDelete($id)
+    {
+        $test = Test::onlyTrashed()->find($id);
+        $test->forceDelete();
+
+        return back()->with('success', 'Test eliminado permanentemente.');
+    }
 
     public function show($id)
     {

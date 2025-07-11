@@ -113,10 +113,15 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
             Route::get('pruebas', [TestController::class, 'index'])->name('pruebas.index');
             Route::get('/pruebas/datatable', [TestController::class, 'datatable'])->name('pruebas.datatable');
             Route::get('/pruebas/categorias-tipos', [TestController::class, 'categoriaConTipos'])->name('pruebas.categorias.tipos');
-            Route::put('/pruebas/{id}', [TestController::class, 'update']);
-            Route::get('/pruebas/{id}', [TestController::class, 'show']);
-            Route::post('/pruebas', [TestController::class, 'store']);
+            
             Route::delete('/pruebas/{id}', [TestController::class, 'destroy']);
+            Route::get('/pruebas/deleted', [TestController::class, 'trash'])->name('tests.deleted');
+            Route::put('/pruebas/{id}/restore', [TestController::class, 'restore'])->name('tests.restore');
+            Route::delete('/pruebas/{id}/force-delete', [TestController::class, 'forceDelete'])->name('tests.forceDelete');
+            
+            Route::put('/pruebas/{id}', [TestController::class, 'update']);
+            Route::get('/pruebas/{id}', [TestController::class, 'show'])->where('id', '[0-9]+');
+            Route::post('/pruebas', [TestController::class, 'store']);
 
             // Rutas para Secciones
             Route::get('secciones', [SeccionController::class, 'index'])->name('secciones.index');

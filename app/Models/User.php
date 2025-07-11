@@ -95,7 +95,7 @@ class User extends Authenticatable
     {
         return $this->hasOneThrough(
             AccessCode::class,               // Modelo final (donde está vacante)
-            userAssignedTest::class,         // Tabla intermedia
+            UserAssignedTest::class,         // Tabla intermedia
             'user_id',                       // Clave foránea en userAssignedTest (hacia User)
             'id',                            // Clave foránea en AccessCode (usada por userAssignedTest)
             'id',                            // Clave local en User

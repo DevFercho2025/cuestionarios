@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class Respuesta extends Model
 {
     use HasFactory;
+    use softDeletes;
 
     protected $table = "psico_alobri_answers"; 
     protected $fillable = ["answer", "option", "question_id", "is_correct","extra_data"];
@@ -23,6 +25,14 @@ class Respuesta extends Model
     protected static function boot()
     {
         parent::boot();
+
+        static::forceDeleted(function ($respuesta) {
+            $extraData = json_decode($respuesta->extra_data, true);
+
+            if (!empty($extraData['file_path']) && Storage::disk('public')->exists($extraData['file_path'])) {
+                Storage::disk('public')->delete($extraData['file_path']);
+            }
+        });
 
         static::deleting(function ($respuesta) {
             $extraData = json_decode($respuesta->extra_data, true);

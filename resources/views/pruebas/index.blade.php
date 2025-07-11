@@ -112,6 +112,48 @@
         </div>
     </div>
 
+    <!--Botón para abrir modal de evaluaciones eliminadas-->
+    <div class="col s4 right-align mt-2">
+        <div style="text-align: right; padding-right:1.5rem;">
+            <a id="trashBtn" class="btn btn-large gradient-btn pulse" style="color: white; display: inline-block; background-color:#4f52b5;">
+            Ver eliminadas
+            </a>
+        </div>
+    </div>
+
+    <!--Modal para ver evaluaciones eliminadas-->
+    <div class="modal fade" id="modalEliminados" tabindex="-1" aria-labelledby="modalEliminadosLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pruebas eliminadas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                <th>Título</th>
+                                <th>Tipo</th>
+                                <th>Categoría</th>
+                                <th>Fecha de eliminación</th>
+                                <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deletedTestsTable">
+                                <!--dinámico-->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!--Modal para añadir preguntas a pruebas ya creadas-->
     <div class="modal fade" id="modal-add-questions" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl modal-fullheight">
@@ -145,8 +187,6 @@
     <!-- jQuery y Scripts adicionales -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.8/inputmask.min.js"></script>
-
-
 
 <script>
     if (typeof jQuery === 'undefined') {
@@ -489,7 +529,6 @@
             });
 
 
-
             //Eliminar una evaluación
             jQuery('#testsTable').on('click', '.delete-btn', function () {
                 if (typeof Swal === 'undefined') {
@@ -568,6 +607,7 @@
                     }
                 });
             });
+            
 
                 
             // Reinicializar tooltips
@@ -579,5 +619,46 @@
             alert('Ocurrió un error al inicializar la aplicación: ' + error.message);
         }
     }
+
+    //abrir modal de evaluaciones eliminadas
+    document.getElementById('trashBtn').addEventListener('click', function () {
+        jQuery.ajax({
+            url:"{{ route('tests.deleted') }}",
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                $('#deletedTestsTable').html(data.html);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar las pruebas eliminadas:', error);
+                alert('No se pudieron cargar las pruebas eliminadas.');
+            }
+        });
+
+        // Mostrar modal
+        const modal = new bootstrap.Modal(document.getElementById('modalEliminados'));
+        modal.show();
+
+    });
+
+        $(document).on('click', '.restore-btn', function () {
+            const id = $(this).data('id');
+
+            $.ajax({
+                url: `/pruebas/${id}/restore`,
+                type: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function (response) {
+                    console.log("Restaurado correctamente");
+                    location.reload(); // O puedes eliminar el <tr> del DOM directamente
+                },
+                error: function (xhr) {
+                    alert('Error al restaurar el test.');
+                    console.error(xhr.responseText);
+                }
+            });
+        });
 </script>
 @endsection

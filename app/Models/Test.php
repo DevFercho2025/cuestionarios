@@ -4,16 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 
 class Test extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $table = "psico_alobri_tests";
     protected $fillable = ["test_title","created_at","updated_at","time_at", "type_id"];
     public $timestamps = true;
+    
 
     public function type()
     {
@@ -56,9 +59,25 @@ class Test extends Model
     {
         parent::boot();
 
-        static::deleting(function ($test) {
+        //Solo si se elimina permanentemente
+        static::forceDeleted(function ($test) {
             foreach ($test->sections as $section) {
-                $section->delete(); //eliminar sus secciones
+                $section->forceDelete();
+            }
+        });
+
+        //softDelete
+        static::deleting(function ($test) {
+            if (! $test->isForceDeleting()) {
+                foreach ($test->sections as $section) {
+                    $section->delete();
+                }
+            }
+        });
+
+        static::restored(function ($test) {
+            foreach ($test->sections()->withTrashed()->get() as $section) {
+                $section->restore();
             }
         });
     }
