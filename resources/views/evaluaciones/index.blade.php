@@ -1,4 +1,7 @@
 @extends('layout.admin')
+
+
+
 @section('title', 'Gestión de Evaluaciones')
 
 @section('content')
@@ -116,7 +119,7 @@
             ];
         @endphp
     <script>
-        
+
         if (typeof jQuery === 'undefined') {
             document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
         }
@@ -340,7 +343,7 @@
                                         url: "{{ route('admin.evaluaciones.asignar') }}",
                                         method: 'POST',
                                         data: {
-                                            user_id: userId, 
+                                            user_id: userId,
                                             pruebas: pruebas,
                                             force: force ? 1 : 0,
                                             access_code_id: accessCodeId,
@@ -663,7 +666,7 @@
                 if (typeof M !== 'undefined') {
                     M.Tooltip.init(document.querySelectorAll('.tooltipped'));
                 }
-                
+
             } catch (error) {
                 console.error('Error al inicializar la tabla:', error);
                 alert('Ocurrió un error al inicializar la aplicación: ' + error.message);
