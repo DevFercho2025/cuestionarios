@@ -839,8 +839,9 @@
                         //Depresión de Beck
                         newRespuestaHTML = `
                             <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                                <input type="text" class="form-control option-text" placeholder="Opción" value="${letraB}" required style="flex:1;">
-                                <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
+                                <input type="text" class="form-control score-text" placeholder="Opción" value="${numBeck}" required style="flex:0.5;">
+                                <input type="text" class="form-control option-text" placeholder="Opción" value="${letraB}" required style="flex:0.5;">
+                                <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:3;">
                                 <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
                             </div>
                         `;
