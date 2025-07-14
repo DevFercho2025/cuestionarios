@@ -110,7 +110,7 @@ class TestController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Test eliminado correctamente.'
+                'message' => 'Test eliminado correctamente, puedes restaurarlo en "Ver Eliminadas"'
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -142,14 +142,19 @@ class TestController extends Controller
     public function restore($id)
     {
         $test = Test::onlyTrashed()->find($id);
-
         if (!$test) {
-            return back()->with('error', 'No se pudo restaurar el test: no existe o no está en la papelera.');
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo restaurar el test: no existe o no está en la papelera.'
+            ], 404);
         }
 
         $test->restore();
 
-        return back()->with('success', 'Test restaurado correctamente.');
+         return response()->json([
+            'success' => true,
+            'message' => 'Test restaurado correctamente.'
+        ]);
     }
 
     public function forceDelete($id)
@@ -157,7 +162,10 @@ class TestController extends Controller
         $test = Test::onlyTrashed()->find($id);
         $test->forceDelete();
 
-        return back()->with('success', 'Test eliminado permanentemente.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Test eliminado definitivamente.'
+        ]);
     }
 
     public function show($id)

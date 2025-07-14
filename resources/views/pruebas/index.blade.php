@@ -57,7 +57,14 @@
             border: 1px solid #3b82f6;
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
         }
-
+    
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
     <div class="container">
@@ -620,39 +627,65 @@
         }
     }
 
-    //abrir modal de evaluaciones eliminadas
-    document.getElementById('trashBtn').addEventListener('click', function () {
-        jQuery.ajax({
-            url:"{{ route('tests.deleted') }}",
-            method: 'GET',
-            dataType: 'json',
-            success: function (data) {
-                $('#deletedTestsTable').html(data.html);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error al cargar las pruebas eliminadas:', error);
-                alert('No se pudieron cargar las pruebas eliminadas.');
-            }
+        //abrir modal de evaluaciones eliminadas
+        document.getElementById('trashBtn').addEventListener('click', function () {
+            jQuery.ajax({
+                url:"{{ route('tests.deleted') }}",
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    $('#deletedTestsTable').html(data.html);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error al cargar las pruebas eliminadas:', error);
+                    alert('No se pudieron cargar las pruebas eliminadas.');
+                }
+            });
+
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('modalEliminados'));
+            modal.show();
+
         });
 
-        // Mostrar modal
-        const modal = new bootstrap.Modal(document.getElementById('modalEliminados'));
-        modal.show();
-
-    });
-
+        //Restaurar una evaluación
         $(document).on('click', '.restore-btn', function () {
             const id = $(this).data('id');
+            console.log("ID a restaurar:", id);
+            const $btn = $(this);
+            $btn.prop('disabled', true).html('<i class="ri-loader-line spin"></i>');
 
             $.ajax({
-                url: `/pruebas/${id}/restore`,
+                url: `/psicometricas/admin/pruebas/${id}/restore`,
                 type: 'PUT',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 success: function (response) {
-                    console.log("Restaurado correctamente");
-                    location.reload(); // O puedes eliminar el <tr> del DOM directamente
+                    if (response.success) {
+                        // Elimina la fila del DOM
+                        $btn.closest('tr').remove();
+
+                        // Si ya no hay filas, mostramos el mensaje de "No hay pruebas eliminadas."
+                        if ($('#deletedTestsTable tr').length === 0) {
+                            $('#deletedTestsTable').html('<tr><td colspan="5">No hay pruebas eliminadas.</td></tr>');
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: '<span style="color: white;">¡Restuarado!</span>',
+                            text: response.message,
+                            confirmButtonColor: '#3d4e81',
+                            timer: 2000,
+                            timerProgressBar: true,
+                            background: '#262b3c',
+                        });
+                        table.ajax.reload(null, false);
+                        let table = jQuery('#testsTable').DataTable();
+
+                    } else {
+                        alert('No se pudo restaurar el test.');
+                    }
                 },
                 error: function (xhr) {
                     alert('Error al restaurar el test.');
@@ -660,5 +693,89 @@
                 }
             });
         });
+
+        //Eliminar definitivamente una evaluación
+        $(document).on('click', '.force-delete-btn', function () {
+            if (typeof Swal === 'undefined') {
+                alert('SweetAlert2 no está disponible.');
+                return;
+            }
+
+            const id = $(this).data('id');
+            const row = $(this).closest('tr');
+            const testTitle = row.find('td:first').text().trim(); // Asume que el título está en la primera columna
+
+            $('#modalEliminados').modal('hide');
+            Swal.fire({
+                title: '<span style="color: white;">¿Eliminar definitivamente?</span>',
+                html: `
+                    <span style="color: #d32f2f;">
+                        Esta acción <b>no se puede deshacer</b>. Se eliminará por completo la evaluación 
+                        <span style="color: white;">${testTitle}</span> junto con todas sus secciones, preguntas y respuestas.
+                        <br><br>
+                        Escriba el <b>nombre exacto</b> de la evaluación para confirmar.
+                    </span>
+                `,
+                input: 'text',
+                inputPlaceholder: 'Escriba el nombre exacto de la evaluación',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d32f2f',
+                cancelButtonColor: '#4b5563',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                background: '#262b3c',
+                customClass: {
+                    input: 'swal-confirm-input'
+                },
+                showClass: { popup: 'animate__animated animate__fadeIn' },
+                hideClass: { popup: 'animate__animated animate__fadeOut' },
+                preConfirm: (inputValue) => {
+                    if (inputValue !== testTitle) {
+                        Swal.showValidationMessage('El nombre no coincide. Escriba el nombre exacto de la evaluación.');
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/psicometricas/admin/pruebas/${id}/force-delete`,
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function (response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '<span style="color: white;">¡Eliminado permanentemente!</span>',
+                                text: response.message || 'La evaluación fue eliminada.',
+                                background: '#262b3c',
+                                confirmButtonColor: '#3d4e81',
+                                timer: 2000,
+                                timerProgressBar: true
+                            });
+
+                            // Elimina la fila de la tabla
+                            row.fadeOut(300, function () {
+                                $(this).remove();
+
+                                if ($('#deletedTestsTable tr').length === 0) {
+                                    $('#deletedTestsTable').html('<tr><td colspan="5">No hay pruebas eliminadas.</td></tr>');
+                                }
+                            });
+                        },
+                        error: function (xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message || 'No se pudo eliminar definitivamente la evaluación.',
+                                background: '#262b3c',
+                                confirmButtonColor: '#d32f2f'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
 </script>
 @endsection

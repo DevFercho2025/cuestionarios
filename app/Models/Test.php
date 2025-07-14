@@ -61,7 +61,7 @@ class Test extends Model
 
         //Solo si se elimina permanentemente
         static::forceDeleted(function ($test) {
-            foreach ($test->sections as $section) {
+            foreach ($test->sections()->withTrashed()->get() as $section) {
                 $section->forceDelete();
             }
         });
