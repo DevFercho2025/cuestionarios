@@ -186,6 +186,7 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
         Route::get('/cargar-formulario', [FormularioController::class, 'cargarFormulario'])->name('candidate.cargar.formulario');
         //Route::post('/permisos-preliminares', [FormularioController::class, 'guardarCandidato'])->name('guardar.candidato');
         Route::post('/formulario', [FormularioController::class, 'guardarRespuestas'])->name('guardar.respuestas');
+        Route::post('/formulario-terminar', [FormularioController::class, 'tokenRecord'])->name('token.record');
         Route::post('/guardar-foto', [FormularioController::class, 'guardarFoto'])->name('guardar.foto');
     });
 

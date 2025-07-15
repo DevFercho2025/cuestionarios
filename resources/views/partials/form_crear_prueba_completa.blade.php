@@ -816,16 +816,7 @@
                                 <input type="text" class="form-control option-text" placeholder="Opción" value="${letraMoss}" required style="flex:1;">
                                 <input type="text" class="form-control answer-text" placeholder="Respuesta" required style="flex:2;">
                                 
-                                <select class="form-select aspecto" style="flex:2;">
-                                    <option value="">Seleccione una opción</option>
-                                    <option value="A">A. Habilidad en Supervisión.</option>
-                                    <option value="B">B. Capacidad de decisión en las relaciones humanas.</option>
-                                    <option value="C">C. Capacidad de evacuación de problemas interpersonales.</option>
-                                    <option value="D">D. Habilidad para establecer relaciones interpersonales.</option>
-                                    <option value="E">E. Sentido común y tacto en las relaciones interpersonales.</option>
-                                </select>
-
-                                <input type="file" class="form-control answer-file" style="flex:1;"">
+                                <input type="file" class="form-control answer-file" style="flex:2;"">
                                 <input type="checkbox" class="form-check-input is-correct" title="¿Es correcta?">
                                 <button type="button" class="remove-respuesta btn btn-rojo btn-sm" title="Eliminar respuesta">×</button>
                             </div>
@@ -1307,6 +1298,26 @@
                         </button>
                     `;
                 break;
+            case 19:
+                //moss
+                html += `<select class="form-select aspecto mb-3">
+                                <option value="">Seleccione una opción</option>
+                                <option value="A">A. Habilidad en Supervisión.</option>
+                                <option value="B">B. Capacidad de decisión en las relaciones humanas.</option>
+                                <option value="C">C. Capacidad de evacuación de problemas interpersonales.</option>
+                                <option value="D">D. Habilidad para establecer relaciones interpersonales.</option>
+                                <option value="E">E. Sentido común y tacto en las relaciones interpersonales.</option>
+                         </select>`
+                
+                html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}"></div>`;
+
+                    // Botón para añadir nuevas respuestas
+                    html += `
+                        <button type="button" id="add-respuesta-btn-${sectionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
+                            + Añadir respuesta
+                        </button>
+                    `;
+                break;
             case 21:
                     html += `
                             <div class="form-floating form-floating-outline mb-4">
@@ -1548,7 +1559,8 @@
                                 }
                                 break;
                             case 19:
-                                const AspectSelectEl = input.querySelector('.aspecto');
+                                const contenedor = document.querySelector(`#contenedor-respuestas-previo-${sectionId}`);
+                                const AspectSelectEl = contenedor.querySelector('.aspecto');
                                 const AspectValue = AspectSelectEl?.value || '';
 
                                 if (answer && option && AspectValue) {

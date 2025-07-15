@@ -49,7 +49,7 @@ class FormularioController extends Controller
             
             if (!$user) {
                 return response()->json(['error' => 'Usuario no autenticado'], 401); // Si no está autenticado, retorna un error
-            }
+            } 
 
             $seccion_id = $request->query('section_id');
             if (!$seccion_id) {
@@ -93,7 +93,11 @@ class FormularioController extends Controller
             foreach ($preguntas as $pregunta) {
                 foreach ($pregunta->respuestas as $respuesta) {
                     if ($respuesta->extra_data) {
-                        $respuesta->extra_data = json_decode($respuesta->extra_data, true);
+                        if (is_string($respuesta->extra_data)) {
+                            $respuesta->extra_data = json_decode($respuesta->extra_data, true);
+                        } elseif (!is_array($respuesta->extra_data)) {
+                            $respuesta->extra_data = [];
+                        }
                     }
                 }
                 $pregunta->tiempoRestante = gmdate("i:s", $tiempoSeccion);
@@ -232,104 +236,6 @@ class FormularioController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Respuesta guardada correctamente.']);
     }
-    /*public function guardarRespuestas(Request $request)
-    {
-        
-        $user = Auth::user();
-        $user_id = $user->id;
-        $usuarioIp = \Illuminate\Support\Facades\Request::getClientIp(true);
-
-        $tiempoAgotado = $request->input('tiempo_agotado', 0);
-        $seccion_id = $request->input('seccion_id');
-
-        $seccionesCompletadas = session('secciones_completadas', []);
-        if (!in_array($seccion_id, $seccionesCompletadas)) {
-            $seccionesCompletadas[] = $seccion_id;
-        }
-
-        if ($tiempoAgotado != 1) {
-            #Obtener las preguntas requeridas dentro del rango actual
-            $preguntasRequeridas = Pregunta::where('section_id', $seccion_id)
-                ->where('required', true)
-                ->pluck('id')
-                ->toArray();
-
-            #Verificar si todas las preguntas requeridas fueron respondidas
-            $respuestasEnviadas = array_map('intval', array_keys($request->respuestas ?? []));
-
-            $faltantes = array_diff($preguntasRequeridas, $respuestasEnviadas);
-
-            if (!empty($faltantes)) {
-                return back()->withErrors(['error' => 'Debe responder todas las preguntas requeridas antes de continuar.']);
-            }
-        }
-        $respuestas = $request->input('respuestas', []) ?? []; //Toma el valor del campo respuestas del request. Si no existe, usa un array vacío como valor predeterminado. Si por alguna razón sigue siendo null, entonces lo reemplazará con otro array vacío.
-
-        foreach ($respuestas as $pregunta_id => $respuesta_data) {
-
-            if (is_scalar($respuesta_data)) {
-                $respuesta = Respuesta_Usuario::updateOrCreate(
-                    ['user_id' => $user_id, 'pregunta_id' => $pregunta_id],
-                    [
-                        'respuesta_id' => $respuesta_data,
-                        'ip_usuario' => $usuarioIp,
-                        'extra_data' => null
-                    ]
-                );
-            } 
-            //respuesta es compuesta (como cleaver)
-            elseif (is_array($respuesta_data)) {
-                foreach ($respuesta_data as $bloque => $tipos) {
-                    foreach ($tipos as $tipo => $respuesta_id) {
-                        $respuesta = Respuesta_Usuario::updateOrCreate(
-                            ['user_id' => $user_id, 'pregunta_id' => $pregunta_id],
-                            [
-                                'respuesta_id' => $respuesta_id,
-                                'ip_usuario' => $usuarioIp,
-                                'extra_data' => json_encode([
-                                    'bloque' => $bloque, //a, b, c...
-                                    'tipo' => $tipo // M o L
-                                ])
-                            ]
-                        );
-                    }
-                }
-            }
-
-            // Buscar respuesta existente
-            /*$respuesta = Respuesta_Usuario::where('user_id', $user_id)
-                ->where('pregunta_id', $pregunta_id)
-                ->first();
-        
-                if ($respuesta) {
-                    // Si existe, actualiza la respuesta_id y la IP
-                    $respuesta->respuesta_id = $respuesta_id;
-                    $respuesta->ip_usuario = $usuarioIp;
-                } else {
-                // Si no existe, crea una nueva
-                $respuesta = new Respuesta_Usuario();
-                $respuesta->user_id = $user_id;
-                $respuesta->pregunta_id = $pregunta_id;
-                $respuesta->respuesta_id = $respuesta_id;
-                $respuesta->ip_usuario = $usuarioIp;
-            }*/
-        
-            /*$respuesta->save();
-        }
-
-        $this->generarToken($user_id);
-
-        
-        $seccionesRespondidas = Respuesta_Usuario::where('user_id', $user_id) //respuestas con el id del usuario
-        ->join('psico_alobri_preguntas', 'psico_alobri_respuestas_usuario.pregunta_id', '=', 'psico_alobri_preguntas.pregunta_id')
-        ->pluck('psico_alobri_preguntas.seccion_id')  //Muestra solo el seccion_id de las preguntas del join.
-        ->unique() //Elimina duplicados
-        ->toArray();
-
-        session(['secciones_completadas' => $seccionesRespondidas]);
-
-        return redirect()->route('candidate.dashboard');
-    }*/
 
     public function generarToken($user_id)
     {
