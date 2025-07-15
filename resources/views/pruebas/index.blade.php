@@ -166,17 +166,18 @@
         <div class="modal-dialog modal-dialog-centered modal-xl modal-fullheight">
             <div class="modal-content">
                 <div class="modal-header">
+                    <h5 class="modal-title">Añadir preguntas</h5>
                     <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="add-questions" class="content fade">
+                    <div id="add-questions-modal-body" class="content">
                         <div class="col-md-12">
                             <!-- Nav tabs -->
-                            <ul class="nav nav-tabs" id="tabs-secciones" role="tablist">
+                            <ul class="nav nav-tabs" id="tabs-secciones-Q" role="tablist">
                                 <!--Aquí van pestañas de secciones-->
                             </ul>
                             <!-- Tab content -->
-                            <div class="tab-content mt-3" id="contenido-secciones">
+                            <div class="tab-content mt-3" id="contenido-secciones-Q">
                                 <!--Contenido para crear preguntas y sus respuestas-->
                             </div>
                         </div>
@@ -184,7 +185,7 @@
                 </div>
                 <!--Botón para cerrar ventana-->
                 <div class="modal-footer">
-                    <button class="modal-close btn btn-azul">Cerrar</button>
+                    <button type="button" class="modal-close btn btn-azul"  data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -475,67 +476,74 @@
 
             jQuery(document).off('click', '.add-questions');
             jQuery(document).on('click', '.add-questions', function () {
-                const modal = document.getElementById('modal-add-questions');
-                const bootstrapModal = new bootstrap.Modal(modal);
-                bootstrapModal.show();
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    const modalQ = new bootstrap.Modal(document.getElementById('modal-add-questions'));
+                    modalQ.show();
+                    $('#tabs-secciones-Q').empty();
+                    $('#contenido-secciones-Q').empty();
+                }
+                
                 document.getElementById('modal-add-questions').style.zIndex = '20001';
 
                 const id = $(this).data('id');
 
-                $.ajax({
-                    url: `secciones/by-test/${id}`,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (secciones) {
-                        $('#tabs-secciones').empty();
-                        $('#contenido-secciones').empty();
+                setTimeout(() => {
+                    $.ajax({
+                        url: `secciones/by-test/${id}`,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (secciones) {
 
-                        secciones.forEach((seccion, index) => {
-                            const seccionId = 'seccion-' + seccion.id;
-                            const titulo = seccion.title;
+                            secciones.forEach((seccionQ, indexQ) => {
+                                const seccionIdQ = 'seccion-' + seccionQ.id;
+                                const tituloQ = seccionQ.title;
 
-                            const tab = `
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link ${index === 0 ? 'active' : ''}" 
-                                            id="${seccionId}-tab" 
-                                            data-bs-toggle="tab" 
-                                            data-bs-target="#${seccionId}" 
-                                            type="button" 
-                                            role="tab" 
-                                            aria-controls="${seccionId}" 
-                                            aria-selected="${index === 0 ? 'true' : 'false'}">
-                                        ${titulo}
-                                    </button>
-                                </li>`;
+                                const tab = `
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link ${indexQ === 0 ? 'active' : ''}" 
+                                                id="${seccionIdQ}-tab" 
+                                                data-bs-toggle="tab" 
+                                                data-bs-target="#${seccionIdQ}" 
+                                                type="button" 
+                                                role="tab" 
+                                                aria-controls="${seccionIdQ}" 
+                                                aria-selected="${indexQ === 0 ? 'true' : 'false'}">
+                                            ${tituloQ}
+                                        </button>
+                                    </li>`;
 
-                            const contenido = `
-                                <div class="tab-pane fade ${index === 0 ? 'show active' : ''}" 
-                                    id="${seccionId}" 
-                                    role="tabpanel" 
-                                    aria-labelledby="${seccionId}-tab"
-                                    data-test-id="${seccion.test_id}" 
-                                    data-section-id="${seccion.id}">
-                                    <p>Preguntas para <strong>${titulo}</strong> van aquí.</p>
-                                </div>`;
-                            jQuery('#tabs-secciones').append(tab);
-                            jQuery('#contenido-secciones').append(contenido);
+                                const contenido = `
+                                    <div class="tab-pane fade ${indexQ === 0 ? 'show active' : ''}" 
+                                        id="${seccionIdQ}" 
+                                        role="tabpanel" 
+                                        aria-labelledby="${seccionIdQ}-tab"
+                                        data-test-id="${seccionQ.test_id}" 
+                                        data-section-id="${seccionQ.id}">
 
-                            // Activar la primera pestaña
-                            if (index === 0) {
-                                const tabTriggerEl = document.querySelector(`#${seccionId}-tab`);
+                                        ${generarFormPreguntaHTML(seccionQ)}
+                                    </div>`;
+                                jQuery('#tabs-secciones-Q').append(tab);
+                                jQuery('#contenido-secciones-Q').append(contenido);
+
+                                const tabTriggerEl = document.querySelector(`#${seccionIdQ}-tab`);
                                 const tabTrigger = new bootstrap.Tab(tabTriggerEl);
                                 tabTrigger.show();
-                            }
-                        });
 
-                    },
-                    error: function () {
-                        console.error('No se pudieron cargar las secciones.');
-                    }
-                });
+
+                                cargarTiposDePregunta(`#pregunta-tipo-id-${seccionQ.id}`);
+
+                            });
+
+                        },
+                        error: function () {
+                            console.error('No se pudieron cargar las secciones.');
+                        }
+                    });
+                }, 300);
+                
             });
 
-
+            
             //Eliminar una evaluación
             jQuery('#testsTable').on('click', '.delete-btn', function () {
                 if (typeof Swal === 'undefined') {
