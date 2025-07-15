@@ -540,6 +540,9 @@
                         }
                     });
                 }, 300);
+
+                let table = jQuery('#testsTable').DataTable();
+                table.ajax.reload(null, false);
                 
             });
 
