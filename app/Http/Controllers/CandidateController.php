@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\AccessCode;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Respuesta_Usuario;
+use App\Models\UserTestRecord;
 
 class CandidateController extends Controller
 {
@@ -51,13 +51,8 @@ class CandidateController extends Controller
 
         $aplicacion = AccessCode::find($codigoActualId);
 
-        $seccionesCompletadas = Respuesta_Usuario::where('user_id', $user->id)
-            ->join('psico_alobri_questions', 'psico_alobri_user_answers.question_id', '=', 'psico_alobri_questions.id')
-            ->pluck('psico_alobri_questions.section_id')
-            ->unique()
-            ->toArray();
+        $seccionesCompletadas = UserTestRecord::userCompletedSections($user->id);
         
-    
         $tests = $user->assignedTestsPorCodigo($codigoActualId)->get();
         
         $secciones = $tests->load('sections');

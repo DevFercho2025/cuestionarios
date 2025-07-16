@@ -267,9 +267,9 @@ function iniciarTemporizador() {
                 input.disabled = true;
             });
 
-
-            //alert("Se agotó el tiempo para esta sección.");
-            document.querySelector("form").submit(); //click a siguiente automáticamente
+            alert("tiempo agotado, enviando tus respuestas.")
+            
+            form.submit();
         }
     }, 1000);
 }
@@ -278,4 +278,18 @@ document.querySelectorAll('.cleaver-bloque').forEach((bloque, index) => {
     if (index > 1) {
         bloque.style.display = 'none';
     }
+});
+
+
+let formSubmitting = false;
+document.querySelector("form").addEventListener("submit", function (e) {
+    if (formSubmitting) return;
+
+    e.preventDefault();
+
+    console.log("test_id:", this.querySelector('[name="test_id"]').value);
+    console.log("section_id:", this.querySelector('[name="section_id"]').value);
+
+    formSubmitting = true;
+    this.submit(); // Envío real
 });

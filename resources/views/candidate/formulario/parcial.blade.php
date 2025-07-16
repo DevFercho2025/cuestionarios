@@ -201,8 +201,9 @@
 <div class="contenedor-C d-flex justify-content-center align-items-center vh-100">
     <div class="card quiz-card">
         <div class="card-body" style="max-height: 740px">
-            <form action="{{ route('guardar.respuestas') }}" method="POST">
+            <form action="{{ route('token.record') }}" method="POST">
                 @csrf
+
                 @php $numPregunta = 0; @endphp
 
                 @foreach ($preguntas as $pregunta)
@@ -235,7 +236,8 @@
                 @endforeach
 
                 <input type="hidden" name="tiempo_agotado" id="tiempo_agotado" value="0">
-                <input type="hidden" name="seccion_id" value="{{ $seccion_id }}">
+                <input type="hidden" name="section_id" value="{{ $seccion_id }}">
+                <input type="hidden" name="test_id" value="{{ $test_id }}">
 
                 <div id="respuestas-hidden-container"></div>
                 <button type="submit" id="enviar" style="display: none;">Enviar</button>

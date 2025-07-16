@@ -31,6 +31,7 @@
         let rangoFin = {{ $rango_fin }};
 
         let seccionId = @json($section_id);
+        let testId = @json($test_id);
 
         let cameraRequired = {{ $cameraRequired }};
         let locationRequired = {{ $locationRequired }};
@@ -159,7 +160,7 @@
 
         <script>
             function cargarForm(seccionId) {
-                let url = "{{ route('candidate.cargar.formulario') }}?section_id=" + seccionId + "&cameraRequired=" + cameraRequired 
+                let url = "{{ route('candidate.cargar.formulario') }}?section_id=" + seccionId + "&test_id=" + testId + "&cameraRequired=" + cameraRequired 
               + "&locationRequired=" + locationRequired;
 
                 fetch(url)

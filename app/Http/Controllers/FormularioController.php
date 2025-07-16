@@ -6,7 +6,7 @@ use App\Models\AccessCode;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ImagenUsuario;
 use App\Models\Respuesta_Usuario;
-use App\Models\pregunta;
+use App\Models\UserTestRecord;
 use App\Models\Seccion;
 use App\Models\TokenEvaluacion;
 use Illuminate\Support\Facades\Log;
@@ -28,13 +28,16 @@ class FormularioController extends Controller
     {
         $categoria_id = $request->query('categoria_id'); 
         $section_id = $request->query('section_id'); 
+
+        $seccion = Seccion::find($section_id);
+        $test_id = $seccion?->test_id;
         
         $user = Auth::user();
         $aplicacion = AccessCode::where('user_id', $user->id)->first();
         $cameraRequired = $aplicacion->camera;
         $locationRequired = $aplicacion->location;
         
-        return view('candidate.permisos', compact('categoria_id', 'section_id', 'cameraRequired', 'locationRequired'));
+        return view('candidate.permisos', compact('categoria_id', 'section_id', 'cameraRequired', 'locationRequired','test_id'));
     }
 
     public function guardarCandidato(Request $request)
@@ -55,6 +58,7 @@ class FormularioController extends Controller
             if (!$seccion_id) {
                 return response()->json(['error' => 'El parámetro seccion_id es obligatorio'], 400);
             }
+            $test_id = $request->query('test_id');
 
             $cameraRequired = $request->query('cameraRequired');
             $locationRequired = $request->query('locationRequired');
@@ -111,7 +115,8 @@ class FormularioController extends Controller
                 'candidato' => $user,
                 'seccion_id' => $seccion_id,
                 'cameraRequired' => $cameraRequired,
-                'locationRequired' => $locationRequired
+                'locationRequired' => $locationRequired,
+                'test_id' => $test_id
             ]);
     
         } catch (\Exception $e) {
@@ -237,13 +242,20 @@ class FormularioController extends Controller
         return response()->json(['success' => true, 'message' => 'Respuesta guardada correctamente.']);
     }
 
-    public function generarToken($user_id)
+    public function tokenRecord(Request $request)
     {
         try {
-            /*$user = Auth::user();
-            $user_id = $user->id;*/
+            $user = Auth::user();
+            $user_id = $user->id;
             if (!$user_id) {
                 return response()->json(['error' => 'user_id vacío'], 500);
+            }
+
+            $test_id = $request->get('test_id');
+            $section_id = $request->get('section_id');
+
+            if (!$test_id || !$section_id) {
+                return response()->json(['error' => 'Faltan test_id o section_id'], 400);
             }
 
             $tokenEv = TokenEvaluacion::where('user_id', $user_id)->first();
@@ -264,7 +276,7 @@ class FormularioController extends Controller
                 ->update(['token_id' => $tokenEv->id]);
 
             #Obtener imágenes del usuario que no tienen un token asociado
-            $imagenes = ImagenUsuario::where('id_usuario', $user_id)
+            $imagenes = ImagenUsuario::where('user_id', $user_id)
                 ->whereNull('token_id')
                 ->get();
 
@@ -274,7 +286,43 @@ class FormularioController extends Controller
                 $imagen->save();
             }
 
-            return response()->json(['token' => $tokenEv->token]);
+            //Buscar o crear el registro del candidato
+            $record = UserTestRecord::firstOrNew([
+                'user_id' => $user_id,
+                'test_id' => $test_id,
+                'token_id' => $tokenEv->id,
+            ]);
+
+            $completedSections = $record->completed_sections ?? [];
+            if (!is_array($completedSections)) {
+                $completedSections = [];
+            }
+            if (!in_array($section_id, $completedSections)) {
+                $completedSections[] = $section_id;
+            }
+
+            $record->completed_sections_ids = $completedSections;
+
+            // Obtener todas las secciones del test
+            $allSectionIds = Seccion::where('test_id', $test_id)
+                ->pluck('id')
+                ->map(fn($id) => (string) $id)
+                ->toArray();
+
+            $completedIds = array_map('strval', $completedSections);
+
+            sort($allSectionIds);
+            sort($completedIds);
+
+            // Comparar
+            if ($allSectionIds === $completedIds) {
+                $record->finished_at = now();
+            } else {
+                $record->finished_at = null;
+            }
+
+            $record->save();
+            return redirect()->route('candidate.dashboard')->with('success', 'Formulario enviado correctamente.');
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }

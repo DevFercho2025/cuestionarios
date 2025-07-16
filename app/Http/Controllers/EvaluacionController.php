@@ -101,7 +101,6 @@ class EvaluacionController extends Controller
 
         try {
             $asignadorId = Auth::id();  // usuario que asigna las evaluaciones
-            $companyId = Auth::user()->config?->Company?->id;
 
             $contador = ContadorEvaluacion::where('user_id', $asignadorId)->first();
 
@@ -148,6 +147,7 @@ class EvaluacionController extends Controller
                     'user_id' => $userId,
                     'test_id' => $testId,
                     'application_access_code_id' => $request->access_code_id,
+                    'company_user_id' => Auth::user()->id,
                 ]);
 
                 if ($created->wasRecentlyCreated) {

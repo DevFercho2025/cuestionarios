@@ -30,6 +30,15 @@ class UserTestRecord extends Model
         return $this->belongsTo(Test::class);
     }
 
+    public static function userCompletedSections($userId)
+    {
+        return self::where('user_id', $userId)
+            ->pluck('completed_sections_ids')
+            ->flatten()
+            ->unique()
+            ->toArray();
+    }
+
     public function token()
     {
         return $this->belongsTo(TokenEvaluacion::class);
