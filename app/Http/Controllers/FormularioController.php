@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ImagenUsuario;
 use App\Models\Respuesta_Usuario;
 use App\Models\UserTestRecord;
+use App\Models\UserAssignedTest;
 use App\Models\Seccion;
 use App\Models\TokenEvaluacion;
 use Illuminate\Support\Facades\Log;
@@ -248,14 +249,14 @@ class FormularioController extends Controller
             $user = Auth::user();
             $user_id = $user->id;
             if (!$user_id) {
-                return response()->json(['error' => 'user_id vacío'], 500);
+                return response()->json(['error' => 'Este usuario no tiene un Id'], 500);
             }
 
             $test_id = $request->get('test_id');
             $section_id = $request->get('section_id');
 
             if (!$test_id || !$section_id) {
-                return response()->json(['error' => 'Faltan test_id o section_id'], 400);
+                return response()->json(['error' => 'Falta el identificador de test o sección'], 400);
             }
 
             $tokenEv = TokenEvaluacion::where('user_id', $user_id)->first();
@@ -293,7 +294,7 @@ class FormularioController extends Controller
                 'token_id' => $tokenEv->id,
             ]);
 
-            $completedSections = $record->completed_sections ?? [];
+            $completedSections = $record->completed_sections_ids ?? [];
             if (!is_array($completedSections)) {
                 $completedSections = [];
             }
@@ -322,6 +323,13 @@ class FormularioController extends Controller
             }
 
             $record->save();
+            $assignedTest = UserAssignedTest::where('user_id', $user_id)
+            ->where('test_id', $test_id)
+            ->first();
+
+            $assignedTest->test_record_id = $record->id;
+            $assignedTest->save();
+
             return redirect()->route('candidate.dashboard')->with('success', 'Formulario enviado correctamente.');
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);

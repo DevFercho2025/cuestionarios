@@ -157,7 +157,6 @@
         });
         </script>
     @endif
-
         <script>
             function cargarForm(seccionId) {
                 let url = "{{ route('candidate.cargar.formulario') }}?section_id=" + seccionId + "&test_id=" + testId + "&cameraRequired=" + cameraRequired 
@@ -183,7 +182,6 @@
             
             function cargarScriptsForm() {
                 const scripts = [
-                    /*"{{ asset('js/Formulario.js') }}",*/
                     "{{ asset('js/mostrarPreg.js') }}",
                     "{{ asset('js/progresoEv.js') }}",
 

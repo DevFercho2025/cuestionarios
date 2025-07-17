@@ -13,7 +13,7 @@ class Seccion extends Model
     use softDeletes;
 
     protected $table = "psico_alobri_sections"; #título tabla
-    protected $fillable = ["title", "block", "test_id", "time_at"]; #columnas, 
+    protected $fillable = ["title", "block", "test_id", "time_at","instructions"]; #columnas, 
     public $timestamps = true;
 
     public function test()

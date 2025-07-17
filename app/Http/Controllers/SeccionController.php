@@ -33,10 +33,11 @@ class SeccionController extends Controller
     {
         // Validamos
         $data = $request->validate([
-            'title'   => 'required|string|max:255',
-            'block'  => 'required|string',
-            'test_id' => 'required|exists:psico_alobri_tests,id',
-            'time_at' => 'nullable|date_format:H:i:s',
+            'title'       => 'required|string|max:255',
+            'block'       => 'required|string',
+            'test_id'     => 'required|exists:psico_alobri_tests,id',
+            'time_at'     => 'nullable|date_format:H:i:s',
+            'instructions'=> 'nullable|string'
         ]);
 
         $seccion = Seccion::create($data);

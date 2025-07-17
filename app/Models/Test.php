@@ -14,7 +14,7 @@ class Test extends Model
     use SoftDeletes;
 
     protected $table = "psico_alobri_tests";
-    protected $fillable = ["test_title","created_at","updated_at","time_at", "type_id"];
+    protected $fillable = ["test_title","created_at","updated_at","time_at", "type_id","instructions"];
     public $timestamps = true;
     
 

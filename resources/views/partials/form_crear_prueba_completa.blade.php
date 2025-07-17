@@ -116,89 +116,6 @@
 <!-- Modal Bootstrap con contenido Materialize -->
 
 <div class="modal fade" id="ventana-crear-prueba" tabindex="-1" aria-hidden="true">
-    <!--<div class="modal-dialog modal-dialog-centered modal-xl modal-fullheight">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Crea una prueba</h5>
-                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-4"> <!-- border-end
-                        <div class="card">
-                            <!--<h5 class="card-header">Crear Test</h5>
-                            <div class="card-body">
-                                <div class="form-floating form-floating-outline mb-4">
-                                    <input id="test-titulo" type="text" class="form-control" placeholder="Título" required>
-                                    <label for="test-titulo">Título</label>
-                                </div>
-
-                                <div class="form-floating form-floating-outline mb-4">
-                                    <select id="test-categoria" class="form-select" required>
-                                    </select>
-                                    <label for="test-categoria">Categoría</label>
-                                </div>
-
-                                <div class="form-floating form-floating-outline mb-4">
-                                    <select id="test-tipo" class="form-select" required>
-                                    </select>
-                                    <label for="test-tipo">Tipo</label>
-                                </div>
-
-                                <button id="btn-crear-test" class="btn btn-primary w-100 mt-2">Crear prueba</button>
-                            </div>
-                        </div>
-
-                        <div class="card mt-2">
-                            <!--<h5 class="card-header">Crear Sección</h5>
-                            <div class="card-body">
-                                <div id="crear-seccion-form">
-                                    <div class="form-floating form-floating-outline mb-4">
-                                        <input id="seccion-titulo" type="text" class="form-control" placeholder="Título" required>
-                                        <label for="seccion-titulo">Título</label>
-                                    </div>
-
-                                    <div class="form-floating form-floating-outline mb-4">
-                                        <input id="seccion-bloque" type="text" class="form-control" placeholder="Bloque" required>
-                                        <label for="seccion-bloque">Bloque</label>
-                                    </div>
-
-                                    <div class="form-floating form-floating-outline mb-4">
-                                        <select id="seccion-test-id" class="form-select" required>
-                                            <option disabled selected>Selecciona una prueba</option>
-                                        </select>
-                                        <label for="seccion-test-id">Prueba a la que pertenece</label>
-                                    </div>
-
-                                    <div class="form-floating form-floating-outline mb-4">
-                                        <input type="text" id="seccion-tiempo" class="form-control" placeholder="Tiempo (hh:mm:ss)" value="00:00:00" required>
-                                        <label for="seccion-tiempo">Tiempo (hh:mm:ss)</label>
-                                    </div>
-
-                                    <button id="btn-crear-seccion" class="btn btn-secondary w-100 mt-2">Crear sección</button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="col-md-8">
-                        <!-- Nav tabs 
-                        <ul class="nav nav-tabs" id="tabs-secciones" role="tablist">
-                            <!--Aquí van pestañas de secciones creadas
-                        </ul>
-
-                        <!-- Tab content 
-                        <div class="tab-content mt-3" id="contenido-secciones">
-                            <!--Contenido para crear preguntas y sus respuestas
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <a href="#" class="btn btn-primary" id="TestGuardarBtn">Guardar</a>
-            </div>
-        </div>
-    </div>-->
     <div class="modal-dialog modal-dialog-centered modal-xl modal-fullheight">
         <div class="modal-content">
             <div class="modal-header">
@@ -270,6 +187,11 @@
                                         <label for="test-tipo">Tipo</label>
                                     </div>
 
+                                    <div class="form-floating form-floating-outline mb-4">
+                                        <textarea id="test-instrucciones" class="form-control" placeholder="Escriba acá las instrucciones generales de la evaluación" rows="4" style="min-height: 100px;"></textarea>
+                                        <label for="test-instrucciones">Instrucciones</label>
+                                    </div>
+
                                     <button id="btn-crear-test" class="btn btn-primary w-100 mt-2">Crear prueba</button>
                                 </div>
                             </div>
@@ -301,6 +223,11 @@
                                         <div class="form-floating form-floating-outline mb-4">
                                             <input type="text" id="seccion-tiempo" class="form-control" placeholder="Tiempo (hh:mm:ss)" value="00:00:00" required>
                                             <label for="seccion-tiempo">Tiempo (hh:mm:ss)</label>
+                                        </div>
+
+                                        <div class="form-floating form-floating-outline mb-4">
+                                            <textarea id="seccion-instrucciones" class="form-control" placeholder="Escriba acá las instrucciones específicas de la sección" rows="4" style="min-height: 100px;"></textarea>
+                                            <label for="seccion-instrucciones">Instrucciones</label>
                                         </div>
 
                                         <button id="btn-crear-seccion" class="btn btn-secondary w-100 mt-2">Crear sección</button>
@@ -410,7 +337,8 @@
                 titulo: titulo,
                 categoria_id: document.getElementById('test-categoria').value,
                 tipo_id: document.getElementById('test-tipo').value,
-                _token: '{{ csrf_token() }}'
+                instrucciones: document.getElementById('test-instrucciones').value,
+                _token: '{{ csrf_token() }}',
             };
 
             jQuery.ajax({
@@ -461,6 +389,13 @@
             });
         });
 
+        document.addEventListener('input', function (e) {
+            if (e.target.id === 'test-instrucciones') {
+                e.target.style.height = 'auto';
+                e.target.style.height = (e.target.scrollHeight) + 'px';
+            }
+        });
+
         //crear una Sección
         document.getElementById('btn-crear-seccion').addEventListener('click', function () {
             const data = {
@@ -468,6 +403,7 @@
                 block: document.getElementById('seccion-bloque').value,
                 test_id: document.getElementById('seccion-test-id').value,
                 time_at: document.getElementById('seccion-tiempo').value,
+                instructions: document.getElementById('seccion-instrucciones').value,
                 _token: '{{ csrf_token() }}'
             };
 

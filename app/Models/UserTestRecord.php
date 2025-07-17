@@ -10,14 +10,14 @@ class UserTestRecord extends Model
     //tabla de registro del progreso de los candidatos en cada evaluacion
     use HasFactory;
     protected $table = 'psico_alobri_candidate_test_records';
-    protected $fillable = ['user_id', 'test_id','token_id','completed_sections','started_at','finished_at'];
+    protected $fillable = ['user_id', 'test_id','token_id','completed_sections_ids','started_at','finished_at'];
     public $timestamps = false;
 
     #casts para que Laravel convierta datos en php
     protected $casts = [
         'started_at' => 'datetime',
         'finished_at' => 'datetime',
-        'completed_sections' => 'array' //JSON, con id de las secciones
+        'completed_sections_ids' => 'array' //JSON, con id de las secciones
     ];
 
     public function user()

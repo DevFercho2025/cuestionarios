@@ -1,49 +1,9 @@
-/*//muestra de a una pregunta
-console.log("Script de mostrar preguntas inicializado.");
-
-function inicializarMostrarPreguntas() {
-    console.log("`inicializarMostrarPreguntas()` ejecutado.");
-
-    document.body.removeEventListener("change", manejarCambioRespuesta); // Evita duplicar eventos
-    document.body.addEventListener("change", manejarCambioRespuesta);
-}
-/*
-function manejarCambioRespuesta(event) {
-    if (event.target.classList.contains("respuesta")) {
-        let preguntaActual = parseInt(event.target.dataset.pregunta);
-        let preguntaActualDiv = document.getElementById(`pregunta-${preguntaActual}`);
-        let siguientePreguntaDiv = document.getElementById(`pregunta-${preguntaActual + 1}`);
-
-        console.log(`Respondida pregunta: ${preguntaActual}`);
-        console.log(`Mostrando pregunta: ${preguntaActual + 1}`);
-
-        if (preguntaActualDiv) {
-            preguntaActualDiv.style.display = "none";
-        }
-        if (siguientePreguntaDiv) {
-            siguientePreguntaDiv.style.display = "block";
-        } else {
-            let botonEnviar = document.getElementById("enviar");
-            if (botonEnviar) {
-                botonEnviar.style.display = "block";
-            }
-        }
-    }
-}
-
-// Ejecutar cuando el script se cargue
-inicializarMostrarPreguntas();*/
-
-//para mostrar de a 3 preguntas c:
-
 let respuestasEnGrupo = 0; // Contador de respuestas dentro del bloque de 3
-const LIMITE_PREGUNTAS_POR_BLOQUE = 2; // Tamaño del bloque
+const LIMITE_PREGUNTAS_POR_BLOQUE = 1; // Tamaño del bloque
 
 if (document.readyState === "complete") {
     inicializarMostrarPreguntas();
     iniciarTemporizador();
-    console.log(document.querySelector('input[name="rango_inicio"]'));
-    console.log(document.querySelector('input[name="rango_fin"]'));
 }
 
 function inicializarMostrarPreguntas() {
@@ -161,10 +121,10 @@ function manejarCambioRespuesta(event) {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function (response) {
-                    console.log("✏️ Pregunta abierta enviada:", response);
+                    //console.log("Pregunta abierta enviada:", response);
                 },
                 error: function (xhr, status, error) {
-                    console.error("Error al enviar respuesta abierta:", error);
+                    //console.error("Error al enviar respuesta abierta:", error);
                 }
             });
 
@@ -190,7 +150,7 @@ function manejarCambioRespuesta(event) {
         document.querySelectorAll('#respuestas-hidden-container input[type="hidden"]').forEach(input => {
             todasLasRespuestas[input.name] = input.value;
         });
-        console.log("📋 Respuestas guardadas hasta ahora:", todasLasRespuestas);
+        //console.log("Respuestas guardadas hasta ahora:", todasLasRespuestas);
 
         // Guardar
         $.ajax({
@@ -201,10 +161,10 @@ function manejarCambioRespuesta(event) {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
-                console.log("Respuesta enviada correctamente:", response);
+                //console.log("Respuesta enviada correctamente:", response);
             },
             error: function (xhr, status, error) {
-                console.error("Error al enviar la respuesta:", error);
+                //console.error("Error al enviar la respuesta:", error);
             }
         });
 
@@ -237,8 +197,6 @@ function manejarCambioRespuesta(event) {
 }
 
 function iniciarTemporizador() {
-    console.log("script para temporizador de evaluación cargado");
-
     const progresoTexto = document.querySelector(".texto-Progreso");
     const idSeccion = progresoTexto.dataset.idSeccion;
 
@@ -269,7 +227,7 @@ function iniciarTemporizador() {
 
             alert("tiempo agotado, enviando tus respuestas.")
             
-            form.submit();
+            document.querySelector("form").submit();
         }
     }, 1000);
 }
@@ -286,9 +244,6 @@ document.querySelector("form").addEventListener("submit", function (e) {
     if (formSubmitting) return;
 
     e.preventDefault();
-
-    console.log("test_id:", this.querySelector('[name="test_id"]').value);
-    console.log("section_id:", this.querySelector('[name="section_id"]').value);
 
     formSubmitting = true;
     this.submit(); // Envío real

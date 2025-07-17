@@ -75,10 +75,12 @@ class TestController extends Controller
             'titulo'       => 'required|string|max:255',
             'categoria_id' => 'required|integer|exists:psico_alobri_categories,id',
             'tipo_id'      => 'nullable|integer|exists:psico_alobri_test_types,id',
+            'instrucciones'=> 'nullable|string'
         ]);
 
         $test = new Test();
         $test->test_title = $data['titulo'];
+        $test->instructions = $data['instrucciones'];
         $test->type_id = $data['tipo_id'];
 
         $test->save();
