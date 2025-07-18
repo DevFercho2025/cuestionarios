@@ -6,6 +6,50 @@
     @endphp
 
     <style>
+            h1, h2, h3, h4, h5, h6, p, label, .form-check-label, .pregunta span {
+        font-size: calc(1rem + 0.3vw);
+    }
+
+    /* Títulos principales más grandes */
+    h1 {
+        font-size: calc(1.4rem + 1.2vw);
+    }
+
+    h4 {
+        font-size: calc(1.2rem + 0.5vw);
+    }
+
+    /* Opciones o texto pequeño */
+    .form-check-label, .option-label, small {
+        font-size: calc(0.9rem + 0.3vw);
+    }
+
+    /* Evita que se centre verticalmente si no hay mucho contenido */
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    /* Para mantener altura consistente en tarjetas */
+    .pregunta .card {
+        min-height: 300px; /* Ajusta a lo que necesites */
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: calc(1.2rem + 2vw);
+        }
+
+        h4 {
+            font-size: calc(1rem + 1.2vw);
+        }
+
+        .form-check-label {
+            font-size: calc(0.9rem + 1vw);
+        }
+    }
+
 
         .progreso-Seccion {
             display: flex;
@@ -218,7 +262,7 @@
                                     <span>. {{ $pregunta->question }}</span>
                                 </h4>
                                 <div class="d-flex" id="Respuestas" >
-                                    <div class="form-check d-block" style="width: 100%;">
+                                    <div class="form-check  d-block" style="width: 100%;">
                                         @if (!empty($pregunta->respuestas) && is_iterable($pregunta->respuestas))
                                            @includeIf('question_types.' . $pregunta->tipo_slug, [
                                                 'pregunta' => $pregunta,

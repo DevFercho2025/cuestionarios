@@ -102,4 +102,10 @@ class User extends Authenticatable
             'application_access_code_id'     // Clave local en userAssignedTest que conecta a AccessCode
         );
     }
+
+    #El historial de acciones del usuario
+    public function history()
+    {
+        return $this->hasMany(History::class, 'user_id');
+    }
 }

@@ -205,7 +205,18 @@ class FormularioController extends Controller
                     ]
                 );
             }
-
+            //pdq-varias características
+            elseif (is_array($respuesta_data) && array_key_exists('pdq', $respuesta_data)) {
+                foreach ($respuesta_data['pdq'] as $answer_id) {
+                    Respuesta_Usuario::create([
+                        'user_id' => $user_id,
+                        'question_id' => $question_id,
+                        'answer_id' => $answer_id,
+                        'ip_address' => $ip,
+                        'extra_data' => null
+                    ]);
+                }
+            }
             // Pregunta compuesta tipo Cleaver
             elseif (is_array($respuesta_data)) {
                 foreach ($respuesta_data as $bloque => $tipos) {

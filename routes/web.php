@@ -15,6 +15,7 @@ use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\AplicacionController;
 use App\Http\Controllers\FormularioController;
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\ResultadosController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -170,6 +171,11 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
             Route::delete('usuarios/{id}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
             Route::get('admin/usuarios/datatable', [UsuarioController::class, 'datatable'])->name('usuarios.datatable');
             Route::get('roles/all', [UsuarioController::class, 'all'])->name('roles.all');
+
+            //Gestionar historial
+            Route::get('history', [HistoryController::class, 'index'])->name('history.index');
+            Route::get('history/datatable', [HistoryController::class, 'datatable'])->name('history.datatable');
+
         });
     });
 

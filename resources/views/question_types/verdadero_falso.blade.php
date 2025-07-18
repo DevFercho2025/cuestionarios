@@ -3,18 +3,45 @@
         #sortable-cards {
             min-height: 100px;
             position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: stretch; /* ← clave para alinear verticalmente */
         }
 
         #sortable-cards .drag-item {
-            position: relative;
-            cursor: grab;
-            user-select: none;
+            flex: 0 0 auto;
+            width: 18rem;
+        }
+
+        #sortable-cards .card {
+            height: 100%;
+            display: flex;
+            align-items: flex-start; /* ← Alinea el contenido arriba */
+            justify-content: center;
+            padding: 1rem;
+            text-align: center;
         }
 
         .sortable-ghost {
             opacity: 0.4;
             background-color: #eee;
             border: 2px dashed #aaa;
+        }
+
+        .respuesta {
+            margin-bottom: 10px;
+        }
+
+        .form-check-label {
+            display: block;
+            text-align: left;
+        }
+
+        .form-check {
+            min-height: 60px;
+            display: flex;
+            align-items: center;
         }
     </style>
 </head>

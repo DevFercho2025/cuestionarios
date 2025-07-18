@@ -17,6 +17,7 @@ function inicializarMostrarPreguntas() {
     });
 }
 
+let listo = false;
 function manejarCambioRespuesta(event) {
     if (event.target.classList.contains("respuesta")) {
         const preguntaId = event.target.dataset.preguntaId;
@@ -28,11 +29,29 @@ function manejarCambioRespuesta(event) {
         }
 
         const container = document.getElementById('respuestas-hidden-container');
-
-        let avanzar = false; 
-
         const isCleaver = event.target.name.includes('bloque_');
-        if (isCleaver) {
+        const tipo = event.target.dataset.type;
+        let avanzar = false;
+        if (tipo === 'severalChars') {
+            if (listo) {
+                const prevHidden = container.querySelectorAll(`input[name="respuestas[${preguntaId}][]"]`);
+                prevHidden.forEach(input => input.remove());
+
+                const checkboxes = document.querySelectorAll(`input[data-pregunta-id="${preguntaId}"]:checked`);
+                checkboxes.forEach(cb => {
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = `respuestas[${preguntaId}][pdq][]`;
+                    hiddenInput.value = cb.value;
+
+                    container.appendChild(hiddenInput);
+                });
+                avanzar=true;
+            } else {
+                avanzar=false;
+                return;
+            }
+        } else if (isCleaver) {
             // Extraer tipo (M o L)
             let tipoSeleccion = null;
             let optionB = null;
@@ -148,9 +167,22 @@ function manejarCambioRespuesta(event) {
         // Mostrar en consola
         const todasLasRespuestas = {};
         document.querySelectorAll('#respuestas-hidden-container input[type="hidden"]').forEach(input => {
-            todasLasRespuestas[input.name] = input.value;
+            const name = input.name;
+
+            // Si el campo es tipo array (termina en [])
+            if (name.endsWith('[]')) {
+                const key = name.slice(0, -2); // quitar []
+                if (!todasLasRespuestas[key]) {
+                    todasLasRespuestas[key] = [];
+                }
+                todasLasRespuestas[key].push(input.value);
+            } else {
+                // Campo escalar normal
+                todasLasRespuestas[name] = input.value;
+            }
         });
-        //console.log("Respuestas guardadas hasta ahora:", todasLasRespuestas);
+        
+        console.log("Respuestas guardadas hasta ahora:", todasLasRespuestas);
 
         // Guardar
         $.ajax({
@@ -247,4 +279,16 @@ document.querySelector("form").addEventListener("submit", function (e) {
 
     formSubmitting = true;
     this.submit(); // Envío real
+});
+
+//pdq
+document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("btn-listo")) {
+        listo = true;
+        console.log("clic a listo");
+         const respuestaElement = document.querySelector(".respuesta");
+        if (respuestaElement) {
+            manejarCambioRespuesta({ target: respuestaElement });
+        }
+    }
 });

@@ -125,50 +125,14 @@
                         </li>
                     </ul>
                 </li>
+                <li class="menu-item">
+                    <a href="{{ route('history.index') }}" class="menu-link">
+                        <i class="menu-icon tf-icons ri-file-history-line me-2"></i> 
+                        <div data-i18n="Historial"></div>
+                    </a>
+                </li>
             @endif
         @endif
     </ul>
-
-
-<!--
-    <ul class="menu-inner py-1">
-        Dashboards
-        <li class="menu-item active open">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons ri-home-smile-line"></i>
-                <div data-i18n="Usuarios">Usuarios</div>
-            </a>
-            <ul class="menu-sub">
-                @if(auth()->user()->config?->role?->type === 'Admin')
-                <li class="menu-item">
-                    <a href="{//{route ('candidate.resultados')}}" class="menu-link">
-                        <div data-i18n="Resultados">Resultados</div>
-                    </a>
-                </li>
-                @endif
-
-                
-                <li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <div data-i18n="Roles">Roles</div>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <div data-i18n="Usuarios">Usuarios</div>
-                    </a>
-                </li>
-                @if(auth()->user()->config?->role?->type === 'Candidate')
-                <li class="menu-item">
-                    <a href="{//{route ('candidate.dashboard')}}" class="menu-link">
-                        <div data-i18n="Evaluaciones">Evaluaciones</div>
-                    </a>
-                </li>
-                @endif
-            </ul>
-        </li>
-
-    </ul>
--->
 </aside>
 <!-- / Menu -->
