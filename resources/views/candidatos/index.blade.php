@@ -342,7 +342,7 @@
 
                                     if (newValue !== original) {
                                         $.ajax({
-                                            url: `psicometricas/admin/candidatos/${id}`,
+                                            url: `candidatos/${id}`,
                                             method: 'PUT',
                                             data: {
                                                 _token: "{{ csrf_token() }}",

@@ -9,6 +9,7 @@ use App\Models\Pregunta;
 use App\Models\UserTestRecord;
 use App\Models\UserAssignedTest;
 use App\Models\ContadorEvaluacion;
+use App\Models\History;
 
 use App\Mail\EvaluacionesAsignadas;
 use App\Models\AccessCode;
@@ -140,6 +141,11 @@ class EvaluacionController extends Controller
                     UserTestRecord::where('user_id', $userId)
                         ->where('test_id', $testId)
                         ->delete();
+
+                    History::create([
+                        'user_id' => Auth::user()->id,
+                        'comment' => "Se borraron las respuestas pasadas del candidato con ID $userId al test con ID $testId.",
+                    ]);
                 }
 
                 // Asignar prueba
@@ -155,6 +161,11 @@ class EvaluacionController extends Controller
                     $contador->increment('used_tests');
                 }
             }
+
+            History::create([
+                'user_id' => Auth::user()->id,
+                'comment' => "Se asignó la evaluación con ID $testId al candidato con ID $userId.",
+            ]);
 
             //prueba para ver correo tras asignar
             /*return redirect()->route('enviar.correo', [
@@ -221,6 +232,11 @@ class EvaluacionController extends Controller
         UserAssignedTest::where('user_id', $request->user_id)
             ->whereIn('test_id', $request->tests)
             ->delete();
+
+        History::create([
+            'user_id' => Auth::user()->id,
+            'comment' => "Se quitaron las asignaciones de los tests con IDs: " . implode(', ', $request->tests) . " al candidato con ID {$request->user_id}.",
+        ]);
 
         return response()->json(['success' => true, 'message' => 'Evaluaciones eliminadas']);
     }

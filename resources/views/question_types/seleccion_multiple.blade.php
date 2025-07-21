@@ -8,6 +8,12 @@
             @if($pregunta->required) required @endif>
         <label class="form-check-label">
             {{ $respuesta->option }}&#41; {{ $respuesta->answer }}
+
+            @if (!empty($respuesta->extra_data['file_path']))
+            <div class="mt-2">
+                <img src="{{ asset('storage/' . $respuesta->extra_data['file_path']) }}" alt="Imagen de la respuesta" style="max-width: 100%; height: auto;">
+            </div>
+        @endif
         </label>
     </div>
 @endforeach

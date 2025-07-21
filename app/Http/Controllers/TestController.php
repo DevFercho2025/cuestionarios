@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 use App\Models\Test;
 use App\Models\Category;
+use App\Models\History;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 
@@ -85,6 +87,11 @@ class TestController extends Controller
 
         $test->save();
 
+        History::create([
+            'user_id' => Auth::user()->id,
+            'comment' => "Se creó una nueva evalaución llamada $test->test_title, con ID $test->id.",
+        ]);
+
         if ($request->ajax()) {
             return response()->json([
                 'status'  => 'success',
@@ -99,6 +106,7 @@ class TestController extends Controller
     public function destroy($id)
     {
         $test = Test::find($id);
+        $testName = $test->test_title;
 
         if (!$test) {
             return response()->json([
@@ -109,6 +117,11 @@ class TestController extends Controller
 
         try {
             $test->delete();
+
+            History::create([
+                'user_id' => Auth::user()->id,
+                'comment' => "Se eliminó la evaluación $testName, con ID $id.",
+            ]);
 
             return response()->json([
                 'status' => 'success',

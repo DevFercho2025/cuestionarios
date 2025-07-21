@@ -68,7 +68,7 @@ class FormularioController extends Controller
             $seccion = Seccion::with([
                 'test:id,test_title',
                 'questions' => function ($query) {
-                    $query->select('id', 'section_id', 'question', 'test_id', 'required', 'question_type_id')
+                    $query->select('id', 'section_id', 'question', 'test_id', 'required', 'question_type_id','picture')
                     ->with([
                         'respuestas:id,question_id,answer,option,is_correct,extra_data',
                         'questionType:id,name,slug',

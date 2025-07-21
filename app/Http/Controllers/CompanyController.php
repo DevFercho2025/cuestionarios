@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EmpresaRegistrada;
 use Illuminate\Http\Request;
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -67,7 +69,7 @@ class CompanyController extends Controller
     
         // Guardar la compañía en la base de datos
         $company->save();
-    
+
         // Respuesta exitosa
         return response()->json([
             'message' => 'Compañía creada exitosamente.',

@@ -103,6 +103,10 @@ class User extends Authenticatable
         );
     }
 
+    public function TestCounter(){
+        return $this->hasOne(ContadorEvaluacion::class, 'user_id');
+    }
+
     #El historial de acciones del usuario
     public function history()
     {

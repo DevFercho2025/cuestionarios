@@ -260,6 +260,11 @@
                                     @endif
                                     <span>{{ $numPregunta + 1 }}</span>
                                     <span>. {{ $pregunta->question }}</span>
+                                    @if (!empty($pregunta->picture))
+                                        <div class="mt-3 text-center">
+                                            <img src="{{ asset('storage/' . $pregunta->picture) }}" alt="Imagen de la pregunta" style="max-width: 100%; height: auto;">
+                                        </div>
+                                    @endif
                                 </h4>
                                 <div class="d-flex" id="Respuestas" >
                                     <div class="form-check  d-block" style="width: 100%;">

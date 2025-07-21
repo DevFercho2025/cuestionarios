@@ -36,7 +36,8 @@ Route::post('/candidate/validar-codigo', [CandidateController::class, 'validarCo
 
     //ruta de prueba para ver aspecto de email al asignar evaluación
     Route::get('/evaluaciones-asignadas/{userId}/{codeId}', [EvaluacionController::class, 'correoEvaluacionesAsignadas'])->name('enviar.correo');
-
+    //ruta de prueba para ver aspecto de email al registrarse una empresa
+    Route::get('/empresa-registrada', [AuthController::class, 'correoEmpresaRegistrada'])->name('enviar.correoEmpresa');
 
 Route::get('register', [AuthController::class, 'showRegisterForm'])->name('register.wizard');
 Route::post('register/wizard', [AuthController::class, 'registerFormStore'])->name('register.wizard.store');

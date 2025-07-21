@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\AccessCode;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\History;
 use App\Models\Respuesta_Usuario;
 use App\Models\TokenEvaluacion;
+use App\Models\UserAssignedTest;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -257,6 +259,17 @@ class ResultadosController extends Controller
         $dompdf->set_option('isPhpEnabled', true);
         $dompdf->setPaper('A4','portrait');
         $dompdf->render();
+
+
+        $testAsignados = UserAssignedTest::where('application_access_code_id', $aplicacion->id)->get();
+        $idsTests = $testAsignados->pluck('test_id')->toArray();
+
+        History::create([
+            'user_id' => Auth::user()->id,
+            'comment' => "Se generó un reporte en PDF para el candidato con ID $usuario->id, con los resultados de los Tests con ID: " . implode(', ', $idsTests),
+        ]);
+
+        
         //return view('pdf.resultados', compact('usuario', 'aplicacion', 'respuestas', 'metricas', 'imagenesBase64'));
         return $dompdf->stream(); //ver en el navegador
         //return $dompdf->download("Resultados_token_{$token->token}.pdf");

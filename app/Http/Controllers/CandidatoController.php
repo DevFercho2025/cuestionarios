@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\AccessCode;
-use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Position;
+use App\Models\History;
+
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -137,6 +139,11 @@ class CandidatoController extends Controller
             ]
         );
 
+        History::create([
+            'user_id' => Auth::user()->id,
+            'comment' => "Se creó el candidato con ID {$user->id}.",
+        ]);
+
          return response()->json([
             'success' => true,
             'message' => 'Candidato creado exitosamente.',
@@ -171,6 +178,7 @@ class CandidatoController extends Controller
                         ->where('id', '!=', 2); //Excluye superadmins
                 });
             })->findOrFail($id);
+
             // Validación de los datos de User (nombre, email)
             $validatedUser = $request->validate([
                 'name' => 'sometimes|required|string|max:255',
@@ -195,6 +203,11 @@ class CandidatoController extends Controller
                     'genero' => $validatedInfo['genero'] ?? $info->genero,
                 ]);
             }
+
+            History::create([
+                'user_id' => Auth::user()->id,
+                'comment' => "Se editó la información del candidato con ID $id.",
+            ]);
 
             return response()->json([
                 'status' => 'success',
@@ -231,6 +244,11 @@ class CandidatoController extends Controller
     
             // Eliminar al usuario del candidato
             $candidato->delete();
+
+            History::create([
+                'user_id' => Auth::user()->id,
+                'comment' => "Se eliminó el candidato con ID $id.",
+            ]);
     
             return response()->json([
                 'status'  => 'success',
@@ -270,6 +288,11 @@ class CandidatoController extends Controller
                 'company_id' => $request->company_id,
                 'user_company_id' => Auth::user()->id,
                 'code' => $codigo,
+            ]);
+
+            History::create([
+                'user_id' => Auth::user()->id,
+                'comment' => "Se creó un código de acceso para la vacante '{$request->vacante}' al candidato con ID $request->user_id. Código: $codigo",
             ]);
 
             return response()->json(['code' => $aplicacion->code]);

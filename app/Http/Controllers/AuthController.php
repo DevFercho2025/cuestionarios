@@ -95,10 +95,41 @@ class AuthController extends Controller
             'used_tests'     => 0,
         ]);
 
-        // Finalmente, loguea al usuario o rediríge
-        auth()->login($user);
+        //prueba para ver correo tras crear empresa
+        return $this->correoEmpresaCreada($user->id, $company);
 
-        return redirect()->route('admin.index');
+        // Finalmente, loguea al usuario o rediríge
+        //auth()->login($user);
+
+        //return redirect()->route('admin.index');
+    }
+
+    
+    public function correoEmpresaCreada($user_id, $newCompany)
+    {
+        Log::info('Entró a funcion para redirigir a correo');
+        //prueba con vista
+        $loginURL = route('login') . '#tab-login';
+
+        $url = route('enviar.correoEmpresa', [
+            'userId' => $user_id,
+            'companyId' => $newCompany->id,
+            'loginURL' => $loginURL,
+        ]);
+
+        Log::info('Redirigiendo a URL: ' . $url);
+
+        return redirect($url);
+    }
+
+    public function correoEmpresaRegistrada(Request $request)
+    {
+        Log::info('Datos recibidos para correo', $request->all());
+        $company = Company::findOrFail($request->companyId);
+        $user = User::with('TestCounter')->findOrFail($request->userId);
+        $loginURL = $request->loginURL;
+
+        return new \App\Mail\EmpresaRegistrada($company, $user, $loginURL);
     }
 
     public function login(Request $request)

@@ -2,52 +2,57 @@
 
 namespace App\Mail;
 
-use App\Models\User;
-use App\Models\AccessCode;
 use App\Models\Company;
+use App\Models\User;
+use App\Models\ContadorEvaluacion;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class EvaluacionesAsignadas extends Mailable
+class EmpresaRegistrada extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /**
+     * Create a new message instance.
+     */
     public function __construct(
-        protected User $candidate,
-        protected AccessCode $code,
+        protected Company $newCompany,
+        protected User $companyUser,
         protected string $loginURL,
     )
-    {}
+    {
+        $this->companyUser->loadMissing('TestCounter');
+    }
 
+    /**
+     * Get the message envelope.
+     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Evaluaciones Asignadas',
-            //from global en config mail.php
-            replyTo: [
-                new Address('Asignador@example.com', 'Asignador'),
-            ],
+            subject: 'Empresa Registrada',
         );
     }
 
+    /**
+     * Get the message content definition.
+     */
     public function content(): Content
     {
-        $assignedTests = $this->candidate->assignedTestsPorCodigo($this->code->id)->get();
+        $availableTests = $this->companyUser->TestCounter()->first()->available_tests ;
 
         return new Content(
-            view: 'emails.evaluaciones_asignadas',
+            view: 'emails.empresa_registrada',
             with: [
-                'candidateName' => $this->candidate->name,
-                'assignedTests' => $assignedTests,
-                'testsCount' => $assignedTests->count(),
-                'company' => $this->code->company->name,
-                'code' => $this->code,
+                'companyName' => $this->newCompany->name,
+                'companyUser' => $this->companyUser->name,
+                'email' => $this->companyUser->email,
+                'availableTests' => $availableTests,
                 'logoPath' => public_path('assets/img/Alobri/Alobri-light.png'),
                 'loginURL' => $this->loginURL,
             ],
