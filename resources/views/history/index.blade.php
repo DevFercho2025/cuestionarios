@@ -65,6 +65,9 @@
                                 <th>Id de Usuario</th>
                                 <th>Nombre de Usuario</th>
                                 <th>Comentario</th>
+                                @if (auth()->user()?->config?->role?->isSuperAdmin())
+                                    <th>Compañía</th>
+                                @endif
                             </tr>
                             </thead>
                         </table>
@@ -78,7 +81,16 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.8/inputmask.min.js"></script>
 
+    @php
+        $userPermissions = [
+            'isAuthenticated' => auth()->check(),
+            'isSuperAdmin' => auth()->user()?->config?->role?->isSuperAdmin() ?? false,
+        ];
+    @endphp
+
 <script>
+    var userPermissions = @json($userPermissions);
+
     if (typeof jQuery === 'undefined') {
         document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
     }
@@ -151,7 +163,14 @@
                     {data: 'user_id'},
                     {data: 'user_name'},
                     {data: 'comment'},
-                ],
+                    userPermissions.isSuperAdmin ? {
+                        data: 'company_name',
+                        title: 'Compañía',
+                        render: function(data, type, row) {
+                            return data ?? 'Sin compañía';
+                        }
+                    } : null,
+                ].filter(Boolean),
                 responsive: true,
                 // Se elimina la opción de idioma para evitar textos extra de traducción
                 drawCallback: function () {

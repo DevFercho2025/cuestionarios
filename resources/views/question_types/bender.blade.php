@@ -10,7 +10,7 @@
             placeholder="Escribe tu respuesta aquí">
         </textarea>
 
-        <input type="hidden"
+        <input type="hidden" 
             name="respuestas[{{ $pregunta->id }}][respuesta_id]"
             value="{{ $pregunta->respuestas->first()->id ?? '' }}">
     </div>

@@ -125,13 +125,13 @@
                         </li>
                     </ul>
                 </li>
-                <li class="menu-item">
-                    <a href="{{ route('history.index') }}" class="menu-link">
-                        <i class="menu-icon tf-icons ri-file-history-line me-2"></i> 
-                        <div data-i18n="Historial"></div>
-                    </a>
-                </li>
             @endif
+            <li class="menu-item">
+                <a href="{{ route('history.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons ri-file-history-line me-2"></i> 
+                    <div data-i18n="Historial"></div>
+                </a>
+            </li>
         @endif
     </ul>
 </aside>

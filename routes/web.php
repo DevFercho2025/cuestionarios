@@ -99,6 +99,9 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
         Route::get('usuarios/all', [AplicacionController::class, 'usuarios'])->name('usuarios.all');
         Route::get('vacantes/all', [AplicacionController::class, 'vacantes'])->name('vacantes.all');
 
+        //Ver historial
+        Route::get('history', [HistoryController::class, 'index'])->name('history.index');
+        Route::get('history/datatable', [HistoryController::class, 'datatable'])->name('history.datatable');
 
         // Rutas para solo superadmin
         Route::group(['middleware' => 'is_super_admin'], function () {
@@ -172,10 +175,6 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
             Route::delete('usuarios/{id}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
             Route::get('admin/usuarios/datatable', [UsuarioController::class, 'datatable'])->name('usuarios.datatable');
             Route::get('roles/all', [UsuarioController::class, 'all'])->name('roles.all');
-
-            //Gestionar historial
-            Route::get('history', [HistoryController::class, 'index'])->name('history.index');
-            Route::get('history/datatable', [HistoryController::class, 'datatable'])->name('history.datatable');
 
         });
     });

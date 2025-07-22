@@ -51,7 +51,7 @@
             <a href="{{ $loginURL }}" class="btn">Acceder a mis evaluaciones</a>
         </p>
 
-        <p style="margin-top: 50px;">Si tienes preguntas, no dudes en contactarnos en ejemplo@email.com</p>
+        <p style="margin-top: 50px;">Si tienes preguntas, no dudes en contactarnos en Contacto@alobri.com</p>
 
         <div class="footer">
             Este mensaje fue enviado automáticamente por el sistema de evaluación. Por favor, no respondas directamente a este correo.

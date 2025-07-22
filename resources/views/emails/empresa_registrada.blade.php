@@ -43,7 +43,7 @@
             <a href="{{ $loginURL }}" class="btn">Acceder a mi dashboard</a>
         </p>
 
-        <p style="margin-top: 50px;"> Si necesita ayuda para empezar, no dude en contactarnos en ejemplo@email.com. ¡Estamos aquí para ayudar y sacar el máximo provecho!</p>
+        <p style="margin-top: 50px;"> Si necesita ayuda para empezar, no dude en contactarnos en Contacto@alobri.com. ¡Estamos aquí para ayudar y sacar el máximo provecho!</p>
         <span>Atentamente,</span><br>
         <span style="color: #4c5baf;">Equipo de Alobri</span>
 
