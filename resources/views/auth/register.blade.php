@@ -151,15 +151,13 @@
 
                                         <div class="col-sm-6 form-password-toggle">
                                             <div class="input-group input-group-merge">
-                                                <div class="form-floating form-floating-outline">
+                                                <div class="form-floating form-floating-outline flex-grow-1">
                                                     <input type="password" id="user-password" class="form-control"
                                                            name="password"
                                                            placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                                                            aria-describedby="passwordToggler"/>
                                                     <label for="user-password">Contraseña</label>
                                                 </div>
-                                                <span id="passwordToggler" class="input-group-text cursor-pointer"><i
-                                                        class="ri-eye-off-line"></i></span>
                                             </div>
                                             <div class="progress mt-1" style="height: 6px;">
                                                 <div id="password-strength" class="progress-bar" role="progressbar"
@@ -1171,7 +1169,10 @@
             const fn = document.getElementById('user-firstname').value.trim();
             const ln = document.getElementById('user-lastname').value.trim();
             const em = document.getElementById('user-email').value.trim();
+
             const pw = document.getElementById('user-password').value;
+            const passwordError = document.getElementById('password-error');
+            const strengthBar = document.getElementById('password-strength');
 
             let ok = true;
             if (!fn) {
@@ -1190,16 +1191,19 @@
                 ok = false;
             }
             if (!pw) {
-                document.getElementById('password-error').innerText = 'La contraseña es obligatoria';
+                passwordError.innerText = 'La contraseña es obligatoria';
                 ok = false;
             } else if (pw.length < 8) {
-                document.getElementById('password-error').innerText = 'Mínimo 8 caracteres';
+                passwordError.innerText = 'Mínimo 8 caracteres';
+                ok = false;
+            } else if (!/[A-Za-z]/.test(pw) || !/[0-9]/.test(pw)) {
+                passwordError.innerText = 'Debe contener al menos una letra y un número';
                 ok = false;
             } else {
+                passwordError.innerText = '';
                 const str = calculatePasswordStrength(pw);
-                const bar = document.getElementById('password-strength');
-                bar.style.width = str + '%';
-                bar.className = str < 30 ? 'progress-bar bg-danger'
+                strengthBar.style.width = str + '%';
+                strengthBar.className = str < 30 ? 'progress-bar bg-danger'
                     : str < 60 ? 'progress-bar bg-warning'
                         : 'progress-bar bg-success';
             }
