@@ -38,6 +38,25 @@ return [
 
     'mailers' => [
 
+         'ses' => [
+            'transport' => 'ses',
+            'key' => '',
+            'secret' => '',
+            'region' => 'us-west-2',
+        ],
+
+        'smtp' => [
+            'transport' => 'smtp',
+            'host' => 'email-smtp.us-west-2.amazonaws.com',
+            'port' => 587,
+            'encryption' => 'tls',
+            'username' => '',
+            'password' => '',
+            'timeout' => null,
+            'auth_mode' => null,
+        ],
+        /*
+        
         'mailgun' => [
             'transport' => 'mailgun',
             // 'client' => [
@@ -48,26 +67,11 @@ return [
         'failover' => [
             'transport' => 'failover',
             'mailers' => [
+                'ses',
+                'log',
                 'mailgun',
                 'smtp',
-                'log',
             ],
-        ],
-
-        'smtp' => [
-            'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
-            'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', '127.0.0.1'),
-            'port' => env('MAIL_PORT', 2525),
-            'username' => env('MAIL_USERNAME'),
-            'password' => env('MAIL_PASSWORD'),
-            'timeout' => null,
-            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
-        ],
-
-        'ses' => [
-            'transport' => 'ses',
         ],
 
         'postmark' => [
@@ -102,7 +106,7 @@ return [
                 'ses',
                 'postmark',
             ],
-        ],
+        ],*/
 
     ],
 
