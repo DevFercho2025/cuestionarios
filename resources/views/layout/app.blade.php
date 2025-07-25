@@ -5,7 +5,6 @@
     dir="ltr"
     data-theme="theme-default"
     data-assets-path="../../assets/"
-    data-template="vertical-menu-template"
     data-style="light">
 <head>
     <meta charset="utf-8" />
@@ -13,7 +12,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-    <title>Dashboard</title>
+    <title>Evaluation</title>
 
     <meta name="description" content="" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -24,71 +23,52 @@
     <link rel="stylesheet" href="{{asset('/assets/vendor/fonts/remixicon/remixicon.css')}}" />
     <link rel="stylesheet" href="{{asset('/assets/vendor/fonts/flag-icons.css')}}" />
     <link rel="stylesheet" href="{{asset('/assets/vendor/libs/node-waves/node-waves.css')}}" />
-    <link rel="stylesheet" href="{{asset('/assets/vendor/css/rtl/core.css')}}" class="template-customizer-core-css" />
-    <link rel="stylesheet" href="{{asset('/assets/vendor/css/rtl/theme-default.css')}}" class="template-customizer-theme-css" />
-    <link rel="stylesheet" href="{{asset('/assets/css/demo.css')}}" />
     <link rel="stylesheet" href="{{asset('/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css')}}" />
-    <link rel="stylesheet" href="{{asset('/assets/vendor/libs/typeahead-js/typeahead.css')}}" />
-    <link rel="stylesheet" href="{{asset('/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}" />
-    <link rel="stylesheet" href="{{asset('/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}" />
-    <link rel="stylesheet" href="{{asset('/assets/vendor/libs/flatpickr/flatpickr.css')}}" />
-    <link rel="stylesheet" href="{{asset('/assets/vendor/libs/apex-charts/apex-charts.css')}}" />
-    <link rel="stylesheet" href="{{asset('/assets/vendor/libs/swiper/swiper.css')}}" />
-    <link rel="stylesheet" href="{{asset('/assets/vendor/css/pages/cards-statistics.css')}}" />
-    <link rel="stylesheet" href="{{asset('/assets/vendor/css/pages/cards-analytics.css')}}" />
-    <link rel="stylesheet" href="{{asset('/assets/vendor/libs/bs-stepper/bs-stepper.css')}}" />
-    <link rel="stylesheet" href="{{asset('/assets/vendor/libs/select2/select2.css')}}" />
+
     <script src="{{asset('/assets/vendor/js/helpers.js')}}"></script>
     <script src="{{asset('/assets/vendor/js/template-customizer.js')}}"></script>
     <script src="{{asset('/assets/js/config.js')}}"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 </head>
+
 <body>
 
 <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
     #template-customizer .template-customizer-open-btn{
         display: none !important;
     }
+    #contenidoPagina {
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
 </style>
 
-<!-- Layout wrapper -->
-<div class="container" id="contenidoPagina">
-    @yield('content')
+<!-- Layout-->
+<div class="layout-wrapper">
+    <div class="container-fluid" id="contenidoPagina">
+        @yield('content')
+    </div>
 </div>
-<!-- 1) jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- 2) Select2 JS y CSS -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link
     href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
     rel="stylesheet"
 />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-{{--
-<script src="{{asset('/assets/vendor/libs/jquery/jquery.js')}}"></script>
---}}
-<script src="{{asset('/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')}}"></script>
-<script src="{{asset('/assets/vendor/libs/popper/popper.js')}}"></script>
 <script src="{{asset('/assets/vendor/js/bootstrap.js')}}"></script>
 <script src="{{asset('/assets/vendor/libs/node-waves/node-waves.js')}}"></script>
 <script src="{{asset('/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js')}}"></script>
-<script src="{{asset('/assets/vendor/libs/hammer/hammer.js')}}"></script>
-<script src="{{asset('/assets/vendor/libs/i18n/i18n.js')}}"></script>
-<script src="{{asset('/assets/vendor/js/menu.js')}}"></script>
-<script src="{{asset('/assets/vendor/libs/moment/moment.js')}}"></script>
-<script src="{{asset('/assets/vendor/libs/typeahead-js/typeahead.js')}}"></script>
-<script src="{{asset('/assets/js/main.js')}}"></script>
-<script src="{{asset('/assets/vendor/libs/apex-charts/apexcharts.js')}}"></script>
-<script src="{{asset('/assets/vendor/libs/swiper/swiper.js')}}"></script>
-<script src="{{asset('/assets/js/dashboards-analytics.js')}}"></script>
-<script src="{{asset('/assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
-<script src="{{asset('/assets/js/tables-datatables-advanced.js')}}"></script>
-<script src="{{asset('/assets/js/wizard-ex-property-listing.js')}}"></script>
-<script src="{{asset('/assets/vendor/libs/bs-stepper/bs-stepper.js')}}"></script>
-<script src="{{asset('/assets/vendor/libs/select2/select2.js')}}"></script>
 @stack('scripts')
 
 </body>

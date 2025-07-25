@@ -66,13 +66,13 @@ class FormularioController extends Controller
 
             // Obtener la sección con preguntas, respuestas, y tipo de pregunta
             $seccion = Seccion::with([
-                'test:id,test_title',
+                'test:id,test_title,instructions',
                 'questions' => function ($query) {
                     $query->select('id', 'section_id', 'question', 'test_id', 'required', 'question_type_id','picture')
                     ->with([
                         'respuestas:id,question_id,answer,option,is_correct,extra_data',
                         'questionType:id,name,slug',
-                        'seccion:id,title'
+                        'seccion:id,title,instructions'
                     ]);
                 }
             ])->findOrFail($seccion_id);

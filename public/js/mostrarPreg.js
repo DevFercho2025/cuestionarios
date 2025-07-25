@@ -345,3 +345,9 @@ document.addEventListener("click", function (e) {
         }
     }
 });
+
+//instrucciones
+function mostrarFormulario() {
+    document.getElementById('contenedor-instrucciones').classList.add('d-none');
+    document.getElementById('formulario-preguntas').classList.remove('d-none');
+}

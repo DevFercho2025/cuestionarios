@@ -67,7 +67,7 @@
     @endif
 
 @foreach ($pregunta->respuestas as $respuesta)
-    <div class="form-check">
+    <div class="form-check gap-2">
         <input class="form-check-input respuesta" type="radio"
             data-pregunta-id="{{ $pregunta->id }}"
             value="{{ $respuesta->id }}"

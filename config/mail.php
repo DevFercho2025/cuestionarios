@@ -47,7 +47,7 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'host' => 'email-smtp.us-west-2.amazonaws.com',
+            'host' => '',
             'port' => 587,
             'encryption' => 'tls',
             'username' => '',

@@ -43,6 +43,18 @@
         line-height: 1.2;
         word-break: break-word;
     }
+
+    .BFQ .table-responsive {
+    width: 100% !important;
+    }
+
+    .BFQ .table-responsive > .d-flex {
+    width: 100% !important;
+    }
+
+    .BFQ .flex-fill {
+    min-width: 0;
+    }
 </style>
 
 @php
@@ -66,13 +78,16 @@
 @switch($scaleType)
     @case(3)
         {{--Big Five Questionnaire--}}
-        <div class="container my-4 BFQ">
+        <div class="container-fluid BFQ">
             <div class="row mb-3">
-                <div class="col-1 d-flex align-items-center justify-content-center bg-light">
-                    <span>P{{ $numPregunta }}</span>
+                <div class="col-1 d-flex justify-content-center bg-light pt-5">
+                    @if($pregunta->required)
+                        <span style="color: red;">*</span>
+                    @endif
+                    <h4>P{{ $numPregunta + 1}}</h4>
                 </div>
-                <div class="col-11 bg-white border">
-                    <span>{{ $pregunta->question }}</span>
+                <div class="col-11 bg-white border" style="display: flex; align-items: center;">
+                    <h4 style="margin: 0% !important;">{{ $pregunta->question }}</h4>
                 </div>
             </div>
 
@@ -80,12 +95,10 @@
                 <div class="d-flex flex-column">
 
                     {{--Texto respuesta--}}
-                    <div class="d-flex text-center gap-0 mt-2">
+                    <div class="d-flex text-center gap-0">
                         @foreach ($respuestas as $respuesta)
-                            <div class="flex-fill px-1">
-                                <div class="respuesta-label">
-                                    {{ $respuesta->answer }}
-                                </div>
+                            <div class="flex-fill d-flex align-items-center justify-content-center py-2">
+                                <span>{{ $respuesta->answer }}</span>
                             </div>
                         @endforeach
                     </div>

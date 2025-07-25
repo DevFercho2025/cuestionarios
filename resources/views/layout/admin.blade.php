@@ -78,8 +78,6 @@
         </div>
         <!-- / Layout page -->
     </div>
-
-
 </div>
 <!-- / Layout wrapper -->
 

@@ -1,16 +1,11 @@
 @extends('layout.app')
     @php
-        $candidato = session('candidato', []);
         $rango_inicio = $rango_inicio ?? 1;
         $rango_fin = $rango_fin ?? 35;
         $cameraRequired = $cameraRequired;
         $locationRequired = $locationRequired;
     @endphp
     @section('content')
-    <!-- Esto es para verificar que los datos del candidato se guardaron
-    <p>Nombre: {{ $candidato['nombre'] ?? 'No ingresado' }}</p>
-    <p>Correo: {{ $candidato['correo'] ?? 'No ingresado' }}</p>
-    <p>Género: {{ $candidato['genero'] ?? 'No seleccionado' }}</p>-->
     <div id="contenedorForm">
         
     </div>
@@ -18,6 +13,11 @@
     <style>
         .swal2-container {
             z-index: 9999 !important;
+        }
+        #contenedorForm {
+            width: 100%;
+            padding-left: 20px;
+            padding-right: 20px;
         }
     </style>
 

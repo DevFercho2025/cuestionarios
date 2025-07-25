@@ -1,4 +1,4 @@
-<!--@extends('layout.app')-->
+
     @php
         $seccionActual = null;
         $numPregunta = 0;
@@ -6,49 +6,43 @@
     @endphp
 
     <style>
-            h1, h2, h3, h4, h5, h6, p, label, .form-check-label, .pregunta span {
-        font-size: calc(1rem + 0.3vw);
-    }
 
-    /* Títulos principales más grandes */
-    h1 {
-        font-size: calc(1.4rem + 1.2vw);
-    }
-
-    h4 {
-        font-size: calc(1.2rem + 0.5vw);
-    }
-
-    /* Opciones o texto pequeño */
-    .form-check-label, .option-label, small {
-        font-size: calc(0.9rem + 0.3vw);
-    }
-
-    /* Evita que se centre verticalmente si no hay mucho contenido */
-    .card-body {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-    }
-
-    /* Para mantener altura consistente en tarjetas */
-    .pregunta .card {
-        min-height: 300px; /* Ajusta a lo que necesites */
-    }
-
-    @media (max-width: 768px) {
+        /* Títulos principales más grandes */
         h1 {
-            font-size: calc(1.2rem + 2vw);
+            font-size: calc(1.4rem + 1.2vw);
         }
 
         h4 {
-            font-size: calc(1rem + 1.2vw);
+            font-size: calc(1.2rem + 0.5vw);
         }
 
-        .form-check-label {
-            font-size: calc(0.9rem + 1vw);
+        /* Opciones o texto pequeño */
+        .form-check-label, .option-label, small {
+            font-size: calc(0.9rem + 0.3vw);
         }
-    }
+
+        /* Evita que se centre verticalmente si no hay mucho contenido */
+        .card-body {
+            padding: 0 !important;
+        }
+
+        /* Para mantener altura consistente en tarjetas */
+        .pregunta {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            p {
+                font-size: calc(1.2rem + 2vw);
+            }
+
+            .form-check-label {
+                font-size: calc(0.9rem + 1vw);
+            }
+        }
 
 
         .progreso-Seccion {
@@ -138,18 +132,11 @@
         }
 
         .barra-Superior {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             background-color: #f8f9fa;
             padding: 15px;
             border-radius: 15px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            margin-top: 40px;
-            max-width: 80%;
-            margin-left: auto;
-            margin-right: auto;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1) !important;
+            margin: 15px;
         }
 
         .barra-titulo-cuestionario {
@@ -170,19 +157,15 @@
         }
 
         .contenedor-C{
-            display: flex;
-            align-items: flex-start;
-            justify-content: flex-start;
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            margin-top: 20px;
-            max-width: 80%;
-            max-height: 80%;
-            margin-left: auto;
-            margin-right: auto;
+            display: flex !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            background-color: #f8f9fa !important;
+            padding: 15px !important;
+            border-radius: 15px !important;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1) !important;
+            height: 80% !important;
+            margin: clamp(15px, 1vw, 100px) !important
         }
 
         input[type="radio"].form-check-input {
@@ -195,13 +178,7 @@
 
     <div class="barra-Superior d-flex align-items-center justify-content-between">
         <div class="barra-titulo-cuestionario flex-grow-1 text-center">
-            <h1 style="color: rgba(51,58,153,255);">{{ $testTitulo }}</h1>
-
-            <!--@ foreach ($ preguntas a s $ pregunta)
-                @ if ($ loop- >f irst)
-                    <h1 style="color: rgba(51,58,153,255);">{/{ $pregunta->cuestionario }}</h1>
-                @ endif
-            @ endforeach-->
+            <h2 style="color: rgba(51,58,153,255);">{{ $testTitulo }}</2>
         </div>
 
         <div class="separador"></div>
@@ -235,97 +212,119 @@
             </div>
         </div>
     </div>
+    <div class="contenedor-C d-flex justify-content-center align-items-center">
+        <div class="col-8" style="height: 100%" >
 
-    <!--Contenedor de la cámara-->
-    <div class="video-container" id="videoContainer">
-        <video class="video" width="420" height="420" controls></video>
-    </div>
-    <img src="" class="fotoUsuario" alt="foto" style="display:none">
+            @php
+                $mostrarDirecto = empty($seccion->test->instructions) && empty($seccion->instructions);
+            @endphp
 
-<div class="contenedor-C d-flex justify-content-center align-items-center vh-100">
-    <div class="card quiz-card">
-        <div class="card-body" style="max-height: 740px">
-            <form action="{{ route('token.record') }}" method="POST">
-                @csrf
-
-                @php $numPregunta = 0; @endphp
-
-                @foreach ($preguntas as $pregunta)
-                    <div class="pregunta" id="pregunta-{{ $numPregunta }}" style="display: {{ $numPregunta == 0 ? 'block' : 'none' }};">
-                        <div class="card shadow rounded p-3 m-4">
-                            <div class="card-body">
-                                <h4 style="color: rgba(51,58,153,255);">
-                                    @if($pregunta->required)
-                                        <span style="color: red;">*</span>
-                                    @endif
-                                    <span>{{ $numPregunta + 1 }}</span>
-                                    <span>. {{ $pregunta->question }}</span>
-                                    @if (!empty($pregunta->picture))
-                                        <div class="mt-3 text-center">
-                                            <img src="{{ asset('storage/' . $pregunta->picture) }}" alt="Imagen de la pregunta" style="max-width: 100%; height: auto;">
-                                        </div>
-                                    @endif
-                                </h4>
-                                <div class="d-flex" id="Respuestas" >
-                                    <div class="form-check  d-block" style="width: 100%;">
-                                        @if (!empty($pregunta->respuestas) && is_iterable($pregunta->respuestas))
-                                           @includeIf('question_types.' . $pregunta->tipo_slug, [
-                                                'pregunta' => $pregunta,
-                                                'numPregunta' => $numPregunta
-                                            ])
-                                        @elseif($pregunta->required)
-                                            <div class="alert alert-danger">Esta pregunta es requerida.</div>
-                                        @endif
-                                    </div>
-                                </div>
+            @if (!$mostrarDirecto)
+                {{-- Instrucciones del test y sección --}}
+                <div id="contenedor-instrucciones" class="h-100 text-center" style="display:flex; flex-direction:column; justify-content:center;">
+                    <div>
+                        @if (!empty($seccion->test->instructions))
+                            <div class="mb-4 instrucciones-test">
+                                <h5 class="text-primary">Instrucciones del test</h5>
+                                <p>{!! nl2br(e($seccion->test->instructions)) !!}</p>
                             </div>
-                        </div>
+                        @endif
+
+                        @if (!empty($seccion->instructions))
+                            <div class="mb-4 instrucciones-seccion">
+                                <h5 class="text-secondary">Instrucciones de la sección</h5>
+                                <p>{!! nl2br(e($seccion->instructions)) !!}</p>
+                            </div>
+                        @endif
+
+                        @if (!empty($seccion->test->instructions) || !empty($seccion->instructions))
+                            <button type="button" class="btn btn-primary mt-3" onclick="mostrarFormulario()">
+                                Continuar
+                            </button>
+                        @endif
                     </div>
-                    @php $numPregunta++; @endphp
-                @endforeach
-
-                <input type="hidden" name="tiempo_agotado" id="tiempo_agotado" value="0">
-                <input type="hidden" name="section_id" value="{{ $seccion_id }}">
-                <input type="hidden" name="test_id" value="{{ $test_id }}">
-
-                <div id="respuestas-hidden-container"></div>
-                <button type="submit" id="enviar" style="display: none;">Enviar</button>
-            </form>
-
-        </div>
-    </div>
-<div class="w-50 mb-3">
-
-        <div>
-
-            @if($candidato)
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <h4 style="margin: 0; color: #333;">
-                        {{ $candidato->name}}
-                    </h4>
-                    <p style="margin: 0; font-weight: bold;">
-                        Vacante: {{ $candidato->vacante?->vacancy ?? 'No especificada' }}
-                    </p>
+                    
                 </div>
             @endif
+
+                <form id="formulario-preguntas" class="{{ $mostrarDirecto ? '' : 'd-none' }}" action="{{ route('token.record') }}" method="POST" style="height: 100%;">
+                    @csrf
+
+                    @php $numPregunta = 0; @endphp
+
+                    @foreach ($preguntas as $pregunta)
+                        <div class="pregunta" id="pregunta-{{ $numPregunta }}" style="display: {{ $numPregunta == 0 ? 'block' : 'none' }};">
+                            @php
+                                $scaleType = $pregunta->respuestas->first()->extra_data['scale_type'] ?? null;
+                            @endphp
+                            <div style="display:flex; flex-direction:column; justify-content:center; height: 100%;">
+                                <h4 style="color: rgba(51,58,153,255);">
+                                        @if ($scaleType !== 3)
+                                            @if($pregunta->required)
+                                                <span style="color: red;">*</span>
+                                            @endif
+                                            <span>{{ $numPregunta + 1 }}</span>
+                                            <span>. {{ $pregunta->question }}</span>
+                                        @endif
+                                        @if (!empty($pregunta->picture))
+                                            <div class="mt-3 text-center">
+                                                <img src="{{ asset('storage/' . $pregunta->picture) }}" alt="Imagen de la pregunta" style="max-width: 100%; height: auto;">
+                                            </div>
+                                        @endif
+                                    </h4>
+                                    <div class="d-flex" id="Respuestas" >
+                                        <div class="form-check  d-block" style="width: 100%;">
+                                            @if (!empty($pregunta->respuestas) && is_iterable($pregunta->respuestas))
+                                            @includeIf('question_types.' . $pregunta->tipo_slug, [
+                                                    'pregunta' => $pregunta,
+                                                    'numPregunta' => $numPregunta
+                                                ])
+                                            @elseif($pregunta->required)
+                                                <div class="alert alert-danger">Esta pregunta es requerida.</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                        @php $numPregunta++; @endphp
+                    @endforeach
+
+                    <input type="hidden" name="tiempo_agotado" id="tiempo_agotado" value="0">
+                    <input type="hidden" name="section_id" value="{{ $seccion_id }}">
+                    <input type="hidden" name="test_id" value="{{ $test_id }}">
+
+                    <div id="respuestas-hidden-container"></div>
+                    <button type="submit" id="enviar" style="display: none;">Enviar</button>
+                </form>
         </div>
-        <div class="progreso-Seccion">
-            <div class="circulo-Progreso">
-                <span class="valor-Progreso">0%</span>
+        <div class="col-4" style="display:flex; flex-direction:column; justify-content:center; height: 100%">
+            <div>
+                @if($candidato)
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h4 style="margin: 0; color: #333;">
+                            {{ $candidato->name}}
+                        </h4>
+                        <p style="margin: 0; font-weight: bold;">
+                            Vacante: {{ $candidato->vacante?->vacancy ?? 'No especificada' }}
+                        </p>
+                    </div>
+                @endif
             </div>
+            <div class="progreso-Seccion">
+                <div class="circulo-Progreso">
+                    <span class="valor-Progreso">0%</span>
+                </div>
 
-            <div class="texto-Progreso" style="text-align: center" data-id-seccion="{{ $seccion->id }}">
-                {{ $seccion->titulo }}
+                <div class="texto-Progreso" style="text-align: center" data-id-seccion="{{ $seccion->id }}">
+                    {{ $seccion->titulo }}
+                </div>
+
+                @if ($testTitulo === 'Cleaver')
+                    <div id="contenedor-glosario" class="mt-4"></div>
+                @endif
             </div>
-
-            @if ($testTitulo === 'Cleaver')
-                <div id="contenedor-glosario" class="mt-4"></div>
-            @endif
-
         </div>
-
     </div>
-</div>
 
 
 @if ($testTitulo === 'cleaver')
@@ -333,3 +332,9 @@
         @include('partials.glosario_cleaver')
     </div>
 @endif
+
+<!--Contenedor de la cámara-->
+    <div class="video-container" id="videoContainer">
+        <video class="video" width="420" height="420" controls></video>
+    </div>
+    <img src="" class="fotoUsuario" alt="foto" style="display:none">
