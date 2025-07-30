@@ -275,10 +275,10 @@
                                     <div class="d-flex" id="Respuestas" >
                                         <div class="form-check  d-block" style="width: 100%;">
                                             @if (!empty($pregunta->respuestas) && is_iterable($pregunta->respuestas))
-                                            @includeIf('question_types.' . $pregunta->tipo_slug, [
-                                                    'pregunta' => $pregunta,
-                                                    'numPregunta' => $numPregunta
-                                                ])
+                                                @includeIf('question_types.' . $pregunta->tipo_slug, [
+                                                        'pregunta' => $pregunta,
+                                                        'numPregunta' => $numPregunta
+                                                    ])
                                             @elseif($pregunta->required)
                                                 <div class="alert alert-danger">Esta pregunta es requerida.</div>
                                             @endif

@@ -1,6 +1,6 @@
 let circulo = document.querySelector(".circulo-Progreso"),
     valor = document.querySelector(".valor-Progreso"),
-    respuestas = document.querySelectorAll(".form-check-input"),
+    respuestas = document.querySelectorAll("input, textarea, select");
     totalPreguntas = document.querySelectorAll(".pregunta").length,
     respuestasContestadas = 0;
 
@@ -12,8 +12,6 @@ function actualizarProgreso() {
 
 respuestas.forEach((respuesta) => {
     respuesta.addEventListener("change", function () {
-        let preguntaId = this.closest(".pregunta").id;
-        
         // Solo contar si es la primera vez que se responde la pregunta
         if (!this.closest(".pregunta").dataset.respondida) {
             this.closest(".pregunta").dataset.respondida = "true";
