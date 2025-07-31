@@ -89,7 +89,7 @@ class TestController extends Controller
 
         History::create([
             'user_id' => Auth::user()->id,
-            'comment' => "Se creó una nueva evalaución llamada $test->test_title, con ID $test->id.",
+            'comment' => "Se creó una nueva evaluación llamada $test->test_title, con ID $test->id.",
         ]);
 
         if ($request->ajax()) {

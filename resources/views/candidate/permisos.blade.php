@@ -189,10 +189,13 @@
                     "{{ asset('js/pares.js') }}",
                     "https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.8/leader-line.min.js",
 
+                    //zavik
+                    "{{ asset('js/ordenarRespuestas.js') }}",
+
                     //pregunta V o F con ordenamiento de palabras
                     "../../assets/vendor/libs/sortablejs/sortable.js",
                     "{{ asset('js/ordenarPalabras.js') }}",
-
+                    
                     //Glosario de Cleaver
                     "{{ asset('js/glosario.js') }}"
                 ];

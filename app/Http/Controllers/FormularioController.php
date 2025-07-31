@@ -217,6 +217,41 @@ class FormularioController extends Controller
                     ]);
                 }
             }
+            elseif (is_array($respuesta_data) && array_key_exists('patronNum', $respuesta_data)) {
+                foreach ($respuesta_data['patronNum'] as $answer_id => $textoUsuario) {
+                    Respuesta_Usuario::updateOrCreate(
+                        [
+                            'user_id' => $user_id,
+                            'question_id' => $question_id,
+                            'answer_id' => $answer_id
+                        ],
+                        [
+                            'ip_address' => $ip,
+                            'extra_data' => json_encode([
+                                'number_written' => $textoUsuario,
+                            ])
+                        ]
+                    );
+                }
+            }
+            //Pregunta Zavik
+            elseif (is_array($respuesta_data) && array_key_exists('zavik', $respuesta_data)) {
+                foreach ($respuesta_data['zavik'] as $answer_id => $puntaje) {
+                    Respuesta_Usuario::updateOrCreate(
+                        [
+                            'user_id' => $user_id,
+                            'question_id' => $question_id,
+                            'answer_id' => $answer_id
+                        ],
+                        [
+                            'ip_address' => $ip,
+                            'extra_data' => json_encode([
+                                'importance_score' => $puntaje,
+                            ])
+                        ]
+                    );
+                }
+            }
             // Pregunta compuesta tipo Cleaver
             elseif (is_array($respuesta_data)) {
                 foreach ($respuesta_data as $bloque => $tipos) {

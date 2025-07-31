@@ -21,11 +21,5 @@
                 </li>
             @endforeach
         </ul>
-        <button type="button"
-            class="btn btn-success mt-3 btn-listo-ordenamiento"
-            data-pregunta-id="{{ $pregunta->id }}"
-            data-pregunta="{{ $numPregunta }}">
-            Listo
-        </button>
     </div>
 </div>

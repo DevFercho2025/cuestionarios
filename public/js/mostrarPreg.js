@@ -147,6 +147,35 @@ function manejarCambioRespuesta(event) {
                     }
                 }
             }
+        } else if (event.target.type === "text") {
+            const preguntaId = event.target.dataset.preguntaId;
+            const inputs = document.querySelectorAll(`input[data-pregunta-id="${preguntaId}"].respuesta`);
+            const container = document.getElementById('respuestas-hidden-container');
+            let todosLlenos = true;
+
+            inputs.forEach(input => {
+                if (input.value.trim() === "") {
+                    todosLlenos = false;
+                }
+            });
+
+            if (!todosLlenos) return;
+
+            container.querySelectorAll(`input[name^="respuestas[${preguntaId}]"]`).forEach(el => el.remove());
+
+            //formato: respuestas[preguntaId][respuestaId] = valor
+            inputs.forEach(input => {
+                const respuestaId = input.dataset.respuestaId;
+                const valor = input.value.trim();
+
+                const hiddenInput = document.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.name = `respuestas[${preguntaId}][patronNum][${respuestaId}]`;
+                hiddenInput.value = valor;
+                container.appendChild(hiddenInput);
+            });
+
+            avanzar = true;
         } else if (event.target.tagName === "TEXTAREA") { //pregunta abierta
             const preguntaId = event.target.dataset.preguntaId;
             const texto = event.target.value;
@@ -207,41 +236,7 @@ function manejarCambioRespuesta(event) {
             avanzar = true;
         }
 
-        // Mostrar en consola
-        const todasLasRespuestas = {};
-        document.querySelectorAll('#respuestas-hidden-container input[type="hidden"]').forEach(input => {
-            const name = input.name;
-
-            // Si el campo es tipo array (termina en [])
-            if (name.endsWith('[]')) {
-                const key = name.slice(0, -2); // quitar []
-                if (!todasLasRespuestas[key]) {
-                    todasLasRespuestas[key] = [];
-                }
-                todasLasRespuestas[key].push(input.value);
-            } else {
-                // Campo escalar normal
-                todasLasRespuestas[name] = input.value;
-            }
-        });
-        
-        console.log("Respuestas guardadas hasta ahora:", todasLasRespuestas);
-
-        // Guardar
-        $.ajax({
-            url: RUTA_GUARDAR_RESPUESTAS,
-            method: 'POST',
-            data: todasLasRespuestas,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (response) {
-                //console.log("Respuesta enviada correctamente:", response);
-            },
-            error: function (xhr, status, error) {
-                //console.error("Error al enviar la respuesta:", error);
-            }
-        });
+        guardarRespuestasDesdeHiddenInputs();
 
         //Avanzar si corresponde
         if (avanzar) {
@@ -334,20 +329,92 @@ document.querySelector("form").addEventListener("submit", function (e) {
     this.submit(); // Envío real
 });
 
-//pdq
+
 document.addEventListener("click", function (e) {
+    //pdq
     if (e.target.classList.contains("btn-listo")) {
         listo = true;
         console.log("clic a listo");
-         const respuestaElement = document.querySelector(".respuesta");
+        const respuestaElement = document.querySelector(".respuesta");
         if (respuestaElement) {
             manejarCambioRespuesta({ target: respuestaElement });
         }
     }
+
+    //zavik o lifo
+    if (e.target.classList.contains("btn-listo-ordenamiento")) {
+        const preguntaId = e.target.dataset.preguntaId;
+        const numPregunta = parseInt(e.target.dataset.pregunta);
+
+        const lista = document.getElementById(`clone-source-${preguntaId}`);
+        if (!lista) return;
+
+        const inputs = lista.querySelectorAll("input.puntuacion-input");
+        const container = document.getElementById("respuestas-hidden-container");
+
+        container.querySelectorAll(`input[name^="respuestas[${preguntaId}][zavik]"]`).forEach(el => el.remove());
+
+        inputs.forEach(input => {
+            const respuestaId = input.closest("[data-respuesta-id]").dataset.respuestaId;
+            const puntaje = input.value.trim();
+
+            const hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.name = `respuestas[${preguntaId}][zavik][${respuestaId}]`;
+            hiddenInput.value = puntaje;
+            container.appendChild(hiddenInput);
+        });
+
+        guardarRespuestasDesdeHiddenInputs();
+        avanzarAPreguntaSiguiente(numPregunta);
+    }
+
 });
+
+
+function guardarRespuestasDesdeHiddenInputs() {
+    const container = document.getElementById("respuestas-hidden-container");
+    const todasLasRespuestas = {};
+
+    container.querySelectorAll('input[type="hidden"]').forEach(input => {
+        const name = input.name;
+
+        if (name.endsWith('[]')) {
+            const key = name.slice(0, -2);
+            if (!todasLasRespuestas[key]) {
+                todasLasRespuestas[key] = [];
+            }
+            todasLasRespuestas[key].push(input.value);
+        } else {
+            todasLasRespuestas[name] = input.value;
+        }
+    });
+
+    console.log("Respuestas guardadas:", todasLasRespuestas);
+
+    $.ajax({
+        url: RUTA_GUARDAR_RESPUESTAS,
+        method: "POST",
+        data: todasLasRespuestas,
+        headers: {
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+        },
+        success: function (response) {
+            console.log("Respuestas enviadas correctamente");
+        },
+        error: function (xhr) {
+            console.error("Error al enviar respuestas", xhr);
+        }
+    });
+}
 
 //instrucciones
 function mostrarFormulario() {
     document.getElementById('contenedor-instrucciones').classList.add('d-none');
     document.getElementById('formulario-preguntas').classList.remove('d-none');
 }
+
+document.addEventListener('respuestaReordenada', function (e) {
+    console.log('Se reordenó la lista de la pregunta ID:', e.detail.preguntaId);
+    console.log('Nuevo orden:', e.detail.ordenActual);
+});

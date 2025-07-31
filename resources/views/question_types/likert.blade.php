@@ -228,7 +228,7 @@
         @break
 @endswitch
 
-@push('sctripts')
+@push('scripts')
     <script>
         window.respuestasLikertIds = window.respuestasLikertIds || {};
         window.respuestasLikertIds[{{ $pregunta->id }}] = {

@@ -20,6 +20,7 @@
                     style="width: auto; min-height: 40px; max-width: 60px; display: inline-block;"
                     name="respuestas[{{ $pregunta->id }}]"
                     data-pregunta="{{ $numPregunta }}"
+                    data-respuesta-id="{{ $respuesta->id }}"
                     data-pregunta-id="{{ $pregunta->id }}"
                     placeholder="#"
                      
@@ -28,6 +29,7 @@
                 <span class="badge bg-light text-dark px-2 py-1 border p-1 text-center"
                     style="display:inline-block; min-width: 60px; min-height: 40px; "
                     data-pregunta-id="{{ $pregunta->id }}"
+                    data-respuesta-id="{{ $respuesta->id }}"
                     data-pregunta="{{ $numPregunta }}">
                     {{ $respuesta->answer }}
                 </span>
