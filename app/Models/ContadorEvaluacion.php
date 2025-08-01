@@ -12,14 +12,16 @@ class ContadorEvaluacion extends Model
         'user_id',
         'available_tests',
         'used_tests',
-        'num_psychometric_tests',
-        'num_socioeconomic_tests',
+        'pack_id'
     ];
-
-    public $timestamps = false;
 
     public function usuario()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function pack()
+    {
+        return $this->belongsTo(Pack::class, 'pack_id');
     }
 }

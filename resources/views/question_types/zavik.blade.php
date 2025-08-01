@@ -6,13 +6,13 @@
                     data-respuesta-id="{{ $respuesta->id }}">
             
                 <div class="d-flex align-items-center gap-2">
-                    <span class="mb-0">{{ $respuesta->option }}&#41; {{ $respuesta->answer }}</span>
                     <input type="number"
                         class="form-control form-control-sm puntuacion-input"
                         name="puntajes[{{ $pregunta->id }}][{{ $respuesta->id }}]"
                         value=""
                         readonly
                         style="width: 60px;" />
+                    <span class="mb-0">{{ $respuesta->option }}&#41; {{ $respuesta->answer }}</span>
                 </div>
 
                 @if (!empty($respuesta->imagen))

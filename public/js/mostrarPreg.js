@@ -149,7 +149,7 @@ function manejarCambioRespuesta(event) {
             }
         } else if (event.target.type === "text") {
             const preguntaId = event.target.dataset.preguntaId;
-            const inputs = document.querySelectorAll(`input[data-pregunta-id="${preguntaId}"].respuesta`);
+            const inputs = Array.from(document.querySelectorAll(`input[data-pregunta-id="${preguntaId}"].respuesta`)).filter(input => input.offsetParent !== null);
             const container = document.getElementById('respuestas-hidden-container');
             let todosLlenos = true;
 
@@ -161,20 +161,25 @@ function manejarCambioRespuesta(event) {
 
             if (!todosLlenos) return;
 
-            container.querySelectorAll(`input[name^="respuestas[${preguntaId}]"]`).forEach(el => el.remove());
+            container.querySelectorAll(`input[name^="respuestas[${preguntaId}][patronNum]"]`).forEach(el => el.remove());
 
             //formato: respuestas[preguntaId][respuestaId] = valor
             inputs.forEach(input => {
                 const respuestaId = input.dataset.respuestaId;
                 const valor = input.value.trim();
+                const hiddenName = `respuestas[${preguntaId}][patronNum][${respuestaId}]`;
 
-                const hiddenInput = document.createElement("input");
-                hiddenInput.type = "hidden";
-                hiddenInput.name = `respuestas[${preguntaId}][patronNum][${respuestaId}]`;
-                hiddenInput.value = valor;
-                container.appendChild(hiddenInput);
+                let existing = container.querySelector(`input[name="${hiddenName}"]`);
+                if (existing) {
+                    existing.value = valor;
+                } else {
+                    const hiddenInput = document.createElement("input");
+                    hiddenInput.type = "hidden";
+                    hiddenInput.name = hiddenName;
+                    hiddenInput.value = valor;
+                    container.appendChild(hiddenInput);
+                }
             });
-
             avanzar = true;
         } else if (event.target.tagName === "TEXTAREA") { //pregunta abierta
             const preguntaId = event.target.dataset.preguntaId;
