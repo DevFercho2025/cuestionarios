@@ -192,6 +192,9 @@
                     //zavik
                     "{{ asset('js/ordenarRespuestas.js') }}",
 
+                    //dominos
+                    "{{ asset('js/dominosCandidato.js') }}",
+
                     //pregunta V o F con ordenamiento de palabras
                     "../../assets/vendor/libs/sortablejs/sortable.js",
                     "{{ asset('js/ordenarPalabras.js') }}",

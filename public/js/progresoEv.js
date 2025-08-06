@@ -3,12 +3,15 @@ let circulo = document.querySelector(".circulo-Progreso"),
     respuestas = document.querySelectorAll("input, textarea, select");
     totalPreguntas = document.querySelectorAll(".pregunta").length,
     respuestasContestadas = 0;
+    let barraProgreso = document.querySelector(".progress-bar");
 
 function actualizarProgreso() {
     let porcentaje = Math.round((respuestasContestadas / totalPreguntas) * 100);
     valor.textContent = `${porcentaje}%`;
-    circulo.style.background = `conic-gradient(blue ${porcentaje * 3.6}deg, #ededed 0deg)`;
+    //circulo.style.background = `conic-gradient(blue ${porcentaje * 3.6}deg, #ededed 0deg)`;
+    barraProgreso.style.width = `${porcentaje}%`;  
 }
+
 
 respuestas.forEach((respuesta) => {
     respuesta.addEventListener("change", function () {

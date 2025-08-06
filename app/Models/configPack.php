@@ -12,12 +12,10 @@ class configPack extends Model
     protected $fillable = [
         'user_id',
         'pack_id',
-        'included_tests_ids',
         'expiration_date',
     ];
 
     protected $casts = [
-        'included_tests_ids' => 'array',
         'expiration_date' => 'datetime',
     ];
 

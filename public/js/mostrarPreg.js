@@ -39,7 +39,6 @@ document.addEventListener('input', function(event) {
 let listo = false;
 function manejarCambioRespuesta(event) {
     if (event.target.classList.contains("respuesta")) {
-        console.log("entró");
         const preguntaId = event.target.dataset.preguntaId;
         const respuestaId = event.target.value;
 
@@ -52,6 +51,8 @@ function manejarCambioRespuesta(event) {
         const isCleaver = event.target.name.includes('bloque_');
         const tipo = event.target.dataset.type;
         let avanzar = false;
+
+        if (tipo === "domino") return;
         if (tipo === 'severalChars') {
             if (listo) {
                 const prevHidden = container.querySelectorAll(`input[name="respuestas[${preguntaId}][]"]`);
@@ -344,6 +345,56 @@ document.addEventListener("click", function (e) {
         if (respuestaElement) {
             manejarCambioRespuesta({ target: respuestaElement });
         }
+    }
+
+    //Domino
+    if (e.target.classList.contains("btn-listo-dominos")) {
+        console.log("entro a listo dominos");
+        const numPregunta = parseInt(e.target.dataset.pregunta);
+        const preguntaId = parseInt(e.target.dataset.preguntaId);
+        const fichas = document.querySelectorAll(`.ficha[data-pregunta-id="${preguntaId}"][data-fillable="1"]`);
+        const container = document.getElementById('respuestas-hidden-container');
+        
+        let todasCompletas = true;
+
+        container.querySelectorAll(`input[name^="respuestas[${preguntaId}][domino]"]`).forEach(input => input.remove());
+        console.log("🔍 Fichas encontradas:", fichas.length);
+        fichas.forEach(ficha => {
+            console.log("recorriendo ficha");
+
+            const topInput = ficha.querySelector(`input[data-domino-posicion="top"]`);
+            const bottomInput = ficha.querySelector(`input[data-domino-posicion="bottom"]`);
+
+            if (!topInput || !bottomInput || topInput.value === "" || bottomInput.value === "") {
+                todasCompletas = false;
+                ficha.classList.add("incompleta");
+                return;
+            }
+
+            const respuestaId = topInput.dataset.respuestaId;
+
+            // Crear inputs ocultos como los demás tipos
+            const inputTop = document.createElement("input");
+            inputTop.type = "hidden";
+            inputTop.name = `respuestas[${preguntaId}][domino][${respuestaId}][top]`;
+            inputTop.value = parseInt(topInput.value);
+
+            const inputBottom = document.createElement("input");
+            inputBottom.type = "hidden";
+            inputBottom.name = `respuestas[${preguntaId}][domino][${respuestaId}][bottom]`;
+            inputBottom.value = parseInt(bottomInput.value);
+
+            container.appendChild(inputTop);
+            container.appendChild(inputBottom);
+        });
+
+        if (!todasCompletas) {
+            alert("Completa todas las fichas antes de continuar.");
+            return;
+        }
+
+        guardarRespuestasDesdeHiddenInputs();
+        avanzarAPreguntaSiguiente(numPregunta);
     }
 
     //zavik o lifo

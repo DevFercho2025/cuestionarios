@@ -252,6 +252,25 @@ class FormularioController extends Controller
                     );
                 }
             }
+            //Dominos
+            elseif (is_array($respuesta_data) && array_key_exists('domino', $respuesta_data)) {
+                foreach ($respuesta_data['domino'] as $answer_id => $extraData) {
+                    Respuesta_Usuario::updateOrCreate(
+                        [
+                            'user_id' => $user_id,
+                            'question_id' => $question_id,
+                            'answer_id' => $answer_id
+                        ],
+                        [
+                            'ip_address' => $ip,
+                            'extra_data' => json_encode([
+                                'top' => $extraData['top'] ?? null,
+                                'bottom' => $extraData['bottom'] ?? null
+                            ])
+                        ]
+                    );
+                }
+            }
             // Pregunta compuesta tipo Cleaver
             elseif (is_array($respuesta_data)) {
                 foreach ($respuesta_data as $bloque => $tipos) {

@@ -13,7 +13,8 @@ class pack extends Model
         'name',
         'price',
         'content',
-        'adquirable_tests',
+        'included_tests_ids',
+        'adquirable_tests_quantity',
     ];
 
     public function transactions()

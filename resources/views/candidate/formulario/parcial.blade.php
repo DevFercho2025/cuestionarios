@@ -48,13 +48,11 @@
         .progreso-Seccion {
             display: flex;
             flex-direction: column;
-            width: 420px;
             padding: 50px 0;
             border-radius: 8px;
             align-items: center;
-            justify-content: center;  /*<-- asegurá que esté esto */  
+            justify-content: center;
             text-align: center;
-            margin: 0 auto;  /*<-- esto lo centra horizontalmente */  
         }
         .circulo-Progreso{
             position: relative;
@@ -75,29 +73,14 @@
             border-radius: 50%;
             background-color: white;
         }
-        .valor-progreso{
-            position: relative;
-            font-size: 50px;
-            font-weight: 600;
-            color: blue;
-        }
-        .texto-progreso{
-            font-size: 30px;
-            font-weight: 500;
-            padding: 5%;
-        }
 
         .recording-container {
-            width: 90px;
+            width: 40px;
             height: 40px;
-            border-radius: 10px;
-            background-color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            border: 2px solid #ffffff;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .barra-indicador-video {
@@ -149,13 +132,6 @@
             text-align: center;
         }
 
-
-       .separador {
-            width: 2px;
-            height: 50px;
-            background-color: #ccc;
-        }
-
         .contenedor-C{
             display: flex !important;
             align-items: flex-start !important;
@@ -174,46 +150,100 @@
             height: 1em;
             margin-top: 0.3em;
         }
+
+        .container-progress-bar {
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-bar {
+            position: absolute;
+            height: 100%;
+            width: 0%; /* inicial */
+            background-color: blue;
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+        .valor-progreso{
+            position: relative;
+            font-size: 20px;
+            font-weight: 600;
+            color: blue;
+        }
+        .texto-progreso{
+            font-size: 20px;
+            font-weight: 500;
+            padding: 5%;
+        }
+
+        .separador {
+            width: 2px;
+            height: 20px;
+            background-color: #ccc;
+        }
     </style>
 
-    <div class="barra-Superior d-flex align-items-center justify-content-between">
-        <div class="barra-titulo-cuestionario flex-grow-1 text-center">
-            <h2 style="color: rgba(51,58,153,255);">{{ $testTitulo }}</2>
+    <div class="barra-Superior position-relative d-flex align-items-center" style="height: 60px;">
+        <!-- Izquierda: Indicador cámara -->
+        <div class="position-absolute start-0 d-flex align-items-center ps-3">
+            <div class="recording-container" style="{{ $cameraRequired == 0 ? 'display: none;' : '' }}">
+                <div class="recording-indicator"></div>
+            </div>
+            <h5 class="mb-0">Tomando Fotos</h5>
         </div>
 
-        <div class="separador"></div>
+        <!-- Centro: Logo -->
+        <div class="mx-auto d-flex justify-content-center align-items-center">
+            <img
+                src="{{ asset('assets/img/Alobri/alobri-light.png') }}"
+                alt="Logo"
+                height="30px"
+                class="app-brand-img"
+                data-app-light-img="Alobri/Alobri-light.png"
+                data-app-dark-img="Alobri/Alobri-dark.png"
+            />
+        </div>
 
-        <div class="barra-temporizador">
+        <!-- Derecha: Temporizador -->
+        <div class="position-absolute end-0 d-flex align-items-center pe-3">
+            <i class="ri-time-line me-2 fs-4" style="color:#666cff; width:22px; height:22px;"></i>
             @php
                 $seccionesTemporizador = [];
             @endphp
-
             @foreach ($preguntas as $pregunta)
                 @php
                     $idSeccion = $pregunta->seccion->id;
                 @endphp
-
                 @if (!in_array($idSeccion, $seccionesTemporizador))
                     @php
                         $seccionesTemporizador[] = $idSeccion;
                     @endphp
-                    <p id="temporizador-{{ $idSeccion }}" class="temporizador" data-tiempo="{{ $pregunta->tiempoRestante }}" style="display: none;">
+                    <h5 id="temporizador-{{ $idSeccion }}" class="temporizador mb-0 mr-1" data-tiempo="{{ $pregunta->tiempoRestante }}" style="display: none; padding-right:8px;">
                         Tiempo restante: {{ $pregunta->tiempoRestante }}
-                    </p>
+                    </h5>
                 @endif
             @endforeach
         </div>
-
-        <div class="separador"></div>
-
-        <div class="barra-indicador-video d-flex justify-content-center align-items-center">
-            <div class="recording-container" style="{{ $cameraRequired == 0 ? 'display: none;' : '' }}">
-                <div class="recording-indicator"></div>
-            </div>
-        </div>
     </div>
+
+    <!--Barra de progreso-->
+    <div class="d-flex justify-content-center align-items-center" style="position: relative; width: 100%;">
+        <div class="container-progress-bar" style="width: 92%;height:20px;">
+            <div class="progress-bar"></div>
+        </div>
+        <span class="valor-Progreso" style="padding-left:10px;">0%</span>
+    </div>
+    
+    <!--Contenedor de Evaluación-->
     <div class="contenedor-C d-flex justify-content-center align-items-center">
-        <div class="col-8" style="height: 100%" >
+        <!--Instrucciones y preguntas-->
+        <div class="col-12" style="height: 100%" >
+
+            <div class="barra-titulo-cuestionario flex-grow-1 text-center">
+                <h2 style="color: rgba(51,58,153,255);">{{ $testTitulo }}</2>
+            </div>
 
             @php
                 $mostrarDirecto = empty($seccion->test->instructions) && empty($seccion->instructions);
@@ -297,34 +327,32 @@
                     <button type="submit" id="enviar" style="display: none;">Enviar</button>
                 </form>
         </div>
-        <div class="col-4" style="display:flex; flex-direction:column; justify-content:center; height: 100%">
-            <div>
-                @if($candidato)
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <h4 style="margin: 0; color: #333;">
-                            {{ $candidato->name}}
-                        </h4>
-                        <p style="margin: 0; font-weight: bold;">
-                            Vacante: {{ $candidato->vacante?->vacancy ?? 'No especificada' }}
-                        </p>
-                    </div>
-                @endif
-            </div>
-            <div class="progreso-Seccion">
-                <div class="circulo-Progreso">
-                    <span class="valor-Progreso">0%</span>
-                </div>
-
-                <div class="texto-Progreso" style="text-align: center" data-id-seccion="{{ $seccion->id }}">
-                    {{ $seccion->titulo }}
-                </div>
-
-                @if ($testTitulo === 'Cleaver')
-                    <div id="contenedor-glosario" class="mt-4"></div>
-                @endif
-            </div>
-        </div>
     </div>
+
+    <div class="d-flex justify-content-center align-items-start gap-4" style="position: relative; width: 100%;">
+    <div style="text-align: center;">
+       @if($candidato)
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
+                <p style="margin: 0; color: #333;">
+                    <span style="font-weight: bold;">Candidato:</span>
+                    {{ $candidato->name }}
+                </p>
+                <div class="separador"></div>
+                <p style="margin: 0;">
+                    <span style="font-weight: bold;">Vacante:</span>
+                     {{ $candidato->vacante?->vacancy ?? 'No especificada' }}
+                </p>
+            </div>
+        @endif
+    </div>
+
+    <div class="progreso-Seccion">
+        <div class="texto-Progreso" data-id-seccion="{{ $seccion->id }}" style="display:none;"></div>
+        @if ($testTitulo === 'Cleaver')
+            <div id="contenedor-glosario" class="mt-4"></div>
+        @endif
+    </div>
+</div>
 
 
 @if ($testTitulo === 'cleaver')

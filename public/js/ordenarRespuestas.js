@@ -1,5 +1,3 @@
-
-    console.log("ordenar respeustas cargado");
     const listas = document.querySelectorAll('ul[id^="clone-source-"]');
 
     listas.forEach(lista => {

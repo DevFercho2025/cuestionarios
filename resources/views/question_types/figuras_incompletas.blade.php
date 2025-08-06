@@ -69,5 +69,78 @@
             width: 67px;
             height: 110px;
         }
+
+        .invisible-input {
+            display: none !important;
+        }
+        .circulo.editable {
+            background-color: rgb(87, 87, 241);
+        }
     </style>
 </head>
+@php
+    $preguntaId = $pregunta->id;
+@endphp
+
+<div class="contenedor-dinamico-domino">
+    @foreach ($pregunta->respuestas as $index => $respuesta)
+        @php
+            $respuestaId = $respuesta->id;
+            $uId = uniqid();
+            $fillableRaw = $respuesta->extra_data['fillable'] ?? false;
+            $fillable = filter_var($fillableRaw, FILTER_VALIDATE_BOOLEAN);
+
+            //Cargar valores si la ficha no se llena
+            $top = $fillable ? null : ($respuesta->extra_data['top'] ?? 0);
+            $bottom = $fillable ? null : ($respuesta->extra_data['bottom'] ?? 0);
+        @endphp
+
+        <div class="contenedor ficha" data-pregunta-id="{{ $pregunta->id }}" data-fillable="{{ $fillable ? '1' : '0' }}">
+            <div class="fila" data-fila="1">
+                <div class="contenedor-circulos" id="circulos-1-{{ $uId }}">
+                    <input
+                        class="circulo-input respuesta"
+                        data-domino-posicion="top"
+                        type="number"
+                        id="input-f1-{{ $uId }}"
+                        min="0"
+                        max="6"
+                        @if (!is_null($top))
+                            value="{{ $top }}"
+                        @endif
+                        class="respuesta"
+                        name="respuestas[{{ $pregunta->id }}]"
+                        data-respuesta-id="{{ $respuesta->id }}"
+                        data-pregunta="{{ $numPregunta }}"
+                        data-pregunta-id="{{ $pregunta->id }}"
+                        data-type="domino"
+                    >
+                </div>
+            </div>
+            <div class="fila" data-fila="2">
+                <div class="contenedor-circulos" id="circulos-2-{{ $uId }}">
+                    <input
+                        class="circulo-input respuesta"
+                        data-domino-posicion="bottom"
+                        type="number"
+                        id="input-f2-{{ $uId }}"
+                        min="0"
+                        max="6"
+                        name="respuestas[{{ $pregunta->id }}]"
+                        data-respuesta-id="{{ $respuesta->id }}"
+                        data-pregunta="{{ $numPregunta }}"
+                        data-pregunta-id="{{ $pregunta->id }}"
+                        data-type="domino"
+                        @if (!is_null($bottom))
+                            value="{{ $bottom }}"
+                        @endif
+                    >
+                </div>
+            </div>
+        </div>
+    @endforeach
+</div>
+
+<div class="mt-3">
+    <button type="button" class="btn btn-primary btn-listo-dominos" data-pregunta-id="{{ $pregunta->id }}" data-pregunta="{{ $numPregunta }}">Listo</button>
+</div>
