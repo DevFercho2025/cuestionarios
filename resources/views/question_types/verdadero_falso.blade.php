@@ -1,32 +1,19 @@
 <head>
     <style>
         #sortable-cards {
-            min-height: 100px;
-            position: relative;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: stretch; /* ← clave para alinear verticalmente */
+            gap: 10px;
         }
 
-        #sortable-cards .drag-item {
-            flex: 0 0 auto;
-            width: 18rem;
-        }
-
-        #sortable-cards .card {
-            height: 100%;
-            display: flex;
-            align-items: flex-start; /* ← Alinea el contenido arriba */
-            justify-content: center;
-            padding: 1rem;
-            text-align: center;
+        .drag-item {
+            user-select: none;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
         }
 
         .sortable-ghost {
-            opacity: 0.4;
-            background-color: #eee;
-            border: 2px dashed #aaa;
+            opacity: 0.5;
+            background-color: #e0e0e0;
         }
 
         .respuesta {
@@ -49,26 +36,36 @@
 @php
     $respuestaBase = $pregunta->respuestas[0] ?? null;
     $esOrdenable = $respuestaBase && !empty($respuestaBase->extra_data['ordenar']);
-    $palabras = explode(' ', $pregunta->question);
 @endphp
 
     @if($esOrdenable)
-        <div id="sortable-cards" class="row gap-3">
-            @foreach ($palabras as $index => $palabra)
-                <div class="col-auto drag-item" style="width: 18rem;">
-                    <div class="card cursor-move p-1">
-                        <div class="card-body text-center">
-                            <h4>{{ $palabra }}</h4>
+        @php
+            $palabras = explode(' ', $pregunta->question);
+            shuffle($palabras);
+        @endphp
+        <div class="row">
+            <div class="col-12">
+                <div id="sortable-cards-{{ $pregunta->id }}" class="d-flex flex-wrap gap-2">
+                    @foreach ($palabras as $index => $palabra)
+                        <div class="drag-item card cursor-move p-2 text-center" 
+                            data-palabra-index="{{ $index }}" 
+                            style="min-width: 100px;">
+                            <input type="hidden"
+                                name="puntajes[{{ $pregunta->id }}][{{ $index }}]"
+                                class="puntuacion-input"
+                                value="{{ $index + 1 }}">
+                            <h5 class="palabra mb-0">{{ $palabra }}</h5>
                         </div>
-                    </div>
+                    @endforeach
                 </div>
-            @endforeach
+            </div>
         </div>
     @endif
 
 @foreach ($pregunta->respuestas as $respuesta)
     <div class="form-check gap-2">
         <input class="form-check-input respuesta" type="radio"
+            data-type="ToF"
             data-pregunta-id="{{ $pregunta->id }}"
             value="{{ $respuesta->id }}"
             data-pregunta="{{ $numPregunta }}"

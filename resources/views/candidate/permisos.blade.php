@@ -196,8 +196,9 @@
                     "{{ asset('js/dominosCandidato.js') }}",
 
                     //pregunta V o F con ordenamiento de palabras
-                    "../../assets/vendor/libs/sortablejs/sortable.js",
                     "{{ asset('js/ordenarPalabras.js') }}",
+                    "../../assets/vendor/libs/sortablejs/sortable.js",
+                    
                     
                     //Glosario de Cleaver
                     "{{ asset('js/glosario.js') }}"

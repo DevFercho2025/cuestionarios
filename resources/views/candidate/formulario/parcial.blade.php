@@ -239,7 +239,7 @@
     <!--Contenedor de Evaluación-->
     <div class="contenedor-C d-flex justify-content-center align-items-center">
         <!--Instrucciones y preguntas-->
-        <div class="col-12" style="height: 100%" >
+        <div class="col-md-11 col-lg-8 mx-auto mt-5 mb-5" style="height: 100%" >
 
             <div class="barra-titulo-cuestionario flex-grow-1 text-center">
                 <h2 style="color: rgba(51,58,153,255);">{{ $testTitulo }}</2>
@@ -251,8 +251,8 @@
 
             @if (!$mostrarDirecto)
                 {{-- Instrucciones del test y sección --}}
-                <div id="contenedor-instrucciones" class="h-100 text-center" style="display:flex; flex-direction:column; justify-content:center;">
-                    <div>
+                <div id="contenedor-instrucciones" class="text-center" style="height: 70% !important; width:100%; display:flex; flex-direction:column; justify-content:center;">
+                    <div style="heigh:100%">
                         @if (!empty($seccion->test->instructions))
                             <div class="mb-4 instrucciones-test">
                                 <h5 class="text-primary">Instrucciones del test</h5>
@@ -277,7 +277,7 @@
                 </div>
             @endif
 
-                <form id="formulario-preguntas" class="{{ $mostrarDirecto ? '' : 'd-none' }}" action="{{ route('token.record') }}" method="POST" style="height: 100%;">
+                <form id="formulario-preguntas" class="{{ $mostrarDirecto ? '' : 'd-none' }}" action="{{ route('token.record') }}" method="POST" style="height: 90%; width:100%">
                     @csrf
 
                     @php $numPregunta = 0; @endphp
@@ -329,10 +329,10 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-center align-items-start gap-4" style="position: relative; width: 100%;">
+    <div class="d-flex justify-content-center align-items-start" style="position: relative; width: 100%; height:10px;">
     <div style="text-align: center;">
        @if($candidato)
-            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
                 <p style="margin: 0; color: #333;">
                     <span style="font-weight: bold;">Candidato:</span>
                     {{ $candidato->name }}

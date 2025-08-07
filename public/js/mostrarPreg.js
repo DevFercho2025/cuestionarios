@@ -52,6 +52,8 @@ function manejarCambioRespuesta(event) {
         const tipo = event.target.dataset.type;
         let avanzar = false;
 
+        const sortable = document.querySelector(`#sortable-cards-${preguntaId}`);
+
         if (tipo === "domino") return;
         if (tipo === 'severalChars') {
             if (listo) {
@@ -226,8 +228,30 @@ function manejarCambioRespuesta(event) {
             });
 
             return;
+        } else if (tipo === 'ToF' && sortable) {
+            if (!respuestaId) return;
+            // Si es ToF Y es ordenable → guardar texto ordenado y respuesta_id
+            const tarjetas = sortable.querySelectorAll('.drag-item .palabra');
+            const textoOrdenado = Array.from(tarjetas).map(el => el.textContent.trim()).join(' ');
+
+            container.querySelectorAll(`input[name="respuestas[${preguntaId}][respuesta_id]"],
+                                        input[name="respuestas[${preguntaId}][texto]"]`).forEach(el => el.remove());
+
+            const respuestaIdHidden = document.createElement('input');
+            respuestaIdHidden.type = 'hidden';
+            respuestaIdHidden.name = `respuestas[${preguntaId}][respuesta_id]`;
+            respuestaIdHidden.value = respuestaId;
+
+            const textoInput = document.createElement('input');
+            textoInput.type = 'hidden';
+            textoInput.name = `respuestas[${preguntaId}][texto]`;
+            textoInput.value = textoOrdenado;
+
+            container.appendChild(respuestaIdHidden);
+            container.appendChild(textoInput);
+
+            avanzar = true;
         } else {
-            // Pregunta normal
             const hiddenName = `respuestas[${preguntaId}]`;
             let existing = container.querySelector(`input[name="${hiddenName}"]`);
             if (existing) {
@@ -239,6 +263,7 @@ function manejarCambioRespuesta(event) {
                 hiddenInput.value = respuestaId;
                 container.appendChild(hiddenInput);
             }
+
             avanzar = true;
         }
 
