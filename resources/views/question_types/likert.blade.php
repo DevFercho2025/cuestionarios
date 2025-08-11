@@ -1,13 +1,13 @@
 <style>
-    /*BFQ*/
-    .BFQ .select-cell {
+    /*BFQ y Rathus*/
+    .select-cell {
         position: relative;
         cursor: pointer;
         height: 60px;
         text-align: center;
     }
 
-    .BFQ .select-cell input[type="radio"] {
+    .select-cell input[type="radio"] {
         opacity: 0;
         width: 100%;
         height: 100%;
@@ -20,7 +20,7 @@
         cursor: pointer;
     }
 
-    .BFQ .select-cell .x-mark {
+    .select-cell .x-mark {
         font-size: 1.5rem;
         color: #333;
         pointer-events: none;
@@ -33,10 +33,10 @@
         z-index: 1;
     }
 
-    .BFQ .select-cell input[type="radio"]:checked + .x-mark {
+    .select-cell input[type="radio"]:checked + .x-mark {
         opacity: 1;
     }
-
+    
     .respuesta-label {
         font-size: 0.8rem;
         text-align: center;
@@ -44,16 +44,37 @@
         word-break: break-word;
     }
 
+    /*BFQ*/
     .BFQ .table-responsive {
     width: 100% !important;
     }
-
     .BFQ .table-responsive > .d-flex {
     width: 100% !important;
     }
-
     .BFQ .flex-fill {
     min-width: 0;
+    }
+
+    /*Rathus*/
+    .LikertTable {
+        border-collapse: collapse;
+        width: 100%;
+        text-align: center;
+    }
+    .LikertTable th, .LikertTable td {
+        border: 1px solid #000;
+        padding: 4px;
+    }
+    .LikertTable .header-main {
+        background-color: #00CFFF;
+        font-weight: bold;
+    }
+    .LikertTable .header-scale {
+        background-color: #00CFFF;
+    }
+    .LikertTable .item-cell {
+        text-align: left;
+        vertical-align: top;
     }
 </style>
 
@@ -69,6 +90,7 @@
         5 => ['Me desagrada mucho', 'No me gusta','Me es indiferente','Me gusta','Me gusta mucho'], //Hereford
         6 => ['Me gusta','Me es indiferente o tengo dudas','No me gusta','No conozco esa actividad o profesión'],//IPP
         7 => ['Mucho','Poco','Nada'], //IPP vocacional
+        8 => ['Muy característico de mí','Bastante característico de mí','Algo característico de mí','Algo no característico de mí','Bastante poco característico de mí','Muy poco característico de mí'],
         9 => ['Nunca','Poco','A veces','Frecuentemente','Siempre'],
     ];
 
@@ -169,6 +191,7 @@
             </div>
         </div>
         @break
+
     @case(5)
         {{--Hereford--}}
         <div class="form-group mb-4">
@@ -198,6 +221,53 @@
                 </label>
             @endforeach
         </div>
+        @break
+
+    @case(8)
+        {{--Rathus--}}
+        <table class="LikertTable">
+            <thead>
+                <tr>
+                    <th rowspan="2" class="header-main" style="width: 30%;">Item</th>
+                    <th colspan="{{ count($labels) }}" class="header-main"> (+) &nbsp; &lt;-------------- Respuesta --------------&gt; &nbsp; (-)</th>
+                </tr>
+                <tr>
+                    @foreach ($labels as $label)
+                        <th class="header-scale" style="width: calc(70% / {{ count($labels) }});">
+                            {{ $label }}
+                        </th>
+                    @endforeach
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {{-- Primera columna: número y pregunta en la misma celda --}}
+                    <td class="item-cell">
+                        <span style="border: 1px solid #000; display: inline-block; padding: 2px 6px;
+        margin-right: 6px;"><strong>{{ $numPregunta+1 }}. </strong></span>
+                        {{ $pregunta->question }}
+                    </td>
+
+                    {{-- Celdas de selección --}}
+                     @foreach ($respuestas as $respuesta)
+                        <td class="select-cell">
+                            <input
+                                type="radio"
+                                class="respuesta"
+                                name="respuestas[{{ $pregunta->id }}]"
+                                id="respuesta_{{ $respuesta->id }}"
+                                value="{{ $respuesta->id }}"
+                                data-pregunta="{{ $numPregunta + 1 }}"
+                                data-pregunta-id="{{ $pregunta->id }}"
+                                data-type="likertRathus"
+                                @if($pregunta->required) required @endif
+                            >
+                            <span class="x-mark">X</span>
+                        </td>
+                    @endforeach
+                </tr>
+            </tbody>
+        </table>
         @break
     @default
         <div class="form-group mb-4">

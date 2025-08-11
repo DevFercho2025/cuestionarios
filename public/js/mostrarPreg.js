@@ -273,7 +273,7 @@ function manejarCambioRespuesta(event) {
         if (avanzar) {
            const preguntaActual = parseInt(event.target.dataset.pregunta);
     
-            if (tipo === 'likertBFQ') {
+            if (tipo === 'likertBFQ' || tipo === 'likertRathus') {
                 setTimeout(() => {
                     avanzarAPreguntaSiguiente(preguntaActual);
                 }, 1500); // Esperar 1.5 segundo
@@ -454,6 +454,7 @@ document.addEventListener("click", function (e) {
 
 
 function guardarRespuestasDesdeHiddenInputs() {
+    console.log("entró a guardar respuestas");
     const container = document.getElementById("respuestas-hidden-container");
     const todasLasRespuestas = {};
 

@@ -596,7 +596,7 @@
                 const value = parseInt(select.value);
                 container.innerHTML = '';
 
-                if (![1,2,3,4,5,6].includes(value)) {
+                if (![1,2,3,4,5,6,7,8].includes(value)) {
                     container.innerHTML = '<p style="color: red;">Seleccione una escala válida.</p>';
                     return;
                 }
@@ -608,7 +608,8 @@
                     4: ['En absoluto', 'Levemente', 'Moderadamente', 'Severamente'], //BAI
                     5: ['Me desagrada mucho', 'no me gusta','Me es indiferente','Me gusta','Me gusta mucho'], //Hereford
                     6: ['Me gusta','Me es indiferente o tengo dudas','No me gusta','No conozco esa actividad o profesión'], //IPP
-                    7: ['Mucho','Poco','Nada']
+                    7: ['Mucho','Poco','Nada'],
+                    8: ['Muy característico de mí','Bastante característico de mí','Algo característico de mí','Algo no característico de mí','Bastante poco característico de mí','Muy poco característico de mí']
                 };
 
                 labels[value].forEach(label => {
@@ -1115,6 +1116,7 @@
                                 <option value="5">Escala de 5 puntos de gusto para Hereford</option>
                                 <option value="6">Escala de 4 puntos de gusto para IPP</option>
                                 <option value="7">Escala de 3 puntos de aptitud para IPP</option>
+                                <option value="8">Escala de 6 puntos para Rathus</option>
                             </select>
                             <button type="button" class="ver-likert btn btn-azul btn-sm" title="Ver las opciones de esta escala"> ? </button>
                         </div>
@@ -1323,7 +1325,7 @@
             switch (questionType) {
                 case 2: // Likert
                     const scaleSize = parseInt(document.getElementById('likert-scale-size').value);
-                    if (!scaleSize || ![1, 2, 3, 4, 5, 6].includes(scaleSize)) {
+                    if (!scaleSize || ![1, 2, 3, 4, 5, 6, 7, 8].includes(scaleSize)) {
                         valid = false;
                         break;
                     }
@@ -1335,7 +1337,8 @@
                         4: ['En absoluto', 'Levemente', 'Moderadamente', 'Severamente'], //BAI
                         5: ['Me desagrada mucho', 'no me gusta','Me es indiferente','Me gusta','Me gusta mucho'], //Hereford
                         6: ['Me gusta','Me es indiferente o tengo dudas','No me gusta','No conozco esa actividad o profesión'], //IPP
-                        7: ['Mucho','Poco','Nada']
+                        7: ['Mucho','Poco','Nada'],
+                        8: ['Muy característico de mí','Bastante característico de mí','Algo característico de mí','Algo no característico de mí','Bastante poco característico de mí','Muy poco característico de mí']
                     };
 
                     labels[scaleSize].forEach((label, index) => {
@@ -1354,7 +1357,7 @@
                                 extraData.score = 0;
                             }
                         }
-
+                        
                         respuestas.push({
                             answer: label,
                             option: String.fromCharCode(97 + index),

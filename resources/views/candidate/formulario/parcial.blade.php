@@ -289,19 +289,32 @@
                             @endphp
                             <div style="display:flex; flex-direction:column; justify-content:center; height: 100%;">
                                 <h4 style="color: rgba(51,58,153,255);">
-                                        @if ($scaleType !== 3)
-                                            @if($pregunta->required)
-                                                <span style="color: red;">*</span>
+                                    @if ($scaleType !== 3)
+                                        @if($pregunta->required)
+                                            <span style="color: red;">*</span>
+                                        @endif
+                                        <span>{{ $numPregunta + 1 }}.</span>
+                                        <span>
+                                            @if (in_array($pregunta->id, [1071, 1052, 1042]))
+                                                @php
+                                                    $pos = strpos($pregunta->question, '?');
+                                                    $textoPregunta = $pos !== false
+                                                        ? substr($pregunta->question, 0, $pos + 1)
+                                                        : $pregunta->question;
+                                                @endphp
+                                                {{ $textoPregunta }}
+                                            @else
+                                                {{ $pregunta->question }}
                                             @endif
-                                            <span>{{ $numPregunta + 1 }}</span>
-                                            <span>. {{ $pregunta->question }}</span>
-                                        @endif
-                                        @if (!empty($pregunta->picture))
-                                            <div class="mt-3 text-center">
-                                                <img src="{{ asset('storage/' . $pregunta->picture) }}" alt="Imagen de la pregunta" style="max-width: 100%; height: auto;">
-                                            </div>
-                                        @endif
-                                    </h4>
+                                        </span>
+                                    @endif
+
+                                    @if (!empty($pregunta->picture))
+                                        <div class="mt-3 text-center">
+                                            <img src="{{ asset('storage/' . $pregunta->picture) }}" alt="Imagen de la pregunta" style="max-width: 100%; height: auto;">
+                                        </div>
+                                    @endif
+                                </h4>
                                     <div class="d-flex" id="Respuestas" >
                                         <div class="form-check  d-block" style="width: 100%;">
                                             @if (!empty($pregunta->respuestas) && is_iterable($pregunta->respuestas))
