@@ -136,18 +136,8 @@ function manejarCambioRespuesta(event) {
                     siguienteBloque.style.display = 'block';
                     bloqueActual.style.display = 'none';
                 } else {
-                    // Ya no hay más bloques, mostrar siguiente pregunta
-                    const siguientePreguntaDiv = document.getElementById(`pregunta-${parseInt(preguntaId) + 1}`);
-                    if (siguientePreguntaDiv) {
-                        siguientePreguntaDiv.style.display = "block";
-                        bloqueActual.style.display = 'none';
-                    } else {
-                        const botonEnviar = document.getElementById("enviar");
-                        if (botonEnviar) {
-                            botonEnviar.style.display = "block";
-                            bloqueActual.style.display = 'none';
-                        }
-                    }
+                    const preguntaActual = parseInt(event.target.dataset.pregunta);
+                    avanzarAPreguntaSiguiente(preguntaActual);
                 }
             }
         } else if (event.target.type === "text") {

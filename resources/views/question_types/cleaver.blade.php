@@ -32,6 +32,7 @@
                         name="respuestas[{{ $pregunta->id }}][bloque_{{ $option }}][M]"
                         value="{{ $respuesta->id }}"
                         data-pregunta-id="{{ $pregunta->id }}"
+                        data-pregunta="{{ $numPregunta }}"
                         required
                     >
                 </div>
@@ -41,6 +42,7 @@
                         name="respuestas[{{ $pregunta->id }}][bloque_{{ $option }}][L]"
                         value="{{ $respuesta->id }}"
                         data-pregunta-id="{{ $pregunta->id }}"
+                        data-pregunta="{{ $numPregunta }}"
                         required
                     >
                 </div>
