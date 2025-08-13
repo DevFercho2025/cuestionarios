@@ -311,7 +311,7 @@
 
                                     @if (!empty($pregunta->picture))
                                         <div class="mt-3 text-center">
-                                            <img src="{{ asset('storage/' . $pregunta->picture) }}" alt="Imagen de la pregunta" style="max-width: 100%; height: auto;">
+                                            <img src="{{ asset('assets/img/' . $pregunta->picture) }}" alt="Imagen de la pregunta" style="max-width: 100%; height: auto;">
                                         </div>
                                     @endif
                                 </h4>

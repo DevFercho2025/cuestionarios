@@ -65,9 +65,17 @@ class PreguntaController extends Controller
         $data['required'] = $data['required'] ?? 0;
 
         if ($request->hasFile('picture')) {
-            // Guarda el archivo en storage/app/public/preguntas y obtiene la ruta relativa
-            $ruta = $request->file('picture')->store('preguntas', 'public');
-            $data['picture'] = $ruta;
+            $archivo = $request->file('picture');
+
+            //nombre aleatorio de 48 caracteres
+            $nombre = bin2hex(random_bytes(24)) . '.' . $archivo->extension();
+
+            $archivo->move(public_path('assets/img/preguntas'), $nombre);
+            $data['picture'] = 'preguntas/' . $nombre;
+
+            /* Guarda el archivo en storage/app/public/preguntas y obtiene la ruta relativa
+                $ruta = $request->file('picture')->store('preguntas', 'public');
+                $data['picture'] = $ruta;*/
         }
         $question = Pregunta::create($data);
 
@@ -80,14 +88,23 @@ class PreguntaController extends Controller
 
                 if ($request->hasFile($fileKey)) {
                     $archivo = $request->file($fileKey);
-                    $ruta = $archivo->store('respuestas', 'public');
+
+                    $nombre = bin2hex(random_bytes(24)) . '.' . $archivo->extension();
+                    $archivo->move(public_path('assets/img/respuestas'), $nombre);
 
                     $extra = isset($answer['extra_data']) && is_array($answer['extra_data'])
                         ? $answer['extra_data']
                         : [];
 
-                    $extra['file_path'] = $ruta;
+                    $extra['file_path'] = 'respuestas/' . $nombre;
                     $answer['extra_data'] = $extra;
+
+                    /*$ruta = $archivo->store('respuestas', 'public');
+                        $extra = isset($answer['extra_data']) && is_array($answer['extra_data'])
+                            ? $answer['extra_data']
+                            : [];
+                        $extra['file_path'] = $ruta;
+                        $answer['extra_data'] = $extra;*/
                 }
             }
             $respuestaService->saveAnswers($answers, $question->id);

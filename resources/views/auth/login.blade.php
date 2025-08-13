@@ -11,7 +11,7 @@
                             <span class="app-brand-logo demo">
                                 <span>
                                     <img
-                                        src="{{ asset('assets/img/Alobri/alobri-light.png') }}"
+                                        src="{{ asset('assets/img/Alobri/Alobri-light.png') }}"
                                         alt="Logo"
                                         height="30px"
                                         class="app-brand-img"

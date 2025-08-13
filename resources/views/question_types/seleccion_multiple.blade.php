@@ -11,7 +11,7 @@
 
             @if (!empty($respuesta->extra_data['file_path']))
             <div class="mt-2">
-                <img src="{{ asset('storage/' . $respuesta->extra_data['file_path']) }}" alt="Imagen de la respuesta" style="max-width: 100%; height: auto;">
+                <img src="{{ asset('assets/img/' . $respuesta->extra_data['file_path']) }}" alt="Imagen de la respuesta" style="max-width: 100%; height: auto;">
             </div>
         @endif
         </label>
