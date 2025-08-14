@@ -23,10 +23,24 @@
 
 function actualizarPuntajes(lista) {
     const items = lista.querySelectorAll('.drag-item');
-    let puntaje = 4;
-    items.forEach(item => {
-        const input = item.querySelector('.puntuacion-input');
-        if (input) input.value = puntaje;
-        puntaje--;
-    });
+    const tipo = lista.dataset.type; //"zavic" o "hartman"
+
+    let puntaje;
+
+    if (tipo === 'hartman') {
+        puntaje = items.length; //puntaje máximo = cantidad de elementos
+        items.forEach(item => {
+            const input = item.querySelector('.puntuacion-input');
+            if (input) input.value = puntaje;
+            puntaje--; //baja hasta 1
+        });
+    } else { 
+        //Zavic o lifo
+        puntaje = 4;
+        items.forEach(item => {
+            const input = item.querySelector('.puntuacion-input');
+            if (input) input.value = puntaje;
+            puntaje--;
+        });
+    }
 }

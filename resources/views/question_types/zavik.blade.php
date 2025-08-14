@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-md-6 col-12 mb-md-0 mb-6">
-        <ul class="list-group list-group-flush" id="clone-source-{{ $pregunta->id }}">
+        <ul class="list-group list-group-flush" id="clone-source-{{ $pregunta->id }}" data-type="{{ count($pregunta->respuestas) > 4 ? 'hartman' : 'zavic' }}">>
             @foreach ($pregunta->respuestas as $respuesta)
                 <li class="list-group-item drag-item cursor-move d-flex justify-content-between align-items-center"
                     data-respuesta-id="{{ $respuesta->id }}">

@@ -689,17 +689,16 @@
                         letraActualCharCode++; //Incrementa para la próxima vez
                         break;
                     case 15:
-                        //ordenar por importancia (para Zavik)
-                        for (let i = 0; i < 4; i++) {
-                            let letraOpcion = String.fromCharCode(97 + i); // 97 es 'a', 98 es 'b', etc.
+                        //ordenar por importancia (para Zavik y Hartman)
+                        const totalActual = container.querySelectorAll('.respuesta-input').length;
+                        const letraOpcion = String.fromCharCode(97 + totalActual); // siguiente letra
+                        newRespuestaHTML = `
+                            <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                                <input type="text" class="form-control option-text" placeholder="Opción" value="${letraOpcion}" required style="flex:1;">
+                                <input type="text" class="form-control answer-text" placeholder="característica" required style="flex:3;">
+                            </div>
+                        `;
 
-                            newRespuestaHTML += `
-                                <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center; ${i === 0 ? 'margin-top:30px;' : ''}">
-                                    <input type="text" class="form-control option-text" placeholder="Opción" value="${letraOpcion}" required style="flex:1;">
-                                    <input type="text" class="form-control answer-text" placeholder="característica" required style="flex:3;">
-                                </div>
-                            `;
-                        }
                         break;
                     case 16:
                         //patron numérico
@@ -1203,10 +1202,19 @@
             case 14:
             case 15:
                 //Cleaver o Zavik (Bloques de 4 características)
-                    html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}"></div>`;
+                    html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}">`;
 
+                    for (let i = 0; i < 4; i++) {
+                        let letraOpcion = String.fromCharCode(97 + i); // 'a', 'b', 'c', 'd'
+                        html += `
+                            <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center; ${i === 0 ? 'margin-top:30px;' : ''}">
+                                <input type="text" class="form-control option-text" placeholder="Opción" value="${letraOpcion}" required style="flex:1;">
+                                <input type="text" class="form-control answer-text" placeholder="característica" required style="flex:3;">
+                            </div>
+                        `;
+                    }
                     // Botón para añadir nuevas respuestas
-                    html += `
+                    html += `</div>
                         <button type="button" id="add-respuesta-btn-${sectionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
                             + Añadir un bloque de características
                         </button>
