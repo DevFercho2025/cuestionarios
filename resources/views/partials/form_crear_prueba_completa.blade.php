@@ -900,6 +900,16 @@
                 if (event.target.checked) parent.querySelector('.opposite').checked = false;
             }
         });
+
+        //Para dominos, mostrar inputs de cols y rows si se elige forma predeterminada
+        document.addEventListener('change', e => {
+            if (e.target.classList.contains('form-Domino')) {
+                const wrapper = e.target.closest('.contenedor-dinamico-domino');
+                const show = e.target.value === 'A';
+                wrapper.querySelector('.input-cols').style.display = show ? 'inline-block' : 'none';
+                wrapper.querySelector('.input-rows').style.display = show ? 'inline-block' : 'none';
+            }
+        });
     });
 
     //cargar contenido para crear test
@@ -1175,12 +1185,19 @@
             case 6:
                 //Figuras incompletas
                     html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}" class="contenedor-dinamico-domino">
-                                <select class="form-select form-Domino" style="flex:2;">
-                                    <option value="">Seleccione la forma de los Dominos</option>
-                                    <option value="A">Predeterminada</option>
-                                    <option value="B">Espiral</option>
-                                    <option value="C">Circular</option>
-                                </select>
+                                
+                                <div class="domino-config" style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap:10px;">
+                                    <select id="form-Domino-${sectionId}" name="form-Domino-${sectionId}}" class="form-select form-Domino" style="flex:2;">
+                                        <option value="">Seleccione la forma de los Dominos</option>
+                                        <option value="A">Predeterminada</option>
+                                        <option value="B">Espiral</option>
+                                        <option value="C">Circular</option>
+                                    </select>
+                                    <input id="input-cols-${sectionId}" name="input-cols-${sectionId}" type="number" class="form-control input-cols" placeholder="Columnas" min="1" style="width:100px;display:none;">
+                                    <input id="input-rows-${sectionId}" name="input-rows-${sectionId}" type="number" class="form-control input-rows" placeholder="Filas" min="1" style="width:100px;display:none;">
+                                </div>
+
+                                <div class="lista-fichas"></div>
                             </div>`;
 
                     // Botón para añadir nuevas respuestas
@@ -1189,7 +1206,7 @@
                             + Añadir una ficha de Domino
                         </button>
                     `;
-                    return html;  
+                    return html;
                 break;
             case 10:
                 //Pregunta Abierta
@@ -1402,8 +1419,13 @@
                         const isTopValid = topCircles >= 0 && topCircles <= 6;
                         const isBottomValid = bottomCircles >= 0 && bottomCircles <= 6;
 
-                        const formSelect = input.querySelector('.form-Domino');
+                        
+                        const formSelect = document.querySelector(`#form-Domino-${sectionId}`);
+                        const colsInput = document.querySelector(`#input-cols-${sectionId}`);
+                        const rowsInput = document.querySelector(`#input-rows-${sectionId}`);
                         const formValue = formSelect?.value || '';
+                        const cols = parseInt(colsInput?.value) || null;
+                        const rows = parseInt(rowsInput?.value) || null;
 
                         if (isTopValid && isBottomValid) {
                             const extraData = {
@@ -1412,8 +1434,14 @@
                                 fillable: fillable
                             };
 
-                        if (formValue && formValue !== 'A') {
-                            extraData.shape = formValue;
+                        if (formValue === 'B') {
+                            extraData.shape = 'spiral';
+                        } else if (formValue === 'C') {
+                            extraData.shape = 'star';
+                        } else if (formValue === 'A') {
+                            extraData.shape = 'default';
+                            if (cols) extraData.cols = cols;
+                            if (rows) extraData.rows = rows;
                         }
 
                             respuestas.push({

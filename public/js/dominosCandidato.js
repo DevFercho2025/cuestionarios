@@ -126,9 +126,48 @@ function inicializarDominosCandidato() {
     });
 }
 
+function posicionarFichas() {
+    document.querySelectorAll('.contenedor-dinamico-domino').forEach(container => {
+        if (container.classList.contains('shape-star')) {
+            const fichas = container.querySelectorAll('.ficha');
+            const centerX = container.clientWidth / 2;
+            const centerY = container.clientHeight / 2;
+            const radius = 150; // radio de la estrella/círculo
+            const total = fichas.length;
+
+            fichas.forEach((ficha, i) => {
+                const angle = (i / total) * 2 * Math.PI;
+                ficha.style.left = (centerX + radius * Math.cos(angle) - ficha.offsetWidth / 2) + 'px';
+                ficha.style.top  = (centerY + radius * Math.sin(angle) - ficha.offsetHeight / 2) + 'px';
+                ficha.style.transform = `rotate(${angle + Math.PI/2}rad)`;
+            });
+        }
+
+        if (container.classList.contains('shape-spiral')) {
+            const fichas = container.querySelectorAll('.ficha');
+            const centerX = container.clientWidth / 2;
+            const centerY = container.clientHeight / 2;
+            let angle = 0;
+            let radius = 0;
+
+            fichas.forEach((ficha, i) => {
+                const scale = 1 + i * 0.1; // cada ficha más grande
+                ficha.style.transform = `scale(${scale}) rotate(${angle}rad)`;
+                ficha.style.left = (centerX + radius * Math.cos(angle) - (ficha.offsetWidth * scale) / 2) + 'px';
+                ficha.style.top  = (centerY + radius * Math.sin(angle) - (ficha.offsetHeight * scale) / 2) + 'px';
+                angle += Math.PI / 4; // 45° por paso
+                radius += 30;         // más lejos del centro
+            });
+        }
+    });
+}
+
+
 // Ejecutar cuando el DOM esté listo
 if (document.readyState === "complete") {
     inicializarDominosCandidato();
+    posicionarFichas();
 } else {
     window.addEventListener("load", inicializarDominosCandidato);
+    window.addEventListener('load', posicionarFichas);
 }

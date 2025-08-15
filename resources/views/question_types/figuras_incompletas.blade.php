@@ -65,6 +65,19 @@
             gap: 10px;
         }
 
+        .contenedor-dinamico-domino.shape-star,
+        .contenedor-dinamico-domino.shape-spiral {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            flex-wrap: nowrap;
+        }
+
+        .shape-star .ficha,
+        .shape-spiral .ficha {
+            position: absolute;
+        }
+
         .contenedor-dinamico-domino.respuesta-input {
             width: 67px;
             height: 110px;
@@ -80,9 +93,10 @@
 </head>
 @php
     $preguntaId = $pregunta->id;
+    $shape = $pregunta->respuestas[0]->extra_data['shape'] ?? 'default';
 @endphp
 
-<div class="contenedor-dinamico-domino">
+<div class="contenedor-dinamico-domino shape-{{ $shape }}">
     @foreach ($pregunta->respuestas as $index => $respuesta)
         @php
             $respuestaId = $respuesta->id;
