@@ -25,64 +25,7 @@
         }
 
         /*DOMINOS*/
-        .contenedor {
-            width: 67px;
-            height: 110px;
-            border: 2px solid black;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            background: white;
-        }
-
-        .fila {
-            flex: 1;
-            border-top: 2px solid black;
-            box-sizing: border-box;
-        }
-
-        .fila:first-child {
-            border-top: none;
-        }
-
-        .contenedor-circulos {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .circulo {
-            width: 9px;
-            height: 9px;
-            background-color: rgb(0, 0, 0);
-            border-radius: 50%;
-            position: absolute;
-            transition: opacity 0.2s;
-        }
-
-        .circulo-input {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 100%;
-            height: 100%;
-            font-size: 20px;
-            font-weight: bold;
-            color: black;
-
-            /*visualmente invisible*/
-            background: transparent;
-            border: none;
-            outline: none;
-            padding: 0;
-            margin: 0;
-            text-align: center;
-            z-index: 2;
-
-            caret-color: black;
-        }
-
-        .contenedor-dinamico-domino {
+        .contenedor-dinamico-domino .lista-fichas {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
@@ -92,6 +35,106 @@
             width: 67px;
             height: 110px;
         }
+
+        /*Imagen al elegir organización de fichas*/
+        .help-icon {
+            cursor: pointer;
+            margin-left: 5px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            background: #3d4e81;
+            position: relative;
+            color: white;
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tooltip-img {
+            display: none;
+            position: absolute;
+            top: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 1px solid #ccc;
+            background: #fff;
+            padding: 4px;
+            z-index: 100;
+            width: 150px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .tooltip-img img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .help-icon:hover .tooltip-img {
+            display: block;
+        }
+        
+            /*FICHAS*/
+            .contenedor {
+                width: 67px;
+                height: 110px;
+                border: 2px solid black;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                background: white;
+            }
+
+            .fila {
+                flex: 1;
+                border-top: 2px solid black;
+                box-sizing: border-box;
+            }
+
+            .fila:first-child {
+                border-top: none;
+            }
+
+            .contenedor-circulos {
+                position: relative;
+                width: 100%;
+                height: 100%;
+            }
+
+            .circulo {
+                width: 9px;
+                height: 9px;
+                background-color: rgb(0, 0, 0);
+                border-radius: 50%;
+                position: absolute;
+                transition: opacity 0.2s;
+            }
+
+            .circulo-input {
+                position: absolute;
+                bottom: 2px;
+                right: 2px;
+                width: 100%;
+                height: 100%;
+                font-size: 20px;
+                font-weight: bold;
+                color: black;
+
+                /*visualmente invisible*/
+                background: transparent;
+                border: none;
+                outline: none;
+                padding: 0;
+                margin: 0;
+                text-align: center;
+                z-index: 2;
+
+                caret-color: black;
+            }
 
         /* Para pregunta de Terman con Checkbox, al seleccionar "Opuestos" o "Iguales" */
         .checkbox-label {
@@ -833,10 +876,15 @@
                         break;
                 }
 
-                container.insertAdjacentHTML('beforeend', newRespuestaHTML);
-                if (tipo===6) {
+                if (tipo === 6) {
+                    const tilesContainer = container.querySelector('.lista-fichas');
+                    tilesContainer.insertAdjacentHTML('beforeend', newRespuestaHTML);
+
                     const nuevosDominos = container.querySelectorAll('.respuesta-input:last-child .contenedor');
                     nuevosDominos.forEach(domino => inicializarDomino(domino));
+
+                } else {
+                    container.insertAdjacentHTML('beforeend', newRespuestaHTML);
                 }
                 updateRemoveButtons(container);
             }
@@ -908,6 +956,14 @@
                 const show = e.target.value === 'A';
                 wrapper.querySelector('.input-cols').style.display = show ? 'inline-block' : 'none';
                 wrapper.querySelector('.input-rows').style.display = show ? 'inline-block' : 'none';
+
+                const tooltipImg = wrapper.querySelector('.tooltip-img img');
+                switch (e.target.value) {
+                    case 'A': tooltipImg.src = "{{ asset('assets/img/help-icons/default.png') }}"; break;
+                    case 'B': tooltipImg.src = "{{ asset('assets/img/help-icons/spiral.png') }}"; break;
+                    case 'C': tooltipImg.src = "{{ asset('assets/img/help-icons/star.png') }}"; break;
+                    default:  tooltipImg.src = "";
+                }
             }
         });
     });
@@ -1193,6 +1249,13 @@
                                         <option value="B">Espiral</option>
                                         <option value="C">Circular</option>
                                     </select>
+
+                                   <div class="help-icon">?
+                                        <div class="tooltip-img">
+                                            <img src="{{ asset('assets/img/help-icons/default.png') }}" alt="Ejemplo de organización predeterminada">
+                                        </div>
+                                    </div>
+
                                     <input id="input-cols-${sectionId}" name="input-cols-${sectionId}" type="number" class="form-control input-cols" placeholder="Columnas" min="1" style="width:100px;display:none;">
                                     <input id="input-rows-${sectionId}" name="input-rows-${sectionId}" type="number" class="form-control input-rows" placeholder="Filas" min="1" style="width:100px;display:none;">
                                 </div>
