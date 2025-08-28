@@ -237,7 +237,7 @@
     </div>
     
     <!--Contenedor de Evaluación-->
-    <div class="contenedor-C d-flex justify-content-center align-items-center">
+    <div class="contenedor-C d-flex justify-content-center align-items-center osition-relative">
         <!--Instrucciones y preguntas-->
         <div class="col-md-11 col-lg-8 mx-auto mt-5 mb-5" style="height: 100%" >
 
@@ -283,7 +283,7 @@
                     @php $numPregunta = 0; @endphp
 
                     @foreach ($preguntas as $pregunta)
-                        <div class="pregunta" id="pregunta-{{ $numPregunta }}" style="display: {{ $numPregunta == 0 ? 'block' : 'none' }};">
+                        <div class="pregunta {{ $pregunta->tipo_slug }}" id="pregunta-{{ $numPregunta }}" style="display: {{ $numPregunta == 0 ? 'block' : 'none' }};">
                             @php
                                 $scaleType = $pregunta->respuestas->first()->extra_data['scale_type'] ?? null;
                             @endphp
@@ -340,8 +340,17 @@
                     <button type="submit" id="enviar" style="display: none;">Enviar</button>
                 </form>
         </div>
+
+        @if($preguntas->firstWhere('tipo_slug', 'bender'))
+            <div class="position-absolute" style="bottom:10px; right:10px;">
+                <button type="button" class="btn btn-primary d-none" id="btn-siguiente">
+                    Siguiente
+                </button>
+            </div>
+        @endif
     </div>
 
+    <!--parte Inferior-->
     <div class="d-flex justify-content-center align-items-start" style="position: relative; width: 100%; height:10px;">
     <div style="text-align: center;">
        @if($candidato)

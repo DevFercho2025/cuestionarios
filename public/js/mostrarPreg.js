@@ -484,6 +484,16 @@ function guardarRespuestasDesdeHiddenInputs() {
 function mostrarFormulario() {
     document.getElementById('contenedor-instrucciones').classList.add('d-none');
     document.getElementById('formulario-preguntas').classList.remove('d-none');
+
+    //Botón de siguiente pregunta
+    const primeraPregunta = document.querySelector('.pregunta');
+    if (primeraPregunta && primeraPregunta.classList.contains('bender')) {
+        document.getElementById('btn-siguiente').classList.remove('d-none');
+    }
+}
+
+function guardarfotoBender(){
+    
 }
 
 document.addEventListener('respuestaReordenada', function (e) {

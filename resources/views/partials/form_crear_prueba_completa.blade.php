@@ -1272,12 +1272,20 @@
                     return html;
                 break;
             case 10:
-                //Pregunta Abierta
-                    return `
-                        <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                            <input type="text" class="form-control answer-text" value="Respuesta abierta" readonly style="flex:4;">
-                        </div>
-                    `;
+                // Pregunta Abierta
+                return `
+                    <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                        <input type="text" class="form-control answer-text" value="Respuesta abierta" readonly style="flex:4;">
+                    </div>
+                `;
+                break;
+            case 22:
+                // Pregunta Bender
+                return `
+                    <div class="respuesta-input" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                        <input type="text" class="form-control answer-text" value="Respuesta por foto de usuario" readonly style="flex:4;">
+                    </div>
+                `;
                 break;
             case 14:
             case 15:
@@ -1552,6 +1560,7 @@
                                 }
                                 break;
                             case 10: // Abierta
+                            case 22:
                                 if (answer) respuestas.push({ answer });
                                 else valid = false;
                                 break;

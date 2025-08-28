@@ -199,6 +199,8 @@
                     "{{ asset('js/ordenarPalabras.js') }}",
                     "../../assets/vendor/libs/sortablejs/sortable.js",
                     
+                    //bender
+                    "{{ asset('js/bender.js') }}",
                     
                     //Glosario de Cleaver
                     "{{ asset('js/glosario.js') }}"

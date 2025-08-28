@@ -28,11 +28,11 @@ function actualizarPuntajes(lista) {
     let puntaje;
 
     if (tipo === 'hartman') {
-        puntaje = items.length; //puntaje máximo = cantidad de elementos
+        puntaje = 1; //elemento más importante primero
         items.forEach(item => {
             const input = item.querySelector('.puntuacion-input');
             if (input) input.value = puntaje;
-            puntaje--; //baja hasta 1
+            puntaje++;// sube hasta el máximo
         });
     } else { 
         //Zavic o lifo
