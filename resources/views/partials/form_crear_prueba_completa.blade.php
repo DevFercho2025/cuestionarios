@@ -1591,14 +1591,14 @@
 
                                 if (answerA && answerB && (isO !== isI)) {
                                     const answer = `${answerA} ${answerB}`;
-                                    const comparation = isO ? 'opposite' : 'same';
+                                    const comparison = isO ? 'opposite' : 'same';
 
                                     respuestas.push({
                                         answer: answer,
                                         option: null,
                                         is_correct: null,
                                         extra_data: {
-                                            comparation: comparation
+                                            comparison: comparison
                                         }
                                     });
                                 } else {

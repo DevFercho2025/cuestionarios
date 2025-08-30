@@ -39,6 +39,7 @@ document.addEventListener('input', function(event) {
 let listo = false;
 function manejarCambioRespuesta(event) {
     if (event.target.classList.contains("respuesta")) {
+        console.log("entró a cambiar respuesta");
         const preguntaId = event.target.dataset.preguntaId;
         const respuestaId = event.target.value;
 
@@ -241,6 +242,32 @@ function manejarCambioRespuesta(event) {
             container.appendChild(textoInput);
 
             avanzar = true;
+        } else if (tipo === 'io') {
+            const valor = event.target.dataset.answer;
+            //Eliminar hidden previo del mismo par si existe
+            const hiddenName = `respuestas[${preguntaId}][io][${respuestaId}]`;
+            const prevHidden = container.querySelectorAll(`input[name="${hiddenName}"]`);
+            prevHidden.forEach(input => input.remove());
+
+            const hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.name = hiddenName;
+            hiddenInput.value = valor;
+            container.appendChild(hiddenInput);
+
+            //Siguiente pregunta si todos los pares se respondieron
+            const radios = document.querySelectorAll(
+                `input[data-pregunta-id="${preguntaId}"][data-type="io"]`
+            );
+
+            let todosMarcados = true;
+            radios.forEach(radio => {
+                if (!document.querySelector(`input[name="${radio.name}"]:checked`)) {
+                    todosMarcados = false;
+                }
+            });
+
+            avanzar = todosMarcados;
         } else {
             const hiddenName = `respuestas[${preguntaId}]`;
             let existing = container.querySelector(`input[name="${hiddenName}"]`);

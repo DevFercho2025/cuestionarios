@@ -271,6 +271,24 @@ class FormularioController extends Controller
                     );
                 }
             }
+            //opuestas o iguales
+            elseif (is_array($respuesta_data) && array_key_exists('io', $respuesta_data)) {
+                foreach ($respuesta_data['io'] as $answer_id => $comparison) {
+                    if (in_array($comparison, ['same','opposite'])) {
+                        Respuesta_Usuario::updateOrCreate(
+                            [
+                                'user_id'     => $user_id,
+                                'question_id' => $question_id,
+                                'answer_id'   => $answer_id
+                            ],
+                            [
+                                'ip_address'  => $ip,
+                                'extra_data'  => json_encode(['comparison' => $comparison])
+                            ]
+                        );
+                    }
+                }
+            }
             // Pregunta compuesta tipo Cleaver
             elseif (is_array($respuesta_data)) {
                 foreach ($respuesta_data as $bloque => $tipos) {
