@@ -152,6 +152,28 @@
         .checkbox-label:has(input[type="checkbox"]:checked) {
             border-color: #666cff;
         }
+
+        /*Para NEGO (viñetas)*/
+        .grid-vignette .vignette-cell {
+            border: 1px solid #ccc;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+        .grid-vignette .vignette-cell:hover {
+            background: rgba(0,123,255,0.1);
+        }
+        .grid-vignette .vignette-cell.selected::after {
+            content: "El candidato debe rellenar esta parte de la viñeta";
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #007bff;
+            text-align: center;
+            width: 90%;
+        }
     </style>
 
 
@@ -772,7 +794,7 @@
                         `;
                         break;
                     case 18:
-                        //pdq
+                        //pdq, varias caracteristicas
                         let letraOO = String.fromCharCode(letraActualMultiple); //Obtener letra actual
 
                         newRespuestaHTML = `
@@ -887,6 +909,14 @@
                     container.insertAdjacentHTML('beforeend', newRespuestaHTML);
                 }
                 updateRemoveButtons(container);
+            }
+
+            //seleccionar qué parte de una viñeta debe rellenar el candidato.
+            if (e.target.classList.contains('vignette-cell')) {
+                const grid = e.target.closest('.grid-vignette');
+                // quitar selección de todos
+                grid.querySelectorAll('.vignette-cell').forEach(c => c.classList.remove('selected'));
+                e.target.classList.add('selected');
             }
 
         });
@@ -1332,6 +1362,27 @@
                         </button>
                     `;
                 break;
+            case 18:
+                //varias caracteristicas (pdq, ipp, terman)
+                    html += `
+                            <div class="form-floating form-floating-outline mb-4">
+                                <div class="form-floating form-floating-outline mb-4">
+                                    <input type="number" id="num-answers-allowed-${sectionId}" class="form-control" min="1" placeholder="Ej. 2">
+                                    <label for="num-answers-allowed-${sectionId}">¿Cuál es el máximo de respuestas que el candidato puede marcar?</label>
+                                </div>
+                            </div>
+                        `;
+
+                    html += `<div id="respuestas-dinamicas-${sectionId}" data-question-type="${questionType}"></div>`;
+
+                    // Botón para añadir nuevas respuestas
+                    html += `
+                        <button type="button" id="add-respuesta-btn-${sectionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
+                            + Añadir respuesta
+                        </button>
+                    `;
+                    return html;
+                break;
             case 19:
                 //moss
                 html += `<select class="form-select aspecto mb-3">
@@ -1368,6 +1419,20 @@
                         <button type="button" id="add-respuesta-btn-${sectionId}" class="btn btn-azul mt-1" style="width:100%; margin-bottom:10px;">
                             + Añadir respuestas
                         </button>
+                    `;
+                break;
+            case 23:
+                //dialogo en viñeta
+                return `
+                        <div class="vignette-wrapper" id="respuestas-dinamicas-${sectionId}" data-question-type="4">
+                            <div class="grid-vignette" style="display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; width:400px; height:400px; background:#fff; border:2px solid #ccc;">
+                                <div class="vignette-cell" data-pos="tl"></div>
+                                <div class="vignette-cell" data-pos="tr"></div>
+                                <div class="vignette-cell" data-pos="bl"></div>
+                                <div class="vignette-cell" data-pos="br"></div>
+                                <input type="file" class="form-control answer-file" style="flex:1;"">
+                            </div>
+                        </div>
                     `;
                 break;
             default:
@@ -1635,7 +1700,34 @@
                                     });
                                 }
                                 break;
-                            default:
+                            case 23: // Viñeta
+                                const grid = container.querySelector('.grid-vignette');
+                                if (grid) {
+                                    const selected = grid.querySelector('.vignette-cell.selected');
+                                    if (selected) {
+                                        const dialog = selected.dataset.pos;
+
+                                        respuestas.push({
+                                            answer: "Viñeta seleccionada",
+                                            option: null,
+                                            is_correct: null,
+                                            extra_data: {
+                                                quadrant: dialog
+                                            }
+                                        });
+                                    } else {
+                                        valid = false;
+                                    }
+
+                                    const fileEl = grid.querySelector('.answer-file');
+                                    if (fileEl && fileEl.files.length > 0) {
+                                        archivos.push({ file: fileEl.files[0] });
+                                    }
+                                } else {
+                                    valid = false;
+                                }
+                                break;
+                                default:
                                 const fileEl = input.querySelector('.answer-file');
                                 const file = fileEl && fileEl.files.length > 0 ? fileEl.files[0] : null;
                                 if (answer && option) {
