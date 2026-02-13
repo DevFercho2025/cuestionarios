@@ -18,6 +18,7 @@ use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\ResultadosController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\InternalConsumerController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -167,6 +168,14 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
             Route::delete('companias/{id}', [CompanyController::class, 'destroy'])->name('companias.destroy');
             Route::get('admin/companias/datatable', [CompanyController::class, 'datatable'])->name('companias.datatable');
             Route::get('companias/all', [CompanyController::class, 'all'])->name('companias.all');
+
+            // Gestionar consumers API internos (plataformas autorizadas)
+            Route::get('consumers', [InternalConsumerController::class, 'index'])->name('consumers.index');
+            Route::post('consumers', [InternalConsumerController::class, 'store'])->name('consumers.store');
+            Route::get('consumers/{id}', [InternalConsumerController::class, 'show'])->name('consumers.show');
+            Route::put('consumers/{id}', [InternalConsumerController::class, 'update'])->name('consumers.update');
+            Route::delete('consumers/{id}', [InternalConsumerController::class, 'destroy'])->name('consumers.destroy');
+            Route::post('consumers/{id}/regenerate-secret', [InternalConsumerController::class, 'regenerateSecret'])->name('consumers.regenerate');
 
             //gestionar usuarios
             Route::get('usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');

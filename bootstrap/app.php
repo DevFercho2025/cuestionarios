@@ -19,7 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_candidate' => App\Http\Middleware\IsCandidate::class,
             'psico.user' => \App\Http\Middleware\CheckPsicoUser::class,
             'check.user' => \App\Http\Middleware\CustomRedirectIfAuthenticated::class,
-
+            'api.client.auth' => \App\Http\Middleware\ApiClientAuthenticate::class,
+            'api.billing_quota' => \App\Http\Middleware\CheckApiBillingQuota::class,
+            'api.rate_limit' => \App\Http\Middleware\ApiRateLimiter::class,
+            'api.check_test_access' => \App\Http\Middleware\CheckTestAccess::class,
+            'api.internal' => \App\Http\Middleware\InternalApiAuth::class,
         ]);
     })
 

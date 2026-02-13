@@ -35,7 +35,7 @@ class UserAssignedTest extends Model
 
     public function testRecord()
     {
-        return $this->beloingsTo(UserTestRecord::class, 'test_record_id');
+        return $this->belongsTo(UserTestRecord::class, 'test_record_id');
     }
 
 }

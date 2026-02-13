@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/dr_belial/Web/alobri/psicometrias-github log --oneline -20)",
+      "Bash(grep:*)",
+      "Bash(php artisan tinker:*)",
+      "Bash(php artisan:*)",
+      "Bash(ls:*)",
+      "Bash(xargs basename:*)",
+      "Bash(php:*)",
+      "Bash(find:*)",
+      "Bash(fi)",
+      "Bash(done)"
+    ]
+  }
+}

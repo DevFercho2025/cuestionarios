@@ -13,6 +13,9 @@ use App\Models\TokenEvaluacion;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ApiCandidateMapping;
+use App\Models\ApiClient;
+use App\Jobs\SendPdfWebhookJob;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -412,6 +415,19 @@ class FormularioController extends Controller
 
             $assignedTest->test_record_id = $record->id;
             $assignedTest->save();
+
+            // Auto-dispatch webhook if candidate was created via API and test is finished
+            if ($record->finished_at) {
+                $mapping = ApiCandidateMapping::where('user_id', $user_id)->first();
+                if ($mapping) {
+                    $client = ApiClient::where('id', $mapping->api_client_id)
+                        ->whereNotNull('webhook_url')
+                        ->first();
+                    if ($client) {
+                        SendPdfWebhookJob::dispatch($client->id, $assignedTest->id, $user_id);
+                    }
+                }
+            }
 
             return redirect()->route('candidate.dashboard')->with('success', 'Formulario enviado correctamente.');
         } catch (\Exception $e) {
