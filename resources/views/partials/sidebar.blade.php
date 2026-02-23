@@ -126,9 +126,17 @@
                     </ul>
                 </li>
             @endif
+            @if(auth()->user()->config?->role?->type === 'Super Admin')
+                <li class="menu-item">
+                    <a href="{{ route('consumers.index') }}" class="menu-link">
+                        <i class="menu-icon tf-icons ri-plug-line me-2"></i>
+                        <div data-i18n="API Consumers">API Consumers</div>
+                    </a>
+                </li>
+            @endif
             <li class="menu-item">
                 <a href="{{ route('history.index') }}" class="menu-link">
-                    <i class="menu-icon tf-icons ri-file-history-line me-2"></i> 
+                    <i class="menu-icon tf-icons ri-file-history-line me-2"></i>
                     <div data-i18n="Historial"></div>
                 </a>
             </li>

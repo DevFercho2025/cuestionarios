@@ -10,8 +10,24 @@ class InternalConsumerController extends Controller
 {
     public function index()
     {
-        $consumers = ApiInternalConsumer::orderBy('name')->get();
-        return response()->json(['success' => true, 'data' => $consumers]);
+        return view('consumers.index');
+    }
+
+    public function datatable()
+    {
+        $consumers = ApiInternalConsumer::orderBy('name')->get()->map(function ($consumer) {
+            return [
+                'id' => $consumer->id,
+                'name' => $consumer->name,
+                'slug' => $consumer->slug,
+                'domain' => $consumer->domain ?? '—',
+                'is_active' => $consumer->is_active ? 'Sí' : 'No',
+                'last_used_at' => $consumer->last_used_at ? $consumer->last_used_at->format('d/m/Y H:i') : 'Nunca',
+                'created_at' => $consumer->created_at->format('d/m/Y H:i'),
+            ];
+        });
+
+        return response()->json($consumers);
     }
 
     public function store(Request $request)

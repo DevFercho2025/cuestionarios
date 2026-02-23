@@ -142,9 +142,8 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!Hash::check($request->password, $user->password)) {
-            Log::error('El password no coincide.');
-            return back()->withErrors(['email' => 'Contraseña incorrecta.']);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return back()->withErrors(['email' => 'Las credenciales no coinciden con nuestros registros.']);
         }
         // 2) Intento de autenticación
         if (Auth::attempt($credentials)) {

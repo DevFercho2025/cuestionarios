@@ -171,6 +171,7 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
 
             // Gestionar consumers API internos (plataformas autorizadas)
             Route::get('consumers', [InternalConsumerController::class, 'index'])->name('consumers.index');
+            Route::get('consumers/datatable', [InternalConsumerController::class, 'datatable'])->name('consumers.datatable');
             Route::post('consumers', [InternalConsumerController::class, 'store'])->name('consumers.store');
             Route::get('consumers/{id}', [InternalConsumerController::class, 'show'])->name('consumers.show');
             Route::put('consumers/{id}', [InternalConsumerController::class, 'update'])->name('consumers.update');
