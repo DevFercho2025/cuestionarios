@@ -11,10 +11,14 @@ class Respuesta_Usuario extends Model
 
     protected $table = "psico_alobri_user_answers";
     protected $fillable = ['user_id','question_id', 'answer_id','ip_address','token_id','extra_data'];
-    public $timestamps = false; 
+    public $timestamps = false;
+
+    protected $casts = [
+        'extra_data' => 'json',
+    ];
 
     public function tokenEv(){
-        return $this->belongsTo(TokenEvaluacion::class, 'id');
+        return $this->belongsTo(TokenEvaluacion::class, 'token_id');
     }
 
     public function usuario(){

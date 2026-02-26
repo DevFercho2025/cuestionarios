@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class UsuarioController extends Controller
@@ -67,7 +68,7 @@ class UsuarioController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
-        return redirect()->route('admin.users.index')->with('success', 'Usuario creado exitosamente.');
+        return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente.');
     }
 
     public function edit($id)
@@ -100,12 +101,21 @@ class UsuarioController extends Controller
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
+        $currentUser = Auth::user();
+        $companyId = $currentUser->config->company_id;
+
+        $user = User::whereHas('config', fn($q) => $q->where('company_id', $companyId))
+            ->whereHas('config.role', fn($q) => $q->where('id', '!=', 0))
+            ->findOrFail($id);
+
+        if ($user->id === $currentUser->id) {
+            return response()->json(['message' => 'No puedes eliminar tu propia cuenta.'], 403);
+        }
+
         $user->delete();
 
         return response()->json([
             'message' => 'Usuario eliminado exitosamente.',
-            'user' => $user
         ]);
     }
 

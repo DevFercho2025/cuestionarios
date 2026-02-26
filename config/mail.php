@@ -55,40 +55,14 @@ return [
             'timeout' => null,
             'auth_mode' => null,
         ],
-        /*
-        
-        'mailgun' => [
-            'transport' => 'mailgun',
-            // 'client' => [
-            //     'timeout' => 5,
-            // ],
-        ],
 
         'failover' => [
             'transport' => 'failover',
             'mailers' => [
                 'ses',
                 'log',
-                'mailgun',
                 'smtp',
             ],
-        ],
-
-        'postmark' => [
-            'transport' => 'postmark',
-            // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
-            // 'client' => [
-            //     'timeout' => 5,
-            // ],
-        ],
-
-        'resend' => [
-            'transport' => 'resend',
-        ],
-
-        'sendmail' => [
-            'transport' => 'sendmail',
-            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
         ],
 
         'log' => [
@@ -99,14 +73,6 @@ return [
         'array' => [
             'transport' => 'array',
         ],
-
-        'roundrobin' => [
-            'transport' => 'roundrobin',
-            'mailers' => [
-                'ses',
-                'postmark',
-            ],
-        ],*/
 
     ],
 

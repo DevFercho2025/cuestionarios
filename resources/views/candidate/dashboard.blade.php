@@ -72,7 +72,7 @@
                 </li>
                 <li class="mb-2">
                   <span class="fw-medium text-heading me-2">Código de Aplicación:</span>
-                  <span>{{ $aplicacion->codigo ?? 'N/A' }}</span>
+                  <span>{{ $aplicacion->code ?? 'N/A' }}</span>
                 </li>
                 <li class="mb-2">
                   <span class="fw-medium text-heading me-2">Fecha de Registro:</span>
@@ -80,7 +80,7 @@
                 </li>
                 <li class="mb-2">
                   <span class="fw-medium text-heading me-2">Vacante a la que aplica:</span>
-                  <span>{{ $aplicacion->vacante ?? 'N/A' }}</span>
+                  <span>{{ $aplicacion->vacancy ?? 'N/A' }}</span>
                 </li>
               </ul>
             </div>

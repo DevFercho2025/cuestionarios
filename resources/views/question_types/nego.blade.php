@@ -5,6 +5,7 @@
             value="{{ $respuesta->id }}"
             data-pregunta="{{ $numPregunta }}"
             data-pregunta-id="{{ $pregunta->id }}"
+            data-type="nego"
             @if($pregunta->required) required @endif>
 
         <label class="form-check-label d-block">
@@ -12,8 +13,8 @@
 
             @if (!empty($respuesta->extra_data['file_path']))
                 <div class="relative mt-3" style="position: relative; display: inline-block;">
-                    <img src="{{ asset('assets/img/' . $respuesta->extra_data['file_path']) }}" 
-                        alt="Imagen de la respuesta" 
+                    <img src="{{ asset('assets/img/' . $respuesta->extra_data['file_path']) }}"
+                        alt="Imagen de la respuesta"
                         style="max-width: 100%; height: auto; display: block;">
 
                     @php
@@ -27,11 +28,13 @@
                     @endphp
 
                     @if ($quadrant && isset($positions[$quadrant]))
-                        <textarea name="comentarios[{{ $respuesta->id }}]" 
+                        <textarea class="nego-comentario"
+                            data-pregunta-id="{{ $pregunta->id }}"
+                            data-respuesta-id="{{ $respuesta->id }}"
                             placeholder="Escribe tu comentario aquí..."
-                            style="position: absolute; {{ $positions[$quadrant] }} 
+                            style="position: absolute; {{ $positions[$quadrant] }}
                                    width: 40%; height: 60px; resize: none;
-                                   background: rgba(255,255,255,0.8); 
+                                   background: rgba(255,255,255,0.8);
                                    border: 1px solid #ccc; border-radius: 6px; padding: 5px;">
                         </textarea>
                     @endif

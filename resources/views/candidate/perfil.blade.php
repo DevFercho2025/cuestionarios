@@ -33,7 +33,7 @@
                           </li>
                         <li class="d-flex align-items-center mb-4">
                           <i class="ri-user-3-line ri-24px"></i><span class="fw-medium mx-2">Código de Aplicación:</span>
-                          <span>{{ $aplicacion->codigo ?? 'N/A' }}</span>
+                          <span>{{ $aplicacion->code ?? 'N/A' }}</span>
                         </li>
                         <li class="d-flex align-items-center mb-4">
                           <i class="ri-check-line ri-24px"></i><span class="fw-medium mx-2">Fecha de Registro:</span>
@@ -41,7 +41,7 @@
                         </li>
                         <li class="d-flex align-items-center mb-4">
                           <i class="ri-flag-2-line ri-24px"></i><span class="fw-medium mx-2">Vacante a la que aplica:</span>
-                          <span>{{ $aplicacion->vacante ?? 'N/A' }}</span>
+                          <span>{{ $aplicacion->vacancy ?? 'N/A' }}</span>
                         </li>
                       </ul>  
                     </div>

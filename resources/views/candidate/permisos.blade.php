@@ -186,7 +186,7 @@
                     "{{ asset('js/progresoEv.js') }}",
 
                     //preguntas de emparejamiento
-                    "{{ asset('js/pares.js') }}",
+                    "{{ asset('js/Pares.js') }}",
                     "https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.8/leader-line.min.js",
 
                     //zavik

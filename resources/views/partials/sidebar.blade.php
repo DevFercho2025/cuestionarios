@@ -133,6 +133,12 @@
                         <div data-i18n="API Consumers">API Consumers</div>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="{{ route('api-docs.index') }}" class="menu-link">
+                        <i class="menu-icon tf-icons ri-code-s-slash-line me-2"></i>
+                        <div data-i18n="API Docs">API Docs</div>
+                    </a>
+                </li>
             @endif
             <li class="menu-item">
                 <a href="{{ route('history.index') }}" class="menu-link">

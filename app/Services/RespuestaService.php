@@ -1,6 +1,6 @@
 <?php
 
-nameSpace App\Services;
+namespace App\Services;
 use App\Models\Respuesta;
 use App\Models\pregunta;
 use Illuminate\Support\Facades\Log;
@@ -34,11 +34,11 @@ class RespuestaService
                         'answer'      => $answer,
                         'option'      => null,
                         'is_correct'  => null,
-                        'extra_data'  => json_encode(['pair_id' => $pairId]),
+                        'extra_data'  => ['pair_id' => $pairId],
                     ]);
 
                     continue;
-                } else if ($question->type == 2) {
+                } else if ($question->question_type_id == 2) {
                     //likert
                     $escala = intval($respuesta['escala'] ?? 5);
 
@@ -56,6 +56,17 @@ class RespuestaService
                             4 => "De acuerdo",
                             5 => "Totalmente de acuerdo"
                         ],
+                        6 => [
+                            1 => "Me gusta",
+                            2 => "Me es indiferente o tengo dudas",
+                            3 => "No me gusta",
+                            4 => "No conozco esa actividad o profesión"
+                        ],
+                        7 => [
+                            1 => "Mucho",
+                            2 => "Poco",
+                            3 => "Nada"
+                        ],
                     ];
 
                     $labels = $labelsMap[$escala] ?? [];
@@ -66,10 +77,10 @@ class RespuestaService
                             'answer'      => $labels[$i] ?? "Punto $i",
                             'option'      => chr(96 + $i), // 'a', 'b', ...
                             'is_correct'  => null,
-                            'extra_data'  => json_encode([
+                            'extra_data'  => [
                                 'scale_type' => $escala,
                                 'label_index' => $i
-                            ]),
+                            ],
                         ]);
                     }
 
@@ -77,7 +88,7 @@ class RespuestaService
                 } else {
                 
                     //Reacción forzada, Cleaver, o zavik
-                    if ($question->type == 8 || $question->type == 14 || $question->type == 15) {
+                    if (in_array($question->question_type_id, [8, 14, 15])) {
                         $is_correct = null;
                     }
                     Log::debug("Extra data antes de guardar", [
@@ -92,7 +103,7 @@ class RespuestaService
                         'answer'      => $answer,
                         'option'      => $option,
                         'is_correct'  => $is_correct === '' ? null : $is_correct,
-                        'extra_data'  => $extra_data ? json_encode($extra_data) : null,
+                        'extra_data'  => $extra_data ?: null,
                     ]);
                 }
 

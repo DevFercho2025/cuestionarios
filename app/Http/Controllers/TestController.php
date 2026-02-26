@@ -68,7 +68,7 @@ class TestController extends Controller
             ]);
         }
 
-        return redirect()->route('tests.index')->with('success', 'Test actualizado exitosamente.');
+        return redirect()->route('pruebas.index')->with('success', 'Test actualizado exitosamente.');
     }
 
     public function store(Request $request)
@@ -106,7 +106,6 @@ class TestController extends Controller
     public function destroy($id)
     {
         $test = Test::find($id);
-        $testName = $test->test_title;
 
         if (!$test) {
             return response()->json([
@@ -114,6 +113,8 @@ class TestController extends Controller
                 'message' => 'Test no encontrado.'
             ], 404);
         }
+
+        $testName = $test->test_title;
 
         try {
             $test->delete();

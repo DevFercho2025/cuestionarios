@@ -132,7 +132,7 @@
                 'isAdmin' => auth()->user()?->config?->role?->isAdmin() ?? false,
                 'isSuperAdmin' => auth()->user()?->config?->role?->isSuperAdmin() ?? false,
             ];
-            $companyId = Auth()->user()->config->Company->id;
+            $companyId = Auth()->user()->config->company->id;
             
         @endphp
         <script>
@@ -394,7 +394,7 @@
                             }).then((result) => {
                                 if (result.isConfirmed) {
                                     jQuery.ajax({
-                                        url: "/psicometricas/admin/candidatos/${id}" + id,
+                                        url: `/psicometricas/admin/candidatos/${id}`,
                                         method: "DELETE",
                                         data: {_token: '{{ csrf_token() }}'},
                                         dataType: "json",

@@ -21,14 +21,9 @@ class Company extends Model
         'slug'
     ];
 
-    public function users()
+    public function configUsers()
     {
-        return $this->hasMany(User::class, 'company_id');
-    }
-
-    public function assignedTests()
-    {
-        return $this->hasMany(UserAssignedTest::class, 'company_id');
+        return $this->hasMany(ConfigUser::class, 'company_id');
     }
 
 }

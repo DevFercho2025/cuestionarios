@@ -27,18 +27,19 @@ Route::get('/', [HomeController::class, 'index'])->name('home.index');
 
 Route::middleware('check.user')->group(function () {
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('login', [AuthController::class, 'login'])->name('login.post')->middleware('throttle:5,1');
 });
 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/candidate', [CandidateController::class, 'index'])->name('candidate.index');
-Route::post('/candidate/validar-codigo', [CandidateController::class, 'validarCodigo'])->name('validar.codigo');
+Route::post('/candidate/validar-codigo', [CandidateController::class, 'validarCodigo'])->name('validar.codigo')->middleware('throttle:10,1');
 
-    //ruta de prueba para ver aspecto de email al asignar evaluación
-    Route::get('/evaluaciones-asignadas/{userId}/{codeId}', [EvaluacionController::class, 'correoEvaluacionesAsignadas'])->name('enviar.correo');
-    //ruta de prueba para ver aspecto de email al registrarse una empresa
-    Route::get('/empresa-registrada', [AuthController::class, 'correoEmpresaRegistrada'])->name('enviar.correoEmpresa');
+    //rutas de preview de email (solo para super admins autenticados)
+    Route::middleware(['auth', 'is_admin'])->group(function () {
+        Route::get('/evaluaciones-asignadas/{userId}/{codeId}', [EvaluacionController::class, 'correoEvaluacionesAsignadas'])->name('enviar.correo');
+        Route::get('/empresa-registrada', [AuthController::class, 'correoEmpresaRegistrada'])->name('enviar.correoEmpresa');
+    });
 
 Route::get('register', [AuthController::class, 'showRegisterForm'])->name('register.wizard');
 Route::post('register/wizard', [AuthController::class, 'registerFormStore'])->name('register.wizard.store');
@@ -72,7 +73,7 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
         Route::delete('candidatos/{id}', [CandidatoController::class, 'destroy'])->name('candidatos.destroy');
         Route::post('/generar-codigo', [CandidatoController::class, 'generarCodigo'])->name('generar.codigo');
         Route::post('candidatos/codigo', [CandidatoController::class, 'guardarCodigo'])->name('guardar.codigo');
-        Route::get('candidatos/lista', [CandidatoController::class, 'listaUsuarios'])->name('candidatos.lista');
+        //Route::get('candidatos/lista', [CandidatoController::class, 'listaUsuarios'])->name('candidatos.lista');
         Route::get('candidatos/perfil/{id}', [CandidatoController::class, 'verPerfil'])->name('candidatos.perfil');
         Route::post('/check-email', [CandidatoController::class, 'checkEmail'])->name('check.email');
 
@@ -106,6 +107,11 @@ Route::prefix('psicometricas')->middleware(['psico.user'])->group(function () {
 
         // Rutas para solo superadmin
         Route::group(['middleware' => 'is_super_admin'], function () {
+
+            // Documentación API (Swagger-like)
+            Route::get('api-docs', function () {
+                return view('admin.api-docs');
+            })->name('api-docs.index');
 
             // Rutas para gestión de categorías y tipos de pruebas
             Route::get('categorias', [CategoriasTiposEvController::class, 'index'])->name('categoriasTipos.index');

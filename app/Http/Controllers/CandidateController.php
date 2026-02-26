@@ -32,12 +32,14 @@ class CandidateController extends Controller
         $usuario = $codigo->user;
     
         // Verificar si es candidato (no admin)
-        if ($usuario->is_admin || $usuario->is_super_admin) {
+        $role = $usuario->config?->role;
+        if ($role && ($role->isAdmin() || $role->isSuperAdmin())) {
             return back()->withErrors(['codigo' => 'Este código no pertenece a un candidato.']);
         }
-    
+
         // Autenticar al usuario
         Auth::login($usuario);
+        $request->session()->regenerate();
         session(['codigo_actual_id' => $codigo->id]);
     
         // Redirigir al dashboard
@@ -63,7 +65,6 @@ class CandidateController extends Controller
     public function perfil(){
         $user = Auth::user();
         
-        $aplicacion = $user->aplicacion ?? null;
         $aplicacion = AccessCode::where('user_id', $user->id)->first();
 
         return view('candidate.perfil', compact('user', 'aplicacion'));

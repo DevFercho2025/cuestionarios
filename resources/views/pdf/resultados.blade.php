@@ -38,7 +38,13 @@
                     <table>
                         <tr>
                             <td class="deco-td">
-                                <div class="titulo-test">IntegriTEST</div>
+                                <div class="titulo-test">
+                                    @if(!empty($scores))
+                                        {{ collect($scores)->pluck('test_title')->implode(' | ') }}
+                                    @else
+                                        Evaluación Psicométrica
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     </table>
@@ -182,7 +188,7 @@
                                     <p><div style="color:darkcyan; padding-left:10px;">Fecha de registro:</div><span style="padding-left:10px;">{{ $usuario->created_at}}</span></p>
                                 </td>
                                 <td>
-                                    <p><div style="color:darkcyan;">Tipo de prueba:</div>Integridad</p>
+                                    <p><div style="color:darkcyan;">Tipo de prueba:</div>{{ !empty($scores) ? collect($scores)->pluck('type_name')->unique()->implode(', ') : '---' }}</p>
                                 </td>
                                 <td>
                                     <p><div style="color:darkcyan;">Ingresando desde:</div>Liga Remota</p>
@@ -193,7 +199,7 @@
                                     <p><div style="color:darkcyan; padding-left:10px;">Fecha de Inicio de la Prueba:</div> <span style="padding-left:10px;">{{ $usuario->created_at}}</span></p>
                                 </td> 
                                 <td>
-                                    <p><div style="color:darkcyan;">Nombre de la evalaución</div> Integridad</p>
+                                    <p><div style="color:darkcyan;">Nombre de la evaluación</div> {{ !empty($scores) ? collect($scores)->pluck('test_title')->implode(', ') : '---' }}</p>
                                 </td>
                                 <td >
                                     <p><div style="color:darkcyan;">Fecha de envío de la liga de pruebas:</div>{{ $usuario->created_at}}</p>

@@ -23,7 +23,7 @@ class ApiRateLimiter
         }
 
         $key = 'api_client:' . $client->id;
-        $maxAttempts = $client->rate_limit_per_minute;
+        $maxAttempts = $client->rate_limit_per_minute ?? 60;
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
             $retryAfter = $this->limiter->availableIn($key);

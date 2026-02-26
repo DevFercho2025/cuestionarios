@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\Log;
 
 class ResultadosService
 {
+    protected ScoringService $scoringService;
+
+    public function __construct(ScoringService $scoringService)
+    {
+        $this->scoringService = $scoringService;
+    }
+
     public function getResultsByToken(string $tokenStr): array
     {
         $token = TokenEvaluacion::where('token', $tokenStr)->first();
@@ -32,11 +39,14 @@ class ResultadosService
             ->where('token_id', $token->id)
             ->get();
 
+        $scores = $this->scoringService->calculateForUser($usuario->id, $token->id);
+
         return [
             'status' => 'success',
             'usuario' => $usuario,
             'aplicacion' => $aplicacion,
             'respuestas' => $respuestas,
+            'scores' => $scores,
             'tokenStr' => $tokenStr,
             'token' => $token,
             'code' => 200,
@@ -66,11 +76,14 @@ class ResultadosService
             ->where('user_id', $userId)
             ->get();
 
+        $scores = $this->scoringService->calculateForUser($userId, $tokenEval->id);
+
         return [
             'status' => 'success',
             'usuario' => $usuario,
             'aplicacion' => $aplicacion,
             'respuestas' => $respuestas,
+            'scores' => $scores,
             'token' => $tokenEval,
             'assigned_tests' => $assignedTests,
             'code' => 200,
@@ -83,86 +96,42 @@ class ResultadosService
         $usuario = User::findOrFail($token->user_id);
         $aplicacion = AccessCode::where('user_id', $usuario->id)->first();
 
-        $puntuaciones = [
-            'Veracidad' => 75,
-            'Robo' => 60,
-            'Normas' => 75,
-            'Drogas y alcohol' => 75,
-        ];
-
-        $metricas = $this->buildMetricas($puntuaciones);
+        $scores = $this->scoringService->calculateForUser($usuario->id, $token->id);
+        $metricas = $this->buildMetricasFromScores($scores);
         $imagenesBase64 = session("imagenes_pdf_{$tokenId}", []);
 
-        $html = view('pdf.resultados', compact('usuario', 'aplicacion', 'metricas', 'imagenesBase64'));
+        $html = view('pdf.resultados', compact('usuario', 'aplicacion', 'metricas', 'scores', 'imagenesBase64'));
         $dompdf = PDF::loadHtml($html);
         $dompdf->set_option('isHtml5ParserEnabled', true);
-        $dompdf->set_option('isPhpEnabled', true);
+        $dompdf->set_option('isPhpEnabled', false);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
         return $dompdf->output();
     }
 
-    protected function buildMetricas(array $puntuaciones): array
+    /**
+     * Convierte los resultados del ScoringService en el formato de metricas del PDF.
+     */
+    public function buildMetricasFromScores(array $scores): array
     {
         $metricas = [];
-        $config = [
-            'Veracidad' => ['Tiende a falsear informes', 'Dice la verdad'],
-            'Robo' => ['Tiende a cometer robos de bienes/dinero', 'Respeta los bienes de la organización'],
-            'Normas' => ['Tiende a violar normas, leyes y reglamentos', 'Respeta normas, leyes y reglamentos'],
-            'Drogas y alcohol' => ['Tiende a trabajar bajo la influencia de drogas', 'No tiende a trabajar bajo la influencia de drogas'],
-        ];
 
-        foreach ($puntuaciones as $titulo => $puntuacion) {
-            $labels = $config[$titulo] ?? ['', ''];
-            $metricas[] = [
-                'titulo' => $titulo,
-                'puntuacion' => $puntuacion,
-                'etiqueta_izq' => $labels[0],
-                'etiqueta_der' => $labels[1],
-                'descripcion' => $this->obtenerDescripcion($titulo, $puntuacion),
-            ];
-        }
+        foreach ($scores as $testResult) {
+            if (!isset($testResult['metricas'])) continue;
 
-        return $metricas;
-    }
-
-    protected function obtenerDescripcion(string $titulo, int $puntuacion): string
-    {
-        $descripciones = [
-            'Veracidad' => [
-                80 => 'Muy veraz, alta confiabilidad.',
-                60 => 'Moderadamente veraz.',
-                40 => 'Puede falsear información ocasionalmente.',
-                0  => 'Alta tendencia a falsear informes.',
-            ],
-            'Robo' => [
-                80 => 'Respeta completamente los bienes ajenos.',
-                60 => 'Bajo riesgo de conductas indebidas.',
-                40 => 'Riesgo moderado de conductas inapropiadas.',
-                0  => 'Alta probabilidad de actos indebidos.',
-            ],
-            'Normas' => [
-                80 => 'Respeta leyes y normas.',
-                60 => 'Cumple normas en su mayoría.',
-                40 => 'Puede quebrantar normas.',
-                0  => 'Tiende a violar reglamentos.',
-            ],
-            'Drogas y alcohol' => [
-                80 => 'No hay señales de consumo problemático.',
-                60 => 'Riesgo bajo de consumo.',
-                40 => 'Riesgo moderado de uso en el trabajo.',
-                0  => 'Probabilidad alta de trabajar bajo influencias.',
-            ],
-        ];
-
-        $umbrales = $descripciones[$titulo] ?? [];
-        foreach ($umbrales as $umbral => $desc) {
-            if ($puntuacion >= $umbral) {
-                return $desc;
+            foreach ($testResult['metricas'] as $metrica) {
+                $metricas[] = [
+                    'titulo' => $metrica['titulo'],
+                    'puntuacion' => $metrica['puntuacion'],
+                    'etiqueta_izq' => $metrica['etiqueta_izq'],
+                    'etiqueta_der' => $metrica['etiqueta_der'],
+                    'descripcion' => $metrica['descripcion'],
+                    'test_title' => $testResult['test_title'] ?? '',
+                ];
             }
         }
 
-        return 'Sin descripción disponible.';
+        return $metricas;
     }
 }

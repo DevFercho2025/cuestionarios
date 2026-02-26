@@ -25,7 +25,7 @@ class FormularioController extends Controller
 
     public function index()
     {
-        return view('formulario.index');
+        return view('candidate.formulario.index');
     }
 
     public function mostrarPermisos(Request $request)
@@ -150,7 +150,13 @@ class FormularioController extends Controller
             #Extraer los datos Base64
             $image_parts = explode(";base64,", $img);
             $image_type_aux = explode("image/", $image_parts[0]);
-            $image_type = $image_type_aux[1];
+            $image_type = $image_type_aux[1] ?? 'png';
+
+            #Validar extensión permitida
+            $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            if (!in_array(strtolower($image_type), $allowedTypes)) {
+                return response()->json(['error' => 'Tipo de imagen no permitido'], 422);
+            }
 
             $image_base64 = base64_decode($image_parts[1]);
             $fileName = uniqid() . '.' . $image_type;
@@ -161,7 +167,7 @@ class FormularioController extends Controller
 
             #crea un nuevo registro para la BD que referencia la imagen creada
             $imagenUsuario = new ImagenUsuario();
-            $imagenUsuario->id_usuario = $user_id;
+            $imagenUsuario->user_id = $user_id;
             $imagenUsuario->file_name = $fileName;
             $imagenUsuario->file_path = $pathImg;
             $imagenUsuario->created_at = Carbon::now();
@@ -204,7 +210,7 @@ class FormularioController extends Controller
                     [
                         'answer_id' => $respuesta_data['respuesta_id'],
                         'ip_address' => $ip,
-                        'extra_data' => json_encode(['texto' => $respuesta_data['texto']])
+                        'extra_data' => ['texto' => $respuesta_data['texto']]
                     ]
                 );
             }
@@ -230,9 +236,9 @@ class FormularioController extends Controller
                         ],
                         [
                             'ip_address' => $ip,
-                            'extra_data' => json_encode([
+                            'extra_data' => [
                                 'number_written' => $textoUsuario,
-                            ])
+                            ]
                         ]
                     );
                 }
@@ -248,9 +254,9 @@ class FormularioController extends Controller
                         ],
                         [
                             'ip_address' => $ip,
-                            'extra_data' => json_encode([
+                            'extra_data' => [
                                 'importance_score' => $puntaje,
-                            ])
+                            ]
                         ]
                     );
                 }
@@ -266,10 +272,31 @@ class FormularioController extends Controller
                         ],
                         [
                             'ip_address' => $ip,
-                            'extra_data' => json_encode([
+                            'extra_data' => [
                                 'top' => $extraData['top'] ?? null,
                                 'bottom' => $extraData['bottom'] ?? null
-                            ])
+                            ]
+                        ]
+                    );
+                }
+            }
+            //NEGO - respuesta con comentarios en cuadrantes
+            elseif (is_array($respuesta_data) && array_key_exists('nego', $respuesta_data)) {
+                $answerId = $respuesta_data['nego']['answer_id'] ?? null;
+                $comentarios = $respuesta_data['nego']['comentarios'] ?? [];
+
+                if ($answerId) {
+                    Respuesta_Usuario::updateOrCreate(
+                        [
+                            'user_id' => $user_id,
+                            'question_id' => $question_id,
+                        ],
+                        [
+                            'answer_id' => $answerId,
+                            'ip_address' => $ip,
+                            'extra_data' => [
+                                'comentarios' => $comentarios,
+                            ]
                         ]
                     );
                 }
@@ -286,7 +313,7 @@ class FormularioController extends Controller
                             ],
                             [
                                 'ip_address'  => $ip,
-                                'extra_data'  => json_encode(['comparison' => $comparison])
+                                'extra_data'  => ['comparison' => $comparison]
                             ]
                         );
                     }
@@ -315,10 +342,10 @@ class FormularioController extends Controller
                                 'question_id' => $question_id,
                                 'answer_id' => $answer_id,
                                 'ip_address' => $ip,
-                                'extra_data' => json_encode([
+                                'extra_data' => [
                                     'bloque' => $bloque,
                                     'tipo' => $tipo
-                                ])
+                                ]
                             ]);
                         }
                     }
@@ -362,16 +389,10 @@ class FormularioController extends Controller
                 ->whereNull('token_id')
                 ->update(['token_id' => $tokenEv->id]);
 
-            #Obtener imágenes del usuario que no tienen un token asociado
-            $imagenes = ImagenUsuario::where('user_id', $user_id)
+            #Obtener imágenes del usuario que no tienen un token asociado y asignar token en bulk
+            ImagenUsuario::where('user_id', $user_id)
                 ->whereNull('token_id')
-                ->get();
-
-            #a todas esas imagenes se les añade el id del token generado
-            foreach ($imagenes as $imagen) {
-                $imagen->token_id = $tokenEv->id;
-                $imagen->save();
-            }
+                ->update(['token_id' => $tokenEv->id]);
 
             //Buscar o crear el registro del candidato
             $record = UserTestRecord::firstOrNew([

@@ -14,7 +14,7 @@ class AdminController extends Controller
     {
         $user = Auth::user();
 
-        $companyId = $user->config->Company->id;
+        $companyId = $user->config->company->id;
 
         $subareas = SubArea::with('areas')
             ->withCount(['positionPosts' => function ($query) use ($companyId) {

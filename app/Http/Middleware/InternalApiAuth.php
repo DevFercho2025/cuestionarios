@@ -20,9 +20,9 @@ class InternalApiAuth
             ], 401);
         }
 
-        $consumer = ApiInternalConsumer::where('secret', $provided)
-            ->where('is_active', true)
-            ->first();
+        $consumer = ApiInternalConsumer::where('is_active', true)
+            ->get()
+            ->first(fn($c) => hash_equals($c->secret, $provided));
 
         if (!$consumer) {
             return response()->json([

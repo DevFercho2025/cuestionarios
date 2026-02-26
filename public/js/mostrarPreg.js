@@ -268,6 +268,36 @@ function manejarCambioRespuesta(event) {
             });
 
             avanzar = todosMarcados;
+        } else if (tipo === 'nego') {
+            // Guardar la respuesta seleccionada (radio)
+            const negoAnswerName = `respuestas[${preguntaId}][nego][answer_id]`;
+            let existingAnswer = container.querySelector(`input[name="${negoAnswerName}"]`);
+            if (existingAnswer) {
+                existingAnswer.value = respuestaId;
+            } else {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = negoAnswerName;
+                hiddenInput.value = respuestaId;
+                container.appendChild(hiddenInput);
+            }
+
+            // Recolectar todos los comentarios de los textareas NEGO de esta pregunta
+            container.querySelectorAll(`input[name^="respuestas[${preguntaId}][nego][comentarios]"]`).forEach(el => el.remove());
+            const comentarios = document.querySelectorAll(`.nego-comentario[data-pregunta-id="${preguntaId}"]`);
+            comentarios.forEach(textarea => {
+                const rId = textarea.dataset.respuestaId;
+                const texto = textarea.value.trim();
+                if (texto) {
+                    const hiddenComentario = document.createElement('input');
+                    hiddenComentario.type = 'hidden';
+                    hiddenComentario.name = `respuestas[${preguntaId}][nego][comentarios][${rId}]`;
+                    hiddenComentario.value = texto;
+                    container.appendChild(hiddenComentario);
+                }
+            });
+
+            avanzar = true;
         } else {
             const hiddenName = `respuestas[${preguntaId}]`;
             let existing = container.querySelector(`input[name="${hiddenName}"]`);

@@ -44,7 +44,7 @@ class EmpresaRegistrada extends Mailable
      */
     public function content(): Content
     {
-        $availableTests = $this->companyUser->TestCounter()->first()->available_tests ;
+        $availableTests = $this->companyUser->TestCounter?->available_tests ?? 0;
 
         return new Content(
             view: 'emails.empresa_registrada',

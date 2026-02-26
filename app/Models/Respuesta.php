@@ -15,7 +15,11 @@ class Respuesta extends Model
     protected $table = "psico_alobri_answers"; 
     protected $fillable = ["answer", "option", "question_id", "is_correct","extra_data"];
 
-    public $timestamps = true; 
+    public $timestamps = true;
+
+    protected $casts = [
+        'extra_data' => 'json',
+    ];
 
     public function pregunta()
     {
@@ -27,7 +31,7 @@ class Respuesta extends Model
         parent::boot();
 
         static::forceDeleted(function ($respuesta) {
-            $extraData = json_decode($respuesta->extra_data, true);
+            $extraData = $respuesta->extra_data;
 
             if (!empty($extraData['file_path']) && Storage::disk('public')->exists($extraData['file_path'])) {
                 Storage::disk('public')->delete($extraData['file_path']);
@@ -35,7 +39,7 @@ class Respuesta extends Model
         });
 
         static::deleting(function ($respuesta) {
-            $extraData = json_decode($respuesta->extra_data, true);
+            $extraData = $respuesta->extra_data;
 
             if (!empty($extraData['file_path']) && Storage::disk('public')->exists($extraData['file_path'])) {
                 Storage::disk('public')->delete($extraData['file_path']);

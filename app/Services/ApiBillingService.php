@@ -24,12 +24,14 @@ class ApiBillingService
         }
 
         if ($client->isToken()) {
-            $totalCost = ApiTestTokenCost::whereIn('test_id', $testIds)->sum('token_cost');
+            $configuredCost = ApiTestTokenCost::whereIn('test_id', $testIds)->sum('token_cost');
+            $unconfiguredCount = count($testIds) - ApiTestTokenCost::whereIn('test_id', $testIds)->count();
+            $totalCost = $configuredCost + $unconfiguredCount; // unconfigured = 1 each, matching consumeQuota
             return $billing->token_balance >= $totalCost;
         }
 
         if ($client->isSubscription()) {
-            if (now()->greaterThan($billing->subscription_ends_at)) {
+            if (!$billing->subscription_ends_at || now()->greaterThan($billing->subscription_ends_at)) {
                 return false;
             }
             return ($billing->subscription_evals_used + count($testIds)) <= $billing->subscription_eval_limit;
@@ -53,6 +55,9 @@ class ApiBillingService
             if ($client->isToken()) {
                 foreach ($testIds as $testId) {
                     $cost = ApiTestTokenCost::where('test_id', $testId)->value('token_cost') ?? 1;
+                    if ($billing->token_balance < $cost) {
+                        throw new \RuntimeException('Insufficient token balance after lock.');
+                    }
                     $billing->token_balance -= $cost;
                     $this->logUsage($client, 'evaluation_assigned', $cost, $testId, $candidateUserId, $accessCodeId, $ipAddress);
                 }

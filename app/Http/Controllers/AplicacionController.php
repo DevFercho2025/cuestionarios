@@ -29,7 +29,7 @@ class AplicacionController extends Controller
                 'user',
                 'company',
                 'assignedTests.companyUser',
-            ])->get();
+            ])->where('company_id', $companyId)->get();
         }
 
         $data = $codes->map(function ($code) use ($isSuperAdmin) {
@@ -65,7 +65,7 @@ class AplicacionController extends Controller
             'codigo' => 'required|string|max:255',
         ]);
 
-        $accessCode = AccessCode::create($request->all());
+        $accessCode = AccessCode::create($request->only(['user_id', 'vacancy', 'code', 'camera', 'location']));
 
         return response()->json([
             'message' => 'Aplicación creada correctamente.',
@@ -102,7 +102,14 @@ class AplicacionController extends Controller
     // Eliminar aplicación
     public function destroy($id)
     {
-        $code = AccessCode::findOrFail($id);
+        $companyId = Auth::user()->config->company_id;
+        $isSuperAdmin = Auth::user()->config->role->isSuperAdmin() ?? false;
+
+        $query = AccessCode::where('id', $id);
+        if (!$isSuperAdmin) {
+            $query->where('company_id', $companyId);
+        }
+        $code = $query->firstOrFail();
         $code->delete();
 
         return response()->json([
@@ -112,7 +119,7 @@ class AplicacionController extends Controller
 
     public function usuarios()
     {
-        $usuarios = User::select('id', 'nombre')->get();
+        $usuarios = User::select('id', 'name')->get();
         return response()->json($usuarios);
     }
 

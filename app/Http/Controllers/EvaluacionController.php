@@ -63,19 +63,20 @@ class EvaluacionController extends Controller
         $hace6Meses = Carbon::now()->subMonths(6);
         $testsRecientes = [];
 
-        foreach ($pruebas as $testId) {
-            $registroReciente = UserTestRecord::where('user_id', $userId)
-                ->where('test_id', $testId)
-                ->whereNotNull('finished_at')
-                ->where('finished_at', '>=', $hace6Meses)
-                ->first();
+        // Pre-load all tests to avoid N+1
+        $testsMap = Test::whereIn('id', $pruebas)->pluck('test_title', 'id');
 
-            if ($registroReciente) {
-                $testsRecientes[] = [
-                    'test_title' => Test::find($testId)->test_title,
-                    'finished_at' => $registroReciente->finished_at->toDateTimeString(),
-                ];
-            }
+        $registrosRecientes = UserTestRecord::where('user_id', $userId)
+            ->whereIn('test_id', $pruebas)
+            ->whereNotNull('finished_at')
+            ->where('finished_at', '>=', $hace6Meses)
+            ->get();
+
+        foreach ($registrosRecientes as $registro) {
+            $testsRecientes[] = [
+                'test_title' => $testsMap[$registro->test_id] ?? 'Desconocido',
+                'finished_at' => $registro->finished_at->toDateTimeString(),
+            ];
         }
 
         if (count($testsRecientes) > 0) {
@@ -101,6 +102,20 @@ class EvaluacionController extends Controller
         ]);
 
         try {
+            // Cross-tenant: verify candidate belongs to same company
+            $companyId = Auth::user()->config->company_id;
+            $isSuperAdmin = Auth::user()->config->role->isSuperAdmin() ?? false;
+
+            if (!$isSuperAdmin) {
+                $candidateBelongs = User::where('id', $request->user_id)
+                    ->whereHas('config', fn($q) => $q->where('company_id', $companyId))
+                    ->exists();
+
+                if (!$candidateBelongs) {
+                    return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+                }
+            }
+
             $asignadorId = Auth::id();  // usuario que asigna las evaluaciones
 
             $contador = ContadorEvaluacion::where('user_id', $asignadorId)->first();
@@ -228,6 +243,20 @@ class EvaluacionController extends Controller
             'tests' => 'required|array',
             'tests.*' => 'exists:psico_alobri_tests,id',
         ]);
+
+        // Cross-tenant: verify candidate belongs to same company
+        $companyId = Auth::user()->config->company_id;
+        $isSuperAdmin = Auth::user()->config->role->isSuperAdmin() ?? false;
+
+        if (!$isSuperAdmin) {
+            $candidateBelongs = User::where('id', $request->user_id)
+                ->whereHas('config', fn($q) => $q->where('company_id', $companyId))
+                ->exists();
+
+            if (!$candidateBelongs) {
+                return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+            }
+        }
 
         UserAssignedTest::where('user_id', $request->user_id)
             ->whereIn('test_id', $request->tests)

@@ -34,7 +34,7 @@ class ConfigUser extends Model
         return $this->is_talentina_user;
     }
 
-    public function isPsicoSer(){
-        return $this->is_psico_ser;
+    public function isPiscoUser(){
+        return $this->is_pisco_user;
     }
 }

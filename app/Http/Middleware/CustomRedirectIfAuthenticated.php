@@ -18,7 +18,7 @@ class CustomRedirectIfAuthenticated
                 $user = Auth::user();
 
                 // Lógica personalizada para psicometrías
-                if ($user->config && $user->config->is_psico_user && $user->config->active) {
+                if ($user->config && $user->config->is_pisco_user && $user->config->active) {
                     return redirect('/psicometricas/admin');
                 }
 

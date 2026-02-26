@@ -31,7 +31,7 @@ class EvaluacionesAsignadas extends Mailable
             subject: 'Evaluaciones Asignadas',
             //from global en config mail.php
             replyTo: [
-                new Address('Asignador@example.com', 'Asignador'),
+                new Address(config('mail.from.address', 'noreply@psicometrias.com'), config('mail.from.name', 'Psicometrías')),
             ],
         );
     }
@@ -46,7 +46,7 @@ class EvaluacionesAsignadas extends Mailable
                 'candidateName' => $this->candidate->name,
                 'assignedTests' => $assignedTests,
                 'testsCount' => $assignedTests->count(),
-                'company' => $this->code->company->name,
+                'company' => $this->code->company?->name ?? '',
                 'code' => $this->code,
                 'logoPath' => public_path('assets/img/Alobri/Alobri-light.png'),
                 'loginURL' => $this->loginURL,

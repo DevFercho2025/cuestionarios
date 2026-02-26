@@ -27,7 +27,7 @@ class UserTestRecord extends Model
 
     public function previouslyDonetest()
     {
-        return $this->belongsTo(Test::class);
+        return $this->belongsTo(Test::class, 'test_id');
     }
 
     public static function userCompletedSections($userId)
@@ -41,6 +41,6 @@ class UserTestRecord extends Model
 
     public function token()
     {
-        return $this->belongsTo(TokenEvaluacion::class);
+        return $this->belongsTo(TokenEvaluacion::class, 'token_id');
     }
 }

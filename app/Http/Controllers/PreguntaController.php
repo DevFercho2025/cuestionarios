@@ -137,7 +137,7 @@ class PreguntaController extends Controller
             $data = $request->validate([
                 'question'    => 'required|string',
                 'test_id'     => 'required|exists:psico_alobri_tests,id',
-                'section_id'  => 'required|exists:psico_alobri_secciones,id',
+                'section_id'  => 'required|exists:psico_alobri_sections,id',
             ]);
 
             $pregunta->update($data);

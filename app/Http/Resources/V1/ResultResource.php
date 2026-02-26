@@ -24,6 +24,7 @@ class ResultResource extends JsonResource
                     'test_id' => $at->test_id,
                     'test_title' => $at->test?->test_title,
                 ]) : [],
+            'scores' => $this->resource['scores'] ?? [],
         ];
     }
 }

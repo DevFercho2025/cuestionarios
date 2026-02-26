@@ -95,13 +95,9 @@ class AuthController extends Controller
             'used_tests'     => 0,
         ]);
 
-        //prueba para ver correo tras crear empresa
-        return $this->correoEmpresaCreada($user->id, $company);
+        auth()->login($user);
 
-        // Finalmente, loguea al usuario o rediríge
-        //auth()->login($user);
-
-        //return redirect()->route('admin.index');
+        return redirect()->route('admin.index');
     }
 
     
@@ -146,7 +142,8 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'Las credenciales no coinciden con nuestros registros.']);
         }
         // 2) Intento de autenticación
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
 
             $user   = Auth::user();
             $config = $user->config;

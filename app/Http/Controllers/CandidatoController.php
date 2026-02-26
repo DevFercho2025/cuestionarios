@@ -19,7 +19,7 @@ class CandidatoController extends Controller
     { 
         $conVacante = filter_var($request->input('conVacante', 0), FILTER_VALIDATE_BOOLEAN);
 
-        $companyId = Auth::user()->config->Company->id;
+        $companyId = Auth::user()->config->company->id;
         $positions = Position::with('post')->where('company_id', $companyId)->get();
         return view('candidatos.index', compact('conVacante', 'positions'));
     }
@@ -94,13 +94,15 @@ class CandidatoController extends Controller
         $validator = Validator::make($request->all(), [
             'firstname'     => 'required|string',
             'lastname'      => 'required|string',
+            'email'         => 'required|email',
             'nacimiento'    => 'required|date',
             'genero_legal'  => 'nullable|string',
             'codigo_postal' => 'nullable|string|max:10',
             'telefono'      => 'required|string|max:15',
             'pais'          => 'required|string',
         ], [
-            'email.unique' => 'Este email ya está registrado para este candidato en la misma empresa.',
+            'email.required' => 'El email es obligatorio.',
+            'email.email' => 'El email debe ser una dirección válida.',
         ]);
 
         if ($validator->fails()) {
@@ -157,27 +159,44 @@ class CandidatoController extends Controller
     }
 
     public function show($id)
-{
-    $candidato = User::whereHas('config.role', function ($query) {
-        $query->where(function ($subQuery) {
-            $subQuery->where('id', '!=', 1) //Excluye admins
-                ->where('id', '!=', 2); //Excluye superadmins
-        });
-    })->findOrFail($id);
+    {
+        $companyId = Auth::user()->config->company_id;
+        $isSuperAdmin = Auth::user()->config->role->isSuperAdmin() ?? false;
 
-    return response()->json($candidato);
-}
+        $query = User::whereHas('config.role', function ($query) {
+            $query->where(function ($subQuery) {
+                $subQuery->where('id', '!=', 1)
+                    ->where('id', '!=', 2);
+            });
+        });
+
+        if (!$isSuperAdmin) {
+            $query->whereHas('config', fn($q) => $q->where('company_id', $companyId));
+        }
+
+        $candidato = $query->findOrFail($id);
+
+        return response()->json($candidato);
+    }
 
     public function update(Request $request, $id)
     {
         try {
-            // Obtener el candidato (User) por ID
-            $candidato = User::whereHas('config.role', function ($query) {
+            $companyId = Auth::user()->config->company_id;
+            $isSuperAdmin = Auth::user()->config->role->isSuperAdmin() ?? false;
+
+            $query = User::whereHas('config.role', function ($query) {
                 $query->where(function ($subQuery) {
-                    $subQuery->where('id', '!=', 1) //Excluye admins
-                        ->where('id', '!=', 2); //Excluye superadmins
+                    $subQuery->where('id', '!=', 1)
+                        ->where('id', '!=', 2);
                 });
-            })->findOrFail($id);
+            });
+
+            if (!$isSuperAdmin) {
+                $query->whereHas('config', fn($q) => $q->where('company_id', $companyId));
+            }
+
+            $candidato = $query->findOrFail($id);
 
             // Validación de los datos de User (nombre, email)
             $validatedUser = $request->validate([
@@ -225,13 +244,22 @@ class CandidatoController extends Controller
     public function destroy($id)
     {
         try {
+            $companyId = Auth::user()->config->company_id;
+            $isSuperAdmin = Auth::user()->config->role->isSuperAdmin() ?? false;
+
             // Obtener el candidato (User) por ID, asegurándose de que no sea admin
-            $candidato = User::whereHas('config.role', function ($query) {
+            $query = User::whereHas('config.role', function ($query) {
                 $query->where(function ($subQuery) {
                     $subQuery->where('id', '!=', 1) //Excluye admins
                         ->where('id', '!=', 2); //Excluye superadmins
                 });
-            })->findOrFail($id);
+            });
+
+            if (!$isSuperAdmin) {
+                $query->whereHas('config', fn($q) => $q->where('company_id', $companyId));
+            }
+
+            $candidato = $query->findOrFail($id);
     
             // Eliminar la información del candidato (UserInfo)
             $candidato->info()->delete(); 
@@ -306,13 +334,20 @@ class CandidatoController extends Controller
     }
 
     public function verPerfil($id){
+        $companyId = Auth::user()->config->company_id;
+        $isSuperAdmin = Auth::user()->config->role->isSuperAdmin() ?? false;
 
-        $candidato = User::with(['info', 'config.company', 'config.role', 'userTestsAcessCode'])
-        ->whereHas('config.role', function ($query) {
-            $query->where('id', 0); 
-        })
-        ->findOrFail($id);
+        $query = User::with(['info', 'config.company', 'config.role', 'userTestsAcessCodes'])
+            ->whereHas('config.role', function ($query) {
+                $query->where('id', 0);
+            });
 
-    return view('candidatos.perfil', compact('candidato'));
+        if (!$isSuperAdmin) {
+            $query->whereHas('config', fn($q) => $q->where('company_id', $companyId));
+        }
+
+        $candidato = $query->findOrFail($id);
+
+        return view('candidatos.perfil', compact('candidato'));
     }
 }

@@ -13,7 +13,7 @@ class IsSuperAdmin
         $user = Auth::user();
 
         // Verificamos si el usuario está autenticado y si es superadmin
-        if ($user && $user->config && $user->config->role->isSuperAdmin()) {
+        if ($user && $user->config && $user->config->role && $user->config->role->isSuperAdmin()) {
             return $next($request); // Si es superadmin, permite continuar con la petición
         }
 
