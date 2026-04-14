@@ -1,18 +1,196 @@
 @extends('layout.app')
 @section('content')
-    <!-- Loader para procesamiento -->
-    <div id="registration-loader"
-         style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
-        <div class="spinner-border text-primary" role="status"></div>
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}">
+    <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
+
+    <style>
+        .reg-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0d1a 0%, #1a1530 40%, #0d1a2d 100%);
+            display: flex; align-items: center; justify-content: center;
+            padding: 2rem 1rem;
+            position: relative; overflow: hidden;
+        }
+        .reg-page::before {
+            content: ''; position: absolute;
+            top: -20%; right: -10%; width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(99,102,241,0.12), transparent 70%);
+            border-radius: 50%;
+        }
+        .reg-page::after {
+            content: ''; position: absolute;
+            bottom: -15%; left: -5%; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%);
+            border-radius: 50%;
+        }
+        .reg-card {
+            position: relative; z-index: 1;
+            background: rgba(255,255,255,0.97);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.04);
+            max-width: 1100px; width: 100%;
+            overflow: hidden;
+        }
+        .reg-logo {
+            text-align: center; padding: 2rem 2rem 0;
+        }
+        .reg-logo img { height: 34px; }
+
+        /* Stepper overrides */
+        #wizard-registro .bs-stepper-header {
+            background: #f8f9fc !important;
+            border-right: 1px solid #eef0f6 !important;
+            padding: 2rem 1.5rem !important;
+            border-radius: 0 !important;
+        }
+        #wizard-registro .bs-stepper-circle {
+            width: 40px !important; height: 40px !important;
+            background: #e8eaf0 !important; color: #6b7280 !important;
+            border: none !important;
+            font-size: 1rem !important;
+        }
+        #wizard-registro .step.active .bs-stepper-circle {
+            background: linear-gradient(135deg, #6366f1, #7c3aed) !important;
+            color: #fff !important;
+            box-shadow: 0 4px 14px rgba(99,102,241,0.3) !important;
+        }
+        #wizard-registro .bs-stepper-title {
+            font-weight: 600 !important; font-size: 0.9rem !important;
+            color: #374151 !important;
+        }
+        #wizard-registro .bs-stepper-subtitle {
+            font-size: 0.78rem !important; color: #9ca3af !important;
+        }
+        #wizard-registro .step.active .bs-stepper-title { color: #1f2937 !important; }
+        #wizard-registro .line {
+            background: #e5e7eb !important; min-height: 1px !important;
+        }
+        #wizard-registro .bs-stepper-content {
+            padding: 2.5rem !important;
+        }
+        #wizard-registro .bs-stepper-content h3 {
+            font-size: 1.5rem !important; font-weight: 700 !important;
+            color: #111827 !important; letter-spacing: -0.02em !important;
+        }
+        #wizard-registro .bs-stepper-content p {
+            color: #6b7280 !important;
+        }
+
+        /* Form controls */
+        #wizard-registro .form-control,
+        #wizard-registro .form-select {
+            border-radius: 10px !important; border: 1.5px solid #e5e7eb !important;
+            padding: 10px 14px !important; font-size: 0.9rem !important;
+            transition: border-color 0.2s, box-shadow 0.2s !important;
+        }
+        #wizard-registro .form-control:focus,
+        #wizard-registro .form-select:focus {
+            border-color: #818cf8 !important;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;
+        }
+
+        /* Custom option cards */
+        #wizard-registro .custom-option-content {
+            border-radius: 14px !important;
+            border: 1.5px solid #e5e7eb !important;
+            padding: 1.2rem !important;
+            transition: all 0.25s !important;
+            cursor: pointer !important;
+        }
+        #wizard-registro .custom-option-content:hover {
+            border-color: #c7d2fe !important;
+            background: #fafafe !important;
+        }
+        #wizard-registro .form-check-input:checked ~ .custom-option-content,
+        #wizard-registro .custom-option-content:has(input:checked) {
+            border-color: #6366f1 !important;
+            background: rgba(99,102,241,0.04) !important;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.08) !important;
+        }
+        #wizard-registro .custom-option-title {
+            font-weight: 600 !important; color: #1f2937 !important;
+        }
+
+        /* Buttons */
+        #wizard-registro .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #7c3aed) !important;
+            border: none !important; border-radius: 10px !important;
+            padding: 10px 24px !important; font-weight: 600 !important;
+            box-shadow: 0 2px 10px rgba(99,102,241,0.2) !important;
+            transition: all 0.25s !important;
+        }
+        #wizard-registro .btn-primary:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 16px rgba(99,102,241,0.3) !important;
+        }
+        #wizard-registro .btn-outline-secondary {
+            border-radius: 10px !important; padding: 10px 24px !important;
+            font-weight: 600 !important;
+        }
+        #wizard-registro .btn-success {
+            background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+            border: none !important; border-radius: 10px !important;
+            padding: 12px 28px !important; font-weight: 600 !important;
+            box-shadow: 0 2px 10px rgba(34,197,94,0.2) !important;
+        }
+
+        /* Progress bar */
+        #wizard-registro .progress { border-radius: 6px !important; }
+
+        /* Loader */
+        .reg-loader {
+            display: none; position: fixed; inset: 0;
+            background: rgba(10,10,18,0.6); backdrop-filter: blur(4px);
+            z-index: 9999; justify-content: center; align-items: center;
+        }
+        .reg-loader .spinner-border {
+            width: 3rem; height: 3rem; color: #818cf8;
+        }
+
+        /* Back to home link */
+        .reg-back {
+            position: absolute; top: 24px; left: 24px; z-index: 10;
+            display: flex; align-items: center; gap: 6px;
+            color: rgba(255,255,255,0.5); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500;
+            transition: color 0.2s;
+        }
+        .reg-back:hover { color: rgba(255,255,255,0.8); }
+
+        @media (max-width: 768px) {
+            .reg-page { padding: 1rem 0.5rem; }
+            .reg-card { border-radius: 16px; }
+            #wizard-registro.bs-stepper.vertical {
+                flex-direction: column !important;
+            }
+            #wizard-registro .bs-stepper-header {
+                border-right: none !important;
+                border-bottom: 1px solid #eef0f6 !important;
+                flex-direction: row !important;
+                overflow-x: auto !important;
+                padding: 1rem !important;
+            }
+            #wizard-registro .bs-stepper-content {
+                padding: 1.5rem !important;
+            }
+        }
+    </style>
+
+    <!-- Loader -->
+    <div id="registration-loader" class="reg-loader">
+        <div class="spinner-border" role="status"></div>
     </div>
 
-    <!-- Layout container -->
-    <div class="layout-wrapper layout-content-navbar">
-        <div class="layout-container">
-            <!-- Content wrapper -->
-            <div class="content-wrapper">
-                <!-- Content -->
-                <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="reg-page">
+        <a href="{{ route('home.index') }}" class="reg-back">
+            <i class="ri-arrow-left-line"></i> Volver al inicio
+        </a>
+        <div class="reg-card">
+            <div class="reg-logo">
+                <a href="{{ route('home.index') }}">
+                    <img src="{{ asset('assets/img/Alobri/Alobri-light.png') }}" alt="Alobri">
+                </a>
+            </div>
                     <!-- Wizard de Registro -->
                     <div id="wizard-registro" class="bs-stepper vertical mt-2">
                         <div class="bs-stepper-header gap-lg-3 border-end">
@@ -911,14 +1089,8 @@
                         </div>
                     </div>
                     <!-- / Wizard de Registro -->
-                </div>
-                <!-- / Content -->
-            </div>
-            <!-- Content wrapper -->
-        </div>
-        <!-- / Layout page -->
-    </div>
-    <!-- / Layout wrapper -->
+        </div><!-- /reg-card -->
+    </div><!-- /reg-page -->
 
     <!-- Resumen de registro (modal) -->
     <div class="modal fade" id="registration-summary-modal" tabindex="-1" aria-hidden="true">
